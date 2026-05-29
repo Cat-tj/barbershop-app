@@ -31,7 +31,8 @@ export default function LoginPage() {
       const data = await res.json()
 
       // Set session cookie client-side (non-httpOnly for middleware detection)
-      document.cookie = `session=${data.token}; path=/; max-age=${12 * 60 * 60}; SameSite=Lax`
+      const isSecure = location.protocol === 'https:'
+      document.cookie = `session=${data.token}; path=/; max-age=${12 * 60 * 60}; SameSite=Lax${isSecure ? '; Secure' : ''}`
 
       router.push('/')
     } catch {

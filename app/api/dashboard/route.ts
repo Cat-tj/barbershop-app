@@ -120,6 +120,78 @@ export async function GET(_request: NextRequest) {
       }
     }
 
+    // --- Top products ---
+    let top_products: { name: string; qty: number; revenue: number }[] = []
+
+    if (orderIds.length > 0) {
+      const { data: productItems } = await supabase
+        .from('order_items')
+        .select(`
+          product_id,
+          price,
+          qty,
+          products!inner(name)
+        `)
+        .eq('item_type', 'product')
+        .in('order_id', orderIds)
+
+      if (productItems) {
+        const prodAgg = new Map<string, { name: string; qty: number; revenue: number }>()
+        for (const item of productItems) {
+          const prodData = item.products as unknown as { name: string } | null
+          const prodName = prodData?.name || 'Unknown'
+          const existing = prodAgg.get(prodName)
+          if (existing) {
+            existing.qty += item.qty || 1
+            existing.revenue += (item.price || 0) * (item.qty || 1)
+          } else {
+            prodAgg.set(prodName, {
+              name: prodName,
+              qty: item.qty || 1,
+              revenue: (item.price || 0) * (item.qty || 1),
+            })
+          }
+        }
+        top_products = Array.from(prodAgg.values())
+          .sort((a, b) => b.qty - a.qty)
+          .slice(0, 5)
+      }
+    }
+
+    // --- Revenue last 7 days ---
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+    const rangeStart = sevenDaysAgo.toISOString().split('T')[0] + 'T00:00:00Z'
+
+    const { data: weekOrders } = await supabase
+      .from('orders')
+      .select('total, created_at')
+      .eq('status', 'completed')
+      .gte('created_at', rangeStart)
+      .lte('created_at', todayEnd)
+
+    const revenueByDate = new Map<string, number>()
+    // Initialize all 7 days with 0
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      revenueByDate.set(d.toISOString().split('T')[0], 0)
+    }
+
+    if (weekOrders) {
+      for (const o of weekOrders) {
+        const dateKey = o.created_at ? new Date(o.created_at).toISOString().split('T')[0] : null
+        if (dateKey && revenueByDate.has(dateKey)) {
+          revenueByDate.set(dateKey, (revenueByDate.get(dateKey) || 0) + (o.total || 0))
+        }
+      }
+    }
+
+    const revenue_last_7_days = Array.from(revenueByDate.entries()).map(([date, revenue]) => ({
+      date,
+      revenue,
+    }))
+
     // --- Low stock ---
     const { data: products, error: stockErr } = await supabase
       .from('products')
@@ -192,9 +264,11 @@ export async function GET(_request: NextRequest) {
         bookings: bookingsCount ?? 0,
       },
       top_services,
+      top_products,
       top_capsters,
       low_stock,
       recent_orders,
+      revenue_last_7_days,
     })
   } catch (err) {
     console.error('Dashboard API error:', err)

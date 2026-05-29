@@ -28,7 +28,7 @@ function getSessionFromCookie(): UserSession | null {
   return parseJwtPayload(decodeURIComponent(match[1]))
 }
 
-const PUBLIC_PATHS = ['/booking', '/login', '/catalog']
+const PUBLIC_PATHS = ['/booking', '/login', '/catalog', '/register']
 const ADMIN_PATHS = ['/dashboard', '/store', '/purchases', '/admin', '/calendar']
 
 const MAIN_TABS = [
@@ -55,10 +55,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // Initial mount: set mounted flag
   useEffect(() => {
     setMounted(true)
-    setSession(getSessionFromCookie())
   }, [])
+
+  // Re-read cookie when active (picks up newly set cookie after login)
+  useEffect(() => {
+    if (!mounted) return
+    setSession(getSessionFromCookie())
+  }, [mounted, pathname])
 
   const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
   const isLoginPage = pathname === '/login'
@@ -127,7 +133,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto pb-16">
+        <div className="max-w-screen-xl mx-auto h-full flex flex-col">
         {children}
+        </div>
       </main>
 
       {/* Bottom Tab Navigation */}

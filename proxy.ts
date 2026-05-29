@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'romebois-secret-key-change-in-production'
 )
 
-const PUBLIC_ROUTES = ['/booking', '/login', '/catalog']
+const PUBLIC_ROUTES = ['/booking', '/login', '/catalog', '/register']
 const ADMIN_ROUTES = ['/admin', '/store', '/calendar', '/dashboard']
 const USER_ROUTES = ['/purchases']
 

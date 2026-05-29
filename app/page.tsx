@@ -362,7 +362,13 @@ export default function POSPage() {
         .select("*")
         .eq("phone", phone)
         .maybeSingle();
-      setDetectedMember(data ?? null);
+      if (data) {
+        setDetectedMember(data);
+        // Auto-fill customer name if field is empty
+        setCustomerName((prev) => (prev.trim() === "" ? data.name : prev));
+      } else {
+        setDetectedMember(null);
+      }
     }, 500);
     return () => clearTimeout(timeout);
   }, [customerPhone]);
@@ -519,244 +525,439 @@ export default function POSPage() {
     );
   }
 
-  /* ---- render ---------------------------------------------------- */
-  return (
-    <div className="flex flex-col h-full relative">
-      {/* Out of stock banner */}
-      {outOfStockBanner && (
-        <div className="mx-3 mt-2 px-3 py-2 rounded-lg bg-red-900/30 border border-red-700/50 text-red-300 text-xs flex items-center justify-between">
-          <span>{outOfStockBanner}</span>
+  /* ---- shared cart content renderer ------------------------------- */
+  const renderCartContent = (isDesktop: boolean) => (
+    <>
+      {/* Cart header */}
+      <div className="flex-shrink-0 px-4 py-2 flex items-center justify-between border-b border-zinc-800">
+        <h2 className="text-sm font-semibold text-zinc-200">
+          Cart &middot; {cart.length} item{cart.length !== 1 ? "s" : ""}
+        </h2>
+        {cart.length > 0 && (
           <button
-            onClick={() => setOutOfStockBanner(null)}
-            className="text-zinc-400 hover:text-zinc-200 ml-2"
+            onClick={() => setCart([])}
+            className="text-xs text-zinc-500 hover:text-red-400"
           >
-            &times;
-          </button>
-        </div>
-      )}
-
-      {/* Alert toast */}
-      {alert && (
-        <div
-          className={`mx-3 mt-2 px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between ${
-            alert.type === "success"
-              ? "bg-emerald-900/40 border border-emerald-700 text-emerald-300"
-              : "bg-red-900/40 border border-red-700 text-red-300"
-          }`}
-        >
-          <span>{alert.message}</span>
-          <button
-            onClick={() => setAlert(null)}
-            className="ml-3 text-zinc-400 hover:text-zinc-200 text-base leading-none"
-          >
-            &times;
-          </button>
-        </div>
-      )}
-
-      {/* Top bar: search + inventory alert */}
-      <div className="flex-shrink-0 px-3 py-2 flex items-center gap-2">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            placeholder={`Search ${activeTab}\u2026`}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
-          />
-        </div>
-        {/* Inventory alert badge */}
-        {lowStockItems.length > 0 && (
-          <button
-            onClick={() => setShowLowStock(!showLowStock)}
-            className="relative flex-shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold"
-          >
-            {"\u26A0\uFE0F"}
-            <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full bg-amber-500 text-zinc-950 text-[10px] font-bold">
-              {lowStockItems.length}
-            </span>
+            Clear
           </button>
         )}
       </div>
 
-      {/* Low stock dropdown */}
-      {showLowStock && lowStockItems.length > 0 && (
-        <div className="mx-3 mb-2 p-3 bg-zinc-900 border border-zinc-800 rounded-lg">
-          <p className="text-xs text-zinc-400 mb-2">
-            Low Stock Items:
-          </p>
-          <div className="space-y-1.5">
-            {lowStockItems.map((item) => (
+      {/* Cart items */}
+      <div className="flex-1 overflow-y-auto">
+        {cart.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-zinc-600 gap-2">
+            <span className="text-2xl">{"\u{1F6D2}"}</span>
+            <p className="text-sm">Cart is empty</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60">
+            {cart.map((ci) => (
               <div
-                key={item.id}
-                className="flex items-center justify-between text-xs"
+                key={ci.id}
+                className="px-4 py-3 flex items-center gap-2"
               >
-                <span className="text-zinc-300 truncate mr-2">
-                  {item.name}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-zinc-200 truncate">
+                    {ci.name}
+                  </p>
+                  <p className="text-[10px] text-zinc-500">
+                    {formatRp(ci.price)} &times; {ci.qty}
+                  </p>
+                  {ci.itemType === "service" && (
+                    <select
+                      value={ci.capsterId ?? ""}
+                      onChange={(e) =>
+                        setItemCapster(ci.id, Number(e.target.value))
+                      }
+                      className="mt-1 px-2 py-1 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-300 focus:outline-none focus:border-amber-500/50"
+                    >
+                      <option value="">No capster</option>
+                      {capsters.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {detectedMember &&
+                    ci.itemType === "service" &&
+                    detectedMember.total_points >= 50 && (
+                      <p className="text-[10px] text-amber-500/70 mt-0.5">
+                        {"\u{1F504}"} Redeem {Math.min(50, detectedMember.total_points)} pts available
+                      </p>
+                    )}
+                </div>
+
+                {/* Qty controls */}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button
+                    onClick={() => updateQty(ci.id, -1)}
+                    className="w-7 h-7 flex items-center justify-center rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs"
+                  >
+                    &minus;
+                  </button>
+                  <span className="w-6 text-center text-xs font-medium text-zinc-200">
+                    {ci.qty}
+                  </span>
+                  <button
+                    onClick={() => updateQty(ci.id, 1)}
+                    className="w-7 h-7 flex items-center justify-center rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Line total */}
+                <span className="w-20 text-right text-xs font-semibold text-zinc-200 flex-shrink-0">
+                  {formatRp(ci.price * ci.qty)}
                 </span>
-                <span
-                  className={`flex-shrink-0 font-semibold ${
-                    item.stock === 0 ? "text-red-400" : "text-amber-400"
-                  }`}
+
+                {/* Remove */}
+                <button
+                  onClick={() => removeItem(ci.id)}
+                  className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-900/40 text-zinc-500 hover:text-red-400 text-xs flex-shrink-0"
                 >
-                  {item.stock === 0 ? "Habis" : `Sisa ${item.stock}`}
-                </span>
+                  &times;
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Tab switcher + capster row */}
-      <div className="flex-shrink-0 px-3 flex items-center gap-2 mb-2">
-        <div className="flex bg-zinc-800 rounded-lg p-0.5 flex-1">
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              activeTab === "products"
-                ? "bg-zinc-700 text-amber-400"
-                : "text-zinc-500"
-            }`}
-          >
-            Products
-          </button>
-          <button
-            onClick={() => setActiveTab("services")}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              activeTab === "services"
-                ? "bg-zinc-700 text-amber-400"
-                : "text-zinc-500"
-            }`}
-          >
-            Services
-          </button>
-        </div>
-        {/* Capster picker (compact) */}
-        {activeTab === "services" && capsters.length > 0 && (
-          <select
-            value={selectedCapsterId ?? ""}
-            onChange={(e) =>
-              setSelectedCapsterId(
-                e.target.value ? Number(e.target.value) : null
-              )
-            }
-            className="flex-shrink-0 w-32 px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-300 focus:outline-none focus:border-amber-500/50"
-          >
-            <option value="">No capster</option>
-            {capsters.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
         )}
       </div>
 
-      {/* Category tabs (products only) */}
-      {activeTab === "products" && (
-        <div className="flex-shrink-0 px-3 mb-2 overflow-x-auto no-scrollbar">
-          <div className="flex gap-1.5">
-            {CATEGORIES.map((cat) => (
+      {/* Cart footer: customer, payment, submit */}
+      <div className="flex-shrink-0 border-t border-zinc-800 p-4 space-y-3">
+        {/* Customer info */}
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Customer name"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+          />
+          <input
+            type="text"
+            placeholder="Phone (08xxxx) — auto member"
+            value={customerPhone}
+            onChange={(e) => setCustomerPhone(e.target.value)}
+            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+          />
+          {detectedMember && (
+            <div className="px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+              <p className="text-xs text-amber-400 font-semibold">
+                {"\u{1F451}"} {detectedMember.name}
+              </p>
+              <p className="text-[10px] text-amber-500/70 mt-0.5">
+                {formatNumber(detectedMember.total_points)} pts &middot;{" "}
+                {detectedMember.visit_count} visits &middot; Tier{" "}
+                {detectedMember.tier_id}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Capster row (horizontal buttons) */}
+        <div>
+          <p className="text-[10px] text-zinc-500 mb-1">Capster</p>
+          <div className="flex gap-1.5 flex-wrap">
+            <button
+              onClick={() => setSelectedCapsterId(null)}
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
+                selectedCapsterId === null
+                  ? "bg-amber-500/20 border border-amber-500/30 text-amber-400"
+                  : "bg-zinc-800 border border-zinc-700 text-zinc-500"
+              }`}
+            >
+              None
+            </button>
+            {capsters.map((c) => (
               <button
-                key={cat.key}
-                onClick={() => setActiveCategory(cat.key)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  activeCategory === cat.key
-                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                    : "bg-zinc-800 text-zinc-400 border border-zinc-700"
+                key={c.id}
+                onClick={() => setSelectedCapsterId(c.id)}
+                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
+                  selectedCapsterId === c.id
+                    ? "bg-amber-500/20 border border-amber-500/30 text-amber-400"
+                    : "bg-zinc-800 border border-zinc-700 text-zinc-500"
                 }`}
               >
-                {cat.label}
+                {c.name}
               </button>
             ))}
           </div>
         </div>
-      )}
 
-      {/* Items area - scrollable */}
-      <div className="flex-1 overflow-y-auto px-3 pb-4">
-        {filtered.length === 0 && (
-          <p className="text-zinc-600 text-sm text-center py-12">
-            No {activeTab} found.
-          </p>
-        )}
-
-        {activeTab === "products" && filtered.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {filtered.map((item) => {
-              const product = item as Product;
-              const stockWarn = getStockWarning(product);
-              return (
-                <button
-                  key={`product-${item.id}`}
-                  onClick={() => addToCart(item, "product")}
-                  disabled={product.stock <= 0}
-                  className="text-left p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
-                >
-                  <p className="text-xs font-medium text-zinc-200 truncate">
-                    {item.name}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[10px] font-semibold text-amber-400">
-                      {formatRp(item.price)}
-                    </span>
-                    {stockWarn && (
-                      <span className={`text-[10px] ${stockWarn.color}`}>
-                        {stockWarn.text}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {activeTab === "services" && filtered.length > 0 && (
-          <div className="space-y-1.5">
-            {filtered.map((item) => (
+        {/* Payment method */}
+        <div>
+          <p className="text-[10px] text-zinc-500 mb-1">Payment</p>
+          <div className="flex gap-1.5">
+            {[
+              { value: "cash", label: "Cash" },
+              { value: "qris", label: "QRIS" },
+              { value: "debit", label: "Debit" },
+            ].map((m) => (
               <button
-                key={`service-${item.id}`}
-                onClick={() => addToCart(item, "service")}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 active:scale-[0.99] transition-all"
+                key={m.value}
+                onClick={() => setPaymentMethod(m.value)}
+                className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
+                  paymentMethod === m.value
+                    ? "bg-amber-500/20 border border-amber-500/40 text-amber-300"
+                    : "bg-zinc-800 border border-zinc-700 text-zinc-500"
+                }`}
               >
-                <div className="text-left min-w-0">
-                  <p className="text-xs font-medium text-zinc-200 truncate">
-                    {item.name}
-                  </p>
-                  {"duration" in item && item.duration && (
-                    <p className="text-[10px] text-zinc-500">
-                      {item.duration} min
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                  <span className="text-xs font-semibold text-amber-400">
-                    {formatRp(item.price)}
-                  </span>
-                  <span className="w-6 h-6 flex items-center justify-center rounded bg-amber-500/20 text-amber-400 text-xs font-bold">
-                    +
-                  </span>
-                </div>
+                {m.label}
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Discount */}
+        <div className="flex items-center gap-2">
+          <label className="text-[10px] text-zinc-500 flex-shrink-0">
+            Discount
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={subtotal}
+            value={discount || ""}
+            onChange={(e) =>
+              setDiscount(Math.max(0, Number(e.target.value) || 0))
+            }
+            className="flex-1 px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+          />
+        </div>
+
+        {/* Total */}
+        <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
+          <span className="text-xs font-semibold text-zinc-400">Total</span>
+          <span className="text-sm font-bold text-amber-400">
+            {formatRp(total)}
+          </span>
+        </div>
+
+        {/* Submit */}
+        <button
+          onClick={processOrder}
+          disabled={submitting || cart.length === 0}
+          className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold text-sm uppercase tracking-wider transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {submitting ? (
+            <>
+              <span className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+              Processing\u2026
+            </>
+          ) : (
+            "Process Order"
+          )}
+        </button>
+      </div>
+    </>
+  )
+
+  /* ---- render ---------------------------------------------------- */
+  return (
+    <div className="max-w-screen-xl mx-auto w-full h-full flex flex-col md:flex-row relative">
+      {/* LEFT COLUMN: products/services */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Out of stock banner */}
+        {outOfStockBanner && (
+          <div className="mx-3 mt-2 px-3 py-2 rounded-lg bg-red-900/30 border border-red-700/50 text-red-300 text-xs flex items-center justify-between">
+            <span>{outOfStockBanner}</span>
+            <button
+              onClick={() => setOutOfStockBanner(null)}
+              className="text-zinc-400 hover:text-zinc-200 ml-2"
+            >
+              &times;
+            </button>
+          </div>
         )}
 
-        {/* Consumables section (shown in products tab) */}
-        {activeTab === "products" && consumables.length > 0 && (
-          <div className="mt-4">
-            <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 px-1">
-              Consumables
+        {/* Alert toast */}
+        {alert && (
+          <div
+            className={`mx-3 mt-2 px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between ${
+              alert.type === "success"
+                ? "bg-emerald-900/40 border border-emerald-700 text-emerald-300"
+                : "bg-red-900/40 border border-red-700 text-red-300"
+            }`}
+          >
+            <span>{alert.message}</span>
+            <button
+              onClick={() => setAlert(null)}
+              className="ml-3 text-zinc-400 hover:text-zinc-200 text-base leading-none"
+            >
+              &times;
+            </button>
+          </div>
+        )}
+
+        {/* Capster selector — always visible at top */}
+        <div className="flex-shrink-0 px-3 py-2 bg-zinc-900/50 border-b border-zinc-800">
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] text-zinc-500 uppercase tracking-wider flex-shrink-0">Capster</label>
+            <select
+              value={selectedCapsterId ?? ""}
+              onChange={(e) =>
+                setSelectedCapsterId(
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
+              className="flex-1 px-2.5 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
+            >
+              <option value="">No capster (tap to assign)</option>
+              {capsters.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {selectedCapsterId && (
+              <span className="text-[10px] text-amber-400 font-medium bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 flex-shrink-0">
+                Auto-assign ON
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Top bar: search + inventory alert */}
+        <div className="flex-shrink-0 px-3 py-2 flex items-center gap-2">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder={`Search ${activeTab}\u2026`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+            />
+          </div>
+          {/* Inventory alert badge */}
+          {lowStockItems.length > 0 && (
+            <button
+              onClick={() => setShowLowStock(!showLowStock)}
+              className="relative flex-shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold"
+            >
+              {"\u26A0\uFE0F"}
+              <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full bg-amber-500 text-zinc-950 text-[10px] font-bold">
+                {lowStockItems.length}
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Low stock dropdown */}
+        {showLowStock && lowStockItems.length > 0 && (
+          <div className="mx-3 mb-2 p-3 bg-zinc-900 border border-zinc-800 rounded-lg">
+            <p className="text-xs text-zinc-400 mb-2">
+              Low Stock Items:
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              {consumables.map((item) => {
-                const stockWarn = getStockWarning(item);
+            <div className="space-y-1.5">
+              {lowStockItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="text-zinc-300 truncate mr-2">
+                    {item.name}
+                  </span>
+                  <span
+                    className={`flex-shrink-0 font-semibold ${
+                      item.stock === 0 ? "text-red-400" : "text-amber-400"
+                    }`}
+                  >
+                    {item.stock === 0 ? "Habis" : `Sisa ${item.stock}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab switcher + capster row */}
+        <div className="flex-shrink-0 px-3 flex items-center gap-2 mb-2">
+          <div className="flex bg-zinc-800 rounded-lg p-0.5 flex-1">
+            <button
+              onClick={() => setActiveTab("products")}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                activeTab === "products"
+                  ? "bg-zinc-700 text-amber-400"
+                  : "text-zinc-500"
+              }`}
+            >
+              Products
+            </button>
+            <button
+              onClick={() => setActiveTab("services")}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                activeTab === "services"
+                  ? "bg-zinc-700 text-amber-400"
+                  : "text-zinc-500"
+              }`}
+            >
+              Services
+            </button>
+          </div>
+          {/* Capster picker (compact) */}
+          {activeTab === "services" && capsters.length > 0 && (
+            <select
+              value={selectedCapsterId ?? ""}
+              onChange={(e) =>
+                setSelectedCapsterId(
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
+              className="flex-shrink-0 w-32 px-2 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-300 focus:outline-none focus:border-amber-500/50"
+            >
+              <option value="">No capster</option>
+              {capsters.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Category tabs (products only) */}
+        {activeTab === "products" && (
+          <div className="flex-shrink-0 px-3 mb-2 overflow-x-auto no-scrollbar">
+            <div className="flex gap-1.5">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => setActiveCategory(cat.key)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    activeCategory === cat.key
+                      ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                      : "bg-zinc-800 text-zinc-400 border border-zinc-700"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Items area - scrollable */}
+        <div className="flex-1 overflow-y-auto px-3 pb-4">
+          {filtered.length === 0 && (
+            <p className="text-zinc-600 text-sm text-center py-12">
+              No {activeTab} found.
+            </p>
+          )}
+
+          {activeTab === "products" && filtered.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {filtered.map((item) => {
+                const product = item as Product;
+                const stockWarn = getStockWarning(product);
                 return (
                   <button
-                    key={`consumable-${item.id}`}
+                    key={`product-${item.id}`}
                     onClick={() => addToCart(item, "product")}
-                    disabled={item.stock <= 0}
+                    disabled={product.stock <= 0}
                     className="text-left p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                   >
                     <p className="text-xs font-medium text-zinc-200 truncate">
@@ -776,34 +977,106 @@ export default function POSPage() {
                 );
               })}
             </div>
-          </div>
-        )}
+          )}
+
+          {activeTab === "services" && filtered.length > 0 && (
+            <div className="space-y-1.5">
+              {filtered.map((item) => (
+                <button
+                  key={`service-${item.id}`}
+                  onClick={() => addToCart(item, "service")}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 active:scale-[0.99] transition-all"
+                >
+                  <div className="text-left min-w-0">
+                    <p className="text-xs font-medium text-zinc-200 truncate">
+                      {item.name}
+                    </p>
+                    {"duration" in item && item.duration && (
+                      <p className="text-[10px] text-zinc-500">
+                        {item.duration} min
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                    <span className="text-xs font-semibold text-amber-400">
+                      {formatRp(item.price)}
+                    </span>
+                    <span className="w-6 h-6 flex items-center justify-center rounded bg-amber-500/20 text-amber-400 text-xs font-bold">
+                      +
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Consumables section (shown in products tab) */}
+          {activeTab === "products" && consumables.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 px-1">
+                Consumables
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {consumables.map((item) => {
+                  const stockWarn = getStockWarning(item);
+                  return (
+                    <button
+                      key={`consumable-${item.id}`}
+                      onClick={() => addToCart(item, "product")}
+                      disabled={item.stock <= 0}
+                      className="text-left p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                    >
+                      <p className="text-xs font-medium text-zinc-200 truncate">
+                        {item.name}
+                      </p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[10px] font-semibold text-amber-400">
+                          {formatRp(item.price)}
+                        </span>
+                        {stockWarn && (
+                          <span className={`text-[10px] ${stockWarn.color}`}>
+                            {stockWarn.text}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom cart bar (mobile only) */}
+        <div className="flex-shrink-0 px-3 pb-3 md:hidden">
+          <button
+            onClick={() => setCartOpen(true)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-zinc-950 font-bold text-sm transition-all"
+          >
+            <span>
+              {"\u{1F6D2}"} {cart.length} item{cart.length !== 1 ? "s" : ""}
+            </span>
+            <span>{formatRp(total)}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Bottom cart bar */}
-      <div className="flex-shrink-0 px-3 pb-3">
-        <button
-          onClick={() => setCartOpen(true)}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-zinc-950 font-bold text-sm transition-all"
-        >
-          <span>
-            {"\u{1F6D2}"} {cart.length} item{cart.length !== 1 ? "s" : ""}
-          </span>
-          <span>{formatRp(total)}</span>
-        </button>
+      {/* RIGHT COLUMN: cart sidebar (desktop only) */}
+      <div className="hidden md:flex md:w-96 md:flex-shrink-0 md:flex-col md:border-l md:border-zinc-800 md:bg-zinc-900 md:h-full">
+        {renderCartContent(true)}
       </div>
 
-      {/* Cart overlay */}
+      {/* Mobile cart overlay (md:hidden) */}
       {cartOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40"
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
           onClick={() => setCartOpen(false)}
         />
       )}
 
-      {/* Bottom sheet cart */}
+      {/* Mobile bottom sheet cart (md:hidden) */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 bg-zinc-900 rounded-t-xl border-t border-zinc-800 max-h-[85vh] flex flex-col transition-transform duration-300 ${
+        className={`fixed inset-x-0 bottom-0 z-50 bg-zinc-900 rounded-t-xl border-t border-zinc-800 max-h-[85vh] flex flex-col transition-transform duration-300 md:hidden ${
           cartOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -811,233 +1084,7 @@ export default function POSPage() {
         <div className="flex-shrink-0 flex justify-center pt-2 pb-1">
           <div className="w-10 h-1 rounded-full bg-zinc-700" />
         </div>
-
-        {/* Cart header */}
-        <div className="flex-shrink-0 px-4 py-2 flex items-center justify-between border-b border-zinc-800">
-          <h2 className="text-sm font-semibold text-zinc-200">
-            Cart &middot; {cart.length} item{cart.length !== 1 ? "s" : ""}
-          </h2>
-          {cart.length > 0 && (
-            <button
-              onClick={() => setCart([])}
-              className="text-xs text-zinc-500 hover:text-red-400"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        {/* Cart items */}
-        <div className="flex-1 overflow-y-auto">
-          {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-600 gap-2">
-              <span className="text-2xl">{"\u{1F6D2}"}</span>
-              <p className="text-sm">Cart is empty</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-zinc-800/60">
-              {cart.map((ci) => (
-                <div
-                  key={ci.id}
-                  className="px-4 py-3 flex items-center gap-2"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-zinc-200 truncate">
-                      {ci.name}
-                    </p>
-                    <p className="text-[10px] text-zinc-500">
-                      {formatRp(ci.price)} &times; {ci.qty}
-                    </p>
-                    {ci.itemType === "service" && (
-                      <select
-                        value={ci.capsterId ?? ""}
-                        onChange={(e) =>
-                          setItemCapster(ci.id, Number(e.target.value))
-                        }
-                        className="mt-1 px-2 py-1 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-300 focus:outline-none focus:border-amber-500/50"
-                      >
-                        <option value="">No capster</option>
-                        {capsters.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                    {/* Redemption hint */}
-                    {detectedMember &&
-                      ci.itemType === "service" &&
-                      detectedMember.total_points >= 50 && (
-                        <p className="text-[10px] text-amber-500/70 mt-0.5">
-                          {"\u{1F504}"} Redeem {Math.min(50, detectedMember.total_points)} pts available
-                        </p>
-                      )}
-                  </div>
-
-                  {/* Qty controls */}
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={() => updateQty(ci.id, -1)}
-                      className="w-7 h-7 flex items-center justify-center rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs"
-                    >
-                      &minus;
-                    </button>
-                    <span className="w-6 text-center text-xs font-medium text-zinc-200">
-                      {ci.qty}
-                    </span>
-                    <button
-                      onClick={() => updateQty(ci.id, 1)}
-                      className="w-7 h-7 flex items-center justify-center rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  {/* Line total */}
-                  <span className="w-20 text-right text-xs font-semibold text-zinc-200 flex-shrink-0">
-                    {formatRp(ci.price * ci.qty)}
-                  </span>
-
-                  {/* Remove */}
-                  <button
-                    onClick={() => removeItem(ci.id)}
-                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-900/40 text-zinc-500 hover:text-red-400 text-xs flex-shrink-0"
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Cart footer: customer, payment, submit */}
-        <div className="flex-shrink-0 border-t border-zinc-800 p-4 space-y-3">
-          {/* Customer info */}
-          <div className="space-y-2">
-            <input
-              type="text"
-              placeholder="Customer name"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
-            />
-            <input
-              type="text"
-              placeholder="Phone (08xxxx) — auto member"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
-            />
-            {detectedMember && (
-              <div className="px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                <p className="text-xs text-amber-400 font-semibold">
-                  {"\u{1F451}"} {detectedMember.name}
-                </p>
-                <p className="text-[10px] text-amber-500/70 mt-0.5">
-                  {formatNumber(detectedMember.total_points)} pts &middot;{" "}
-                  {detectedMember.visit_count} visits &middot; Tier{" "}
-                  {detectedMember.tier_id}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Capster row (horizontal buttons) */}
-          <div>
-            <p className="text-[10px] text-zinc-500 mb-1">Capster</p>
-            <div className="flex gap-1.5 flex-wrap">
-              <button
-                onClick={() => setSelectedCapsterId(null)}
-                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
-                  selectedCapsterId === null
-                    ? "bg-amber-500/20 border border-amber-500/30 text-amber-400"
-                    : "bg-zinc-800 border border-zinc-700 text-zinc-500"
-                }`}
-              >
-                None
-              </button>
-              {capsters.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedCapsterId(c.id)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
-                    selectedCapsterId === c.id
-                      ? "bg-amber-500/20 border border-amber-500/30 text-amber-400"
-                      : "bg-zinc-800 border border-zinc-700 text-zinc-500"
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Payment method */}
-          <div>
-            <p className="text-[10px] text-zinc-500 mb-1">Payment</p>
-            <div className="flex gap-1.5">
-              {[
-                { value: "cash", label: "Cash" },
-                { value: "qris", label: "QRIS" },
-                { value: "debit", label: "Debit" },
-              ].map((m) => (
-                <button
-                  key={m.value}
-                  onClick={() => setPaymentMethod(m.value)}
-                  className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
-                    paymentMethod === m.value
-                      ? "bg-amber-500/20 border border-amber-500/40 text-amber-300"
-                      : "bg-zinc-800 border border-zinc-700 text-zinc-500"
-                  }`}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Discount */}
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] text-zinc-500 flex-shrink-0">
-              Discount
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={subtotal}
-              value={discount || ""}
-              onChange={(e) =>
-                setDiscount(Math.max(0, Number(e.target.value) || 0))
-              }
-              className="flex-1 px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
-            />
-          </div>
-
-          {/* Total */}
-          <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
-            <span className="text-xs font-semibold text-zinc-400">Total</span>
-            <span className="text-sm font-bold text-amber-400">
-              {formatRp(total)}
-            </span>
-          </div>
-
-          {/* Submit */}
-          <button
-            onClick={processOrder}
-            disabled={submitting || cart.length === 0}
-            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold text-sm uppercase tracking-wider transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {submitting ? (
-              <>
-                <span className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-                Processing\u2026
-              </>
-            ) : (
-              "Process Order"
-            )}
-          </button>
-        </div>
+        {renderCartContent(false)}
       </div>
 
       {/* Receipt modal */}
