@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import AppShell from "./components/AppShell";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="h-full bg-zinc-950 text-zinc-100">
+        <Script src="/sw-update.js" strategy="afterInteractive" />
         <AppShell>{children}</AppShell>
       </body>
     </html>
