@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
       booking_date,
       start_time,
       services,
+      booking_type,
+      notes,
+      is_new_member,
     } = body as {
       customer_name: string
       customer_phone?: string | null
@@ -29,6 +32,9 @@ export async function POST(request: NextRequest) {
       booking_date: string
       start_time: string
       services: BookingService[]
+      booking_type?: string
+      notes?: string | null
+      is_new_member?: boolean
     }
 
     if (!customer_name?.trim()) {
@@ -45,6 +51,35 @@ export async function POST(request: NextRequest) {
 
     if (!services || !Array.isArray(services) || services.length === 0) {
       return Response.json({ error: 'At least one service is required.' }, { status: 400 })
+    }
+
+    // --- Auto-register new member ---
+    if (is_new_member && customer_phone?.trim()) {
+      const phone = customer_phone.trim()
+      // Check if member already exists (race-avoiding)
+      const { data: existingMember } = await supabase
+        .from('members')
+        .select('id')
+        .eq('phone', phone)
+        .maybeSingle()
+
+      if (!existingMember) {
+        const { error: memberError } = await supabase
+          .from('members')
+          .insert({
+            name: customer_name.trim(),
+            phone,
+            tier_id: 1,
+            total_points: 0,
+            total_spent: 0,
+            visit_count: 0,
+          })
+
+        if (memberError) {
+          console.error('Member insert error:', memberError)
+          // Don't fail the booking — just log it
+        }
+      }
     }
 
     // Look up actual service durations from the services table
@@ -77,6 +112,7 @@ export async function POST(request: NextRequest) {
     const end_time = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`
 
     // Insert booking
+    const bookingType = booking_type || 'potong_di_tempat'
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -87,6 +123,8 @@ export async function POST(request: NextRequest) {
         start_time,
         end_time,
         status: 'confirmed',
+        booking_type: bookingType,
+        notes: notes?.trim() || null,
       })
       .select('id')
       .single()

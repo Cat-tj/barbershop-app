@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 interface Capster {
@@ -16,43 +16,45 @@ interface Service {
   duration: number | null
 }
 
-interface SelectedService extends Service {
-  selected: boolean
-}
-
-interface TimeSlot {
+interface SlotItem {
   time: string
-  label: string
+  status: 'available' | 'taken' | 'mine'
 }
 
-function generateTimeSlots(): TimeSlot[] {
-  const slots: TimeSlot[] = []
-  for (let h = 9; h < 21; h++) {
-    const hh = h.toString().padStart(2, '0')
-    slots.push({ time: `${hh}:00`, label: `${hh}:00` })
-    slots.push({ time: `${hh}:30`, label: `${hh}:30` })
-  }
-  // include 21:00
-  slots.push({ time: '21:00', label: '21:00' })
-  return slots
+interface MemberInfo {
+  id: number
+  name: string
+  phone: string
+  tier_id: number
+  total_points: number
+  tier_name: string
+  color: string
 }
 
 export default function BookingPage() {
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
+  // --- State ---
+  const [phone, setPhone] = useState('')
+  const [member, setMember] = useState<MemberInfo | null | undefined>(null) // null=not checked, object=found, undefined=not found
+  const [isNewMember, setIsNewMember] = useState(false)
+  const [name, setName] = useState('')
   const [capsters, setCapsters] = useState<Capster[]>([])
   const [selectedCapster, setSelectedCapster] = useState<number | null>(null)
-  const [services, setServices] = useState<SelectedService[]>([])
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [slots, setSlots] = useState<SlotItem[]>([])
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  const [customerName, setCustomerName] = useState('')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [services, setServices] = useState<Service[]>([])
+  const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set())
+  const [bookingType, setBookingType] = useState<'potong_di_tempat' | 'dipanggil'>('potong_di_tempat')
+  const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [slotsLoading, setSlotsLoading] = useState(false)
 
-  const timeSlots = generateTimeSlots()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // --- Load capsters and services on mount ---
   useEffect(() => {
     async function loadData() {
-      // fetch capsters
       const { data: capsterData } = await supabase
         .from('capsters')
         .select('id, name, active')
@@ -60,27 +62,81 @@ export default function BookingPage() {
         .order('name')
       if (capsterData) setCapsters(capsterData)
 
-      // fetch services
       const { data: serviceData } = await supabase
         .from('services')
         .select('id, name, price, duration')
         .order('name')
-      if (serviceData) {
-        setServices(serviceData.map((s: Service) => ({ ...s, selected: false })))
-      }
+      if (serviceData) setServices(serviceData)
     }
     loadData()
   }, [])
 
+  // --- Debounced phone lookup ---
+  const lookupMember = useCallback((phoneNum: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(async () => {
+      const trimmed = phoneNum.trim()
+      if (!trimmed) {
+        setMember(null)
+        setIsNewMember(false)
+        return
+      }
+      try {
+        const res = await fetch(`/api/member?phone=${encodeURIComponent(trimmed)}`)
+        const data = await res.json()
+        if (data.found) {
+          setMember(data as MemberInfo)
+          setName(data.name)
+          setIsNewMember(false)
+        } else {
+          setMember(undefined)
+          setIsNewMember(true)
+        }
+      } catch {
+        setMember(undefined)
+        setIsNewMember(true)
+      }
+    }, 500)
+  }, [])
+
+  // --- Fetch slots when capster or date changes ---
+  useEffect(() => {
+    if (!selectedCapster || !date) {
+      setSlots([])
+      return
+    }
+    setSlotsLoading(true)
+    const controller = new AbortController()
+    const params = new URLSearchParams({ date, capster_id: String(selectedCapster) })
+    if (phone.trim()) params.set('phone', phone.trim())
+    fetch(`/api/bookings/slots?${params}`, { signal: controller.signal })
+      .then(res => res.json())
+      .then(data => {
+        if (data.slots) setSlots(data.slots)
+      })
+      .catch(() => {})
+      .finally(() => setSlotsLoading(false))
+    return () => controller.abort()
+  }, [selectedCapster, date, phone])
+
+  // --- Clear time selection when capster or date changes ---
+  useEffect(() => {
+    setSelectedTime(null)
+  }, [selectedCapster, date])
+
+  // --- Computed ---
   const toggleService = (id: number) => {
-    setServices(prev =>
-      prev.map(s => (s.id === id ? { ...s, selected: !s.selected } : s))
-    )
+    setSelectedServices(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
-  const selectedServices = services.filter(s => s.selected)
-  const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0)
-  const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration || 30), 0)
+  const selectedServiceList = services.filter(s => selectedServices.has(s.id))
+  const totalPrice = selectedServiceList.reduce((sum, s) => sum + s.price, 0)
+  const totalDuration = selectedServiceList.reduce((sum, s) => sum + (s.duration || 30), 0)
 
   function formatDuration(minutes: number): string {
     const h = Math.floor(minutes / 60)
@@ -90,23 +146,28 @@ export default function BookingPage() {
     return `${h}h ${m}min`
   }
 
+  // --- Submit ---
   const handleBook = async () => {
     setMessage(null)
 
-    if (!customerName.trim()) {
-      setMessage({ type: 'error', text: 'Customer name is required.' })
+    if (!name.trim()) {
+      setMessage({ type: 'error', text: 'Nama diperlukan.' })
+      return
+    }
+    if (!phone.trim()) {
+      setMessage({ type: 'error', text: 'Nomor telepon diperlukan.' })
       return
     }
     if (!selectedCapster) {
-      setMessage({ type: 'error', text: 'Please select a capster.' })
-      return
-    }
-    if (selectedServices.length === 0) {
-      setMessage({ type: 'error', text: 'Please select at least one service.' })
+      setMessage({ type: 'error', text: 'Pilih capster.' })
       return
     }
     if (!selectedTime) {
-      setMessage({ type: 'error', text: 'Please select a time slot.' })
+      setMessage({ type: 'error', text: 'Pilih jam.' })
+      return
+    }
+    if (selectedServiceList.length === 0) {
+      setMessage({ type: 'error', text: 'Pilih minimal satu layanan.' })
       return
     }
 
@@ -116,48 +177,66 @@ export default function BookingPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.trim() || null,
+          customer_name: name.trim(),
+          customer_phone: phone.trim(),
           capster_id: selectedCapster,
           booking_date: date,
           start_time: selectedTime,
-          services: selectedServices.map(s => ({
+          services: selectedServiceList.map(s => ({
             service_id: s.id,
             price: s.price,
           })),
+          booking_type: bookingType,
+          notes: notes.trim() || null,
+          is_new_member: isNewMember,
         }),
       })
 
       const result = await res.json()
-      if (!res.ok) throw new Error(result.error || 'Booking failed')
-      setMessage({ type: 'success', text: `Booking confirmed! ID: ${result.booking_id}` })
+      if (!res.ok) throw new Error(result.error || 'Booking gagal')
+      setMessage({ type: 'success', text: `Booking berhasil! ID: ${result.booking_id}` })
       // reset form
       setSelectedCapster(null)
       setSelectedTime(null)
-      setCustomerName('')
-      setCustomerPhone('')
-      setServices(prev => prev.map(s => ({ ...s, selected: false })))
+      setName('')
+      setPhone('')
+      setSelectedServices(new Set())
+      setNotes('')
+      setBookingType('potong_di_tempat')
+      setMember(null)
+      setIsNewMember(false)
+      setSlots([])
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Booking failed'
+      const msg = err instanceof Error ? err.message : 'Booking gagal'
       setMessage({ type: 'error', text: msg })
     } finally {
       setLoading(false)
     }
   }
 
+  // --- Slot color logic ---
+  function slotClasses(slot: SlotItem): string {
+    const isSelected = selectedTime === slot.time
+    if (isSelected) return 'bg-emerald-600 border-emerald-500 text-white'
+    if (slot.status === 'mine') return 'bg-green-600/30 border-green-500 text-green-300'
+    if (slot.status === 'taken') return 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+    return 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700'
+  }
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-3 sm:p-4 md:p-6">
+      <div className="max-w-lg mx-auto space-y-4">
+
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Booking</h1>
-          <p className="text-zinc-400 text-sm mt-1">Schedule a new appointment</p>
+          <h1 className="text-base font-bold tracking-tight">Booking</h1>
+          <p className="text-zinc-400 text-xs mt-0.5">Buat janji baru</p>
         </div>
 
         {/* MESSAGE */}
         {message && (
           <div
-            className={`p-3 rounded-lg text-sm font-medium ${
+            className={`p-3 rounded-lg text-xs font-medium ${
               message.type === 'success'
                 ? 'bg-emerald-900/50 text-emerald-300 border border-emerald-700'
                 : 'bg-red-900/50 text-red-300 border border-red-700'
@@ -167,28 +246,83 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* DATE PICKER */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-          <label className="block text-sm font-medium text-zinc-300">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-zinc-100
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
-          />
+        {/* SECTION 1: Phone + Member lookup */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+          <label className="block text-xs font-medium text-zinc-400">No. Telepon</label>
+          <div className="flex gap-2">
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => {
+                setPhone(e.target.value)
+                lookupMember(e.target.value)
+              }}
+              placeholder="08123456789"
+              className="flex-1 h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+                         placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+            />
+            <button
+              type="button"
+              onClick={() => lookupMember(phone)}
+              className="h-10 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold
+                         transition-colors focus:outline-none focus:border-emerald-500/50"
+            >
+              Cek
+            </button>
+          </div>
+
+          {/* Member badge */}
+          {member && (
+            <div
+              className="flex items-center gap-2 p-2 rounded-lg text-xs"
+              style={{ backgroundColor: `${member.color}20`, borderColor: member.color, borderWidth: 1 }}
+            >
+              <span>👑</span>
+              <span className="font-semibold">{member.name}</span>
+              <span className="opacity-70">· {member.tier_name}</span>
+              <span className="opacity-70">· {member.total_points?.toLocaleString()} pts</span>
+            </div>
+          )}
+
+          {/* Name input (shown when member not found or not yet checked) */}
+          {member === undefined && (
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">Nama *</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Nama pelanggan"
+                className="w-full h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+                           placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+              />
+            </div>
+          )}
+          {member === null && (
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">Nama *</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Nama pelanggan"
+                className="w-full h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+                           placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+              />
+            </div>
+          )}
         </div>
 
-        {/* CAPSTER SELECTOR */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-          <label className="block text-sm font-medium text-zinc-300">Capster</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {/* SECTION 2: Capster selector */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-zinc-400">Capster</label>
+          <div className="flex flex-wrap gap-2">
             {capsters.map(c => (
               <button
                 key={c.id}
                 type="button"
-                onClick={() => setSelectedCapster(c.id)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                onClick={() => setSelectedCapster(c.id === selectedCapster ? null : c.id)}
+                className={`h-10 px-3 rounded-lg text-xs font-medium transition-colors focus:outline-none ${
                   selectedCapster === c.id
                     ? 'bg-emerald-600 text-white border border-emerald-500'
                     : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600'
@@ -198,121 +332,159 @@ export default function BookingPage() {
               </button>
             ))}
             {capsters.length === 0 && (
-              <p className="text-zinc-500 text-sm col-span-full py-2">No capsters available</p>
+              <p className="text-zinc-500 text-xs py-2">Tidak ada capster</p>
             )}
           </div>
         </div>
 
-        {/* SERVICES */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-          <label className="block text-sm font-medium text-zinc-300">Services</label>
-          <div className="space-y-2">
-            {services.map(s => (
-              <label
-                key={s.id}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                  s.selected
-                    ? 'bg-emerald-900/30 border border-emerald-700'
-                    : 'bg-zinc-800 border border-zinc-700 hover:border-zinc-600'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={s.selected}
-                  onChange={() => toggleService(s.id)}
-                  className="w-4 h-4 accent-emerald-500 rounded"
-                />
-                <div className="flex-1">
-                  <span className="text-sm font-medium text-zinc-200">{s.name}</span>
-                  {s.duration && (
-                    <span className="text-xs text-zinc-500 ml-2">{formatDuration(s.duration)}</span>
-                  )}
-                </div>
-                <span className="text-sm font-semibold text-emerald-400">
-                  Rp {s.price.toLocaleString()}
-                </span>
-              </label>
-            ))}
+        {/* SECTION 3: Date picker */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-zinc-400">Tanggal</label>
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+                       focus:outline-none focus:border-emerald-500/50"
+            style={{ colorScheme: 'dark' }}
+          />
+        </div>
+
+        {/* SECTION 4: Time grid */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-zinc-400">Jam</label>
+          {!selectedCapster ? (
+            <p className="text-xs text-zinc-600 py-4 text-center">Pilih capster dulu</p>
+          ) : slotsLoading ? (
+            <div className="grid grid-cols-4 gap-1.5">
+              {Array.from({ length: 25 }).map((_, i) => (
+                <div key={i} className="h-9 bg-zinc-800 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-1.5">
+              {slots.map(slot => (
+                <button
+                  key={slot.time}
+                  type="button"
+                  disabled={slot.status === 'taken'}
+                  onClick={() => {
+                    if (slot.status !== 'taken') setSelectedTime(slot.time)
+                  }}
+                  className={`h-9 rounded-lg text-xs font-medium transition-colors border focus:outline-none focus:border-emerald-500/50 ${slotClasses(slot)}`}
+                >
+                  {slot.time}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 5: Services */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-zinc-400">Layanan</label>
+          <div className="space-y-1.5">
+            {services.map(s => {
+              const selected = selectedServices.has(s.id)
+              return (
+                <label
+                  key={s.id}
+                  className={`flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-colors ${
+                    selected
+                      ? 'bg-emerald-900/30 border border-emerald-700'
+                      : 'bg-zinc-800 border border-zinc-700 hover:border-zinc-600'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => toggleService(s.id)}
+                    className="w-4 h-4 accent-emerald-500 rounded"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-medium text-zinc-200">{s.name}</span>
+                    {s.duration && (
+                      <span className="text-xs text-zinc-500 ml-1.5">{formatDuration(s.duration)}</span>
+                    )}
+                  </div>
+                  <span className="text-xs font-semibold text-emerald-400 whitespace-nowrap">
+                    Rp {s.price.toLocaleString()}
+                  </span>
+                </label>
+              )
+            })}
             {services.length === 0 && (
-              <p className="text-zinc-500 text-sm py-2">No services available</p>
+              <p className="text-zinc-500 text-xs py-2">Tidak ada layanan</p>
             )}
           </div>
 
-          {/* TOTAL */}
-          {selectedServices.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-between items-center">
-              <div className="text-sm text-zinc-400">
-                {selectedServices.length} service{selectedServices.length > 1 ? 's' : ''}
+          {/* Total */}
+          {selectedServiceList.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center">
+              <div className="text-xs text-zinc-400">
+                {selectedServiceList.length} layanan
                 {totalDuration > 0 && ` · ~${formatDuration(totalDuration)}`}
               </div>
-              <div className="text-lg font-bold text-emerald-400">
+              <div className="text-sm font-bold text-emerald-400">
                 Rp {totalPrice.toLocaleString()}
               </div>
             </div>
           )}
         </div>
 
-        {/* TIME SLOTS */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-          <label className="block text-sm font-medium text-zinc-300">Time Slot</label>
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {timeSlots.map(slot => (
-              <button
-                key={slot.time}
-                type="button"
-                onClick={() => setSelectedTime(slot.time)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  selectedTime === slot.time
-                    ? 'bg-emerald-600 text-white border border-emerald-500'
-                    : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600'
-                }`}
-              >
-                {slot.label}
-              </button>
-            ))}
+        {/* SECTION 6: Booking type + notes */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+          <label className="block text-xs font-medium text-zinc-400">Tipe Booking</label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setBookingType('potong_di_tempat')}
+              className={`flex-1 h-10 rounded-lg text-xs font-medium transition-colors border focus:outline-none ${
+                bookingType === 'potong_di_tempat'
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-600'
+              }`}
+            >
+              Potong di Tempat
+            </button>
+            <button
+              type="button"
+              onClick={() => setBookingType('dipanggil')}
+              className={`flex-1 h-10 rounded-lg text-xs font-medium transition-colors border focus:outline-none ${
+                bookingType === 'dipanggil'
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-600'
+              }`}
+            >
+              Dipanggil
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Catatan</label>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Catatan tambahan..."
+              rows={2}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100
+                         placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+            />
           </div>
         </div>
 
-        {/* CUSTOMER INFO */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
-          <label className="block text-sm font-medium text-zinc-300">Customer</label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Name *</label>
-              <input
-                type="text"
-                value={customerName}
-                onChange={e => setCustomerName(e.target.value)}
-                placeholder="Customer name"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-zinc-100
-                           placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Phone</label>
-              <input
-                type="tel"
-                value={customerPhone}
-                onChange={e => setCustomerPhone(e.target.value)}
-                placeholder="08xxxxxxxxxx"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-zinc-100
-                           placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* BOOK BUTTON */}
+        {/* SUBMIT */}
         <button
           type="button"
           onClick={handleBook}
           disabled={loading}
-          className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700
-                     disabled:text-zinc-500 text-white font-semibold text-base transition-colors
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700
+                     disabled:text-zinc-500 text-white font-semibold text-sm transition-colors
+                     focus:outline-none focus:border-emerald-500/50"
         >
           {loading ? 'Booking...' : 'Book Now'}
         </button>
+
       </div>
     </div>
   )
