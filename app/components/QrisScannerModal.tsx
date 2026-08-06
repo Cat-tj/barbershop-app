@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode'
-import { Camera, X, CheckCircle2, AlertCircle, Upload } from 'lucide-react'
+import { Html5Qrcode } from 'html5-qrcode'
+import { Camera, X, CheckCircle2, AlertCircle, Upload, SwitchCamera } from 'lucide-react'
 
 interface QrisScannerModalProps {
   isOpen: boolean
@@ -13,78 +13,125 @@ interface QrisScannerModalProps {
 export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: QrisScannerModalProps) {
   const [scanResult, setScanResult] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null)
+  const [cameras, setCameras] = useState<{ id: string; label: string }[]>([])
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('')
+  const [isScanning, setIsScanning] = useState(false)
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        if (html5QrCodeRef.current.isScanning) {
+          await html5QrCodeRef.current.stop()
+        }
+        await html5QrCodeRef.current.clear()
+      } catch (e) {
+        console.error('Error stopping scanner:', e)
+      }
+      html5QrCodeRef.current = null
+    }
+    setIsScanning(false)
+  }
+
+  const startScanner = async (cameraId?: string) => {
+    await stopScanner()
+    setErrorMsg(null)
+
+    try {
+      const qrScanner = new Html5Qrcode('qr-reader-container')
+      html5QrCodeRef.current = qrScanner
+
+      const cameraConfig = cameraId
+        ? { deviceId: { exact: cameraId } }
+        : { facingMode: 'environment' }
+
+      await qrScanner.start(
+        cameraConfig,
+        {
+          fps: 10,
+          qrbox: { width: 240, height: 240 },
+          aspectRatio: 1.0,
+        },
+        (decodedText) => {
+          setScanResult(decodedText)
+          onScanSuccess(decodedText)
+          stopScanner()
+        },
+        () => {}
+      )
+      setIsScanning(true)
+    } catch (err) {
+      console.error('Failed to start camera:', err)
+      setErrorMsg('Gagal menyalakan kamera. Pastikan memberikan izin kamera pada browser HP kamu atau gunakan tombol "Upload Gambar QRIS".')
+    }
+  }
 
   useEffect(() => {
     if (!isOpen) {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(() => {})
-        scannerRef.current = null
-      }
+      stopScanner()
       setScanResult(null)
       setErrorMsg(null)
+      setCameras([])
       return
     }
 
-    const timeout = setTimeout(() => {
+    const initCameras = async () => {
       try {
-        const scanner = new Html5QrcodeScanner(
-          'qr-reader-container',
-          {
-            fps: 10,
-            qrbox: { width: 220, height: 220 },
-            aspectRatio: 1.0,
-            rememberLastUsedCamera: true,
-          },
-          false
-        )
-
-        scanner.render(
-          (decodedText) => {
-            setScanResult(decodedText)
-            onScanSuccess(decodedText)
-            scanner.clear().catch(() => {})
-          },
-          () => {}
-        )
-
-        scannerRef.current = scanner
+        const devices = await Html5Qrcode.getCameras()
+        if (devices && devices.length > 0) {
+          setCameras(devices.map(d => ({ id: d.id, label: d.label || `Camera ${d.id}` })))
+          // Prefer back camera if available
+          const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'))
+          const targetId = backCam ? backCam.id : devices[0].id
+          setSelectedCameraId(targetId)
+          await startScanner(targetId)
+        } else {
+          await startScanner()
+        }
       } catch (err) {
-        console.error('Failed to init camera scanner:', err)
-        setErrorMsg('Tidak dapat membuka kamera. Pastikan izin kamera telah diberikan atau gunakan tombol Upload di bawah.')
-      }
-    }, 300)
-
-    return () => {
-      clearTimeout(timeout)
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(() => {})
-        scannerRef.current = null
+        console.warn('Camera enumeration error, trying facingMode:', err)
+        await startScanner()
       }
     }
-  }, [isOpen, onScanSuccess])
+
+    const timer = setTimeout(() => {
+      initCameras()
+    }, 200)
+
+    return () => {
+      clearTimeout(timer)
+      stopScanner()
+    }
+  }, [isOpen])
+
+  const handleSwitchCamera = async (newCamId: string) => {
+    setSelectedCameraId(newCamId)
+    await startScanner(newCamId)
+  }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     try {
+      await stopScanner()
       const html5QrCode = new Html5Qrcode('qr-reader-file-temp')
       const result = await html5QrCode.scanFile(file, true)
       setScanResult(result)
       onScanSuccess(result)
       html5QrCode.clear()
-    } catch {
-      setErrorMsg('Gagal membaca QR code dari gambar. Pastikan foto QRIS jelas dan terang.')
+    } catch (err) {
+      console.error('File scan error:', err)
+      setErrorMsg('Gagal membaca QR code dari gambar. Gunakan foto QRIS yang lebih terang dan jelas.')
     }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-5 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-5 shadow-2xl overflow-hidden space-y-4">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -94,19 +141,19 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-4 border-b border-zinc-800 pb-3">
+        <div className="flex items-center gap-3 border-b border-zinc-800 pb-3">
           <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
             <Camera className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-bold text-zinc-100">Scan / Upload QRIS Merchant</h3>
-            <p className="text-xs text-zinc-400">Scan via kamera atau upload foto QRIS</p>
+            <p className="text-xs text-zinc-400">Kamera HP Live atau Upload File Gambar QRIS</p>
           </div>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <div className="p-3 rounded-2xl bg-red-950/60 border border-red-800/80 text-red-300 text-xs flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-400" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -116,24 +163,48 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
             <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h4 className="text-sm font-bold text-zinc-100">QRIS Berhasil Dibaca!</h4>
-            <p className="text-xs font-mono text-amber-400 bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 break-all max-h-24 overflow-y-auto">
+            <h4 className="text-sm font-bold text-zinc-100">QRIS Berhasil Terbaca!</h4>
+            <p className="text-xs font-mono text-amber-400 bg-zinc-950 p-3 rounded-xl border border-zinc-800 break-all max-h-28 overflow-y-auto w-full">
               {scanResult}
             </p>
             <button
               onClick={onClose}
-              className="w-full py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs"
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20"
             >
-              Gunakan QRIS Ini
+              Gunakan Payload QRIS Ini
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div id="qr-reader-container" className="overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-zinc-950 min-h-[250px]" />
+            {/* Camera Switcher Selector if multiple cameras exist */}
+            {cameras.length > 1 && (
+              <div className="flex items-center justify-between bg-zinc-950 p-2.5 rounded-xl border border-zinc-800">
+                <span className="text-[11px] text-zinc-400 flex items-center gap-1.5 font-medium">
+                  <SwitchCamera className="w-3.5 h-3.5 text-amber-400" /> Pilih Kamera HP:
+                </span>
+                <select
+                  value={selectedCameraId}
+                  onChange={(e) => handleSwitchCamera(e.target.value)}
+                  className="bg-zinc-900 text-xs text-amber-400 font-bold border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none"
+                >
+                  {cameras.map((cam) => (
+                    <option key={cam.id} value={cam.id}>
+                      {cam.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Video Container */}
+            <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-zinc-950 min-h-[260px] flex items-center justify-center">
+              <div id="qr-reader-container" className="w-full" />
+            </div>
+
             <div id="qr-reader-file-temp" className="hidden" />
 
             {/* Upload Fallback Option */}
-            <div className="pt-2 border-t border-zinc-800">
+            <div className="pt-2 border-t border-zinc-800 space-y-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -144,10 +215,10 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs flex items-center justify-center gap-2 border border-zinc-700 transition-all"
+                className="w-full py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs flex items-center justify-center gap-2 border border-zinc-700 transition-all shadow-md"
               >
                 <Upload className="w-4 h-4 text-amber-400" />
-                <span>Upload Foto / Gambar QRIS</span>
+                <span>Upload Foto / Screenshot QRIS</span>
               </button>
             </div>
           </div>
