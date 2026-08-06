@@ -78,12 +78,36 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // AUTOMATIC REWARD POINTS CALCULATION (Per 10.000 IDR = 1 Point)
+    let earnedPoints = 0
+    if (customer_phone?.trim()) {
+      const phone = customer_phone.trim()
+      // Formula: 1 Point for every Rp 10.000 spent in this completed transaction
+      earnedPoints = Math.floor(total / 10000)
+
+      const existing = db.prepare('SELECT id FROM members WHERE phone = ?').get(phone)
+      if (existing) {
+        db.prepare(`
+          UPDATE members 
+          SET total_points = total_points + ?, 
+              total_spent = total_spent + ?
+          WHERE phone = ?
+        `).run(earnedPoints, total, phone)
+      } else {
+        db.prepare(`
+          INSERT INTO members (name, phone, tier_id, total_points, total_spent, visit_count)
+          VALUES (?, ?, 1, ?, ?, 1)
+        `).run(customer_name.trim(), phone, earnedPoints, total)
+      }
+    }
+
     return Response.json({
       success: true,
       order_id: orderId,
       subtotal,
       discount,
       total,
+      earned_points: earnedPoints,
     })
   } catch (err) {
     console.error('Order API error:', err)
