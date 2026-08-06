@@ -138,6 +138,23 @@ if (countCapsters === 0) {
   insertCapster.run('Doni Fade Master', '081311223344')
 }
 
+// Seed default products
+const countProducts = (db.prepare('SELECT COUNT(*) as count FROM products').get() as { count: number }).count
+if (countProducts === 0) {
+  const insertProd = db.prepare('INSERT INTO products (name, price, stock, category, stock_threshold) VALUES (?, ?, ?, ?, ?)')
+  insertProd.run('Pomade Waterbased Altora', 85000, 15, 'product', 5)
+  insertProd.run('Hair Tonic Gingseng', 65000, 8, 'product', 3)
+  insertProd.run('Shampoo Barbershop 1L', 110000, 4, 'consumable', 2)
+}
+
+// Seed default members
+const countMembers = (db.prepare('SELECT COUNT(*) as count FROM members').get() as { count: number }).count
+if (countMembers === 0) {
+  const insertMem = db.prepare('INSERT INTO members (name, phone, tier_id, total_points, total_spent, visit_count) VALUES (?, ?, ?, ?, ?, ?)')
+  insertMem.run('Alexander The Great', '085200000000', 1, 120, 350000, 5)
+  insertMem.run('Budi Santoso', '081299887766', 2, 340, 850000, 12)
+}
+
 // Seed default users
 const hash = bcrypt.hashSync('romebois123icat', 10)
 const insertUser = db.prepare(`
