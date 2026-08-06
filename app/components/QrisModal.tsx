@@ -132,7 +132,7 @@ export default function QrisModal({
             </div>
 
             {/* QR Container */}
-            <div className="relative p-3 bg-white rounded-2xl shadow-inner border-4 border-amber-500/30 mb-4 flex items-center justify-center">
+            <div className="p-3 bg-white rounded-2xl shadow-inner border-4 border-amber-500/30 mb-4 flex items-center justify-center">
               {qrUrl ? (
                 <img src={qrUrl} alt="QRIS Code" className="w-60 h-60 rounded-lg" />
               ) : (
@@ -140,12 +140,6 @@ export default function QrisModal({
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
               )}
-
-              {/* QRIS Logo Badge inside QR */}
-              <div className="absolute inset-auto p-1.5 bg-zinc-950 border border-zinc-800 rounded-lg shadow-md flex items-center gap-1 text-[11px] font-bold text-amber-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>QRIS</span>
-              </div>
             </div>
 
             {/* Timer & Info */}
