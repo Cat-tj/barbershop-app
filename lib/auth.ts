@@ -1,11 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
-import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from './sqlite'
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'romebois-secret-key-change-in-production'
@@ -18,30 +13,18 @@ export interface UserSession {
 }
 
 export async function login(username: string, password: string): Promise<{ token: string; user: UserSession } | null> {
-  const { data: account, error } = await supabase
-    .from('user_accounts')
-    .select('id, username, password_hash, role, active')
-    .eq('username', username)
-    .maybeSingle()
+  const account = db
+    .prepare('SELECT id, username, password_hash, role, active FROM user_accounts WHERE username = ?')
+    .get(username) as { id: number; username: string; password_hash: string; role: string; active: number } | undefined
 
-  if (error) {
-    console.error('Supabase query error:', error)
-    throw new Error('Database query error: ' + error.message)
-  }
-
-  if (!account) {
-    console.log('Account not found for username:', username)
-    return null
-  }
-
-  if (!account.active) {
-    console.log('Account disabled for username:', username)
+  if (!account || !account.active) {
+    console.log('SQLite: Account not found or inactive for:', username)
     return null
   }
 
   const valid = await bcrypt.compare(password, account.password_hash)
   if (!valid) {
-    console.log('Invalid password for username:', username)
+    console.log('SQLite: Invalid password for:', username)
     return null
   }
 
