@@ -9,9 +9,9 @@ function crc16(str: string): string {
     crc ^= str.charCodeAt(c) << 8
     for (let i = 0; i < 8; i++) {
       if ((crc & 0x8000) !== 0) {
-        crc = (crc << 1) ^ 0x1021
+        crc = ((crc << 1) ^ 0x1021) & 0xffff
       } else {
-        crc = (crc << 1)
+        crc = (crc << 1) & 0xffff
       }
     }
   }
