@@ -53,7 +53,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-zinc-950/90 border-r border-zinc-800/80 backdrop-blur-xl w-64 text-zinc-300 select-none">
+    <div className="flex flex-col h-full bg-zinc-950 border-r border-zinc-800/80 w-64 text-zinc-300 select-none">
       {/* Header Branding */}
       <div className="p-5 border-b border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -142,14 +142,22 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
   return (
     <>
-      {/* Mobile Toggle Floating Button */}
-      <div className="md:hidden fixed top-3 left-3 z-40">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-amber-500 shadow-xl backdrop-blur-md"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+      {/* Top Navbar Header for Mobile */}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950 border-b border-zinc-800/80 shrink-0">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-sm">
+              R
+            </div>
+            <span className="font-extrabold tracking-wider text-xs text-zinc-100">ROMEBOIS ERP</span>
+          </div>
+        </div>
       </div>
 
       {/* Mobile Drawer Overlay */}
