@@ -18,16 +18,32 @@ export interface UserSession {
 }
 
 export async function login(username: string, password: string): Promise<{ token: string; user: UserSession } | null> {
-  const { data: account } = await supabase
+  const { data: account, error } = await supabase
     .from('user_accounts')
     .select('id, username, password_hash, role, active')
     .eq('username', username)
-    .single()
+    .maybeSingle()
 
-  if (!account || !account.active) return null
+  if (error) {
+    console.error('Supabase query error:', error)
+    throw new Error('Database query error: ' + error.message)
+  }
+
+  if (!account) {
+    console.log('Account not found for username:', username)
+    return null
+  }
+
+  if (!account.active) {
+    console.log('Account disabled for username:', username)
+    return null
+  }
 
   const valid = await bcrypt.compare(password, account.password_hash)
-  if (!valid) return null
+  if (!valid) {
+    console.log('Invalid password for username:', username)
+    return null
+  }
 
   const user: UserSession = { id: account.id, username: account.username, role: account.role as 'admin' | 'user' }
 
