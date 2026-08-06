@@ -29,7 +29,7 @@ function getSessionFromCookie(): UserSession | null {
   return parseJwtPayload(decodeURIComponent(match[1]))
 }
 
-const PUBLIC_PATHS = ['/booking', '/login', '/catalog', '/register']
+const PUBLIC_PATHS = ['/booking', '/login', '/catalog', '/register', '/forms']
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -69,14 +69,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100">
       {/* Altora ERP Sidebar */}
       <Sidebar userRole={session?.role} username={session?.username} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gradient-to-b from-zinc-950 to-zinc-900/60">
-          <div className="max-w-7xl mx-auto h-full">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <main className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 bg-gradient-to-b from-zinc-950 to-zinc-900/60">
+          <div className="w-full h-full max-w-7xl mx-auto">
             {children}
           </div>
         </main>
