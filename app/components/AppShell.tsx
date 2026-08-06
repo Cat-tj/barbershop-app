@@ -70,13 +70,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      {/* Altora ERP Sidebar */}
+    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-[#F7F4EF] text-[#27231F]">
+      {/* Rome Bois Sidebar */}
       <Sidebar userRole={session?.role} username={session?.username} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 bg-gradient-to-b from-zinc-950 to-zinc-900/60">
+        <main className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 bg-[#F7F4EF]">
           <div className="w-full h-full max-w-7xl mx-auto">
             {children}
           </div>

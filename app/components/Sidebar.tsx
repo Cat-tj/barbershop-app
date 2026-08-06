@@ -58,22 +58,22 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-zinc-950 border-r border-zinc-800/80 w-64 text-zinc-300 select-none">
+    <div className="flex flex-col h-full bg-[#F1ECE5] border-r border-[#DED7CE] w-64 text-[#27231F] select-none p-3 my-2 ml-2 rounded-3xl shadow-sm">
       {/* Header Branding */}
-      <div className="p-5 border-b border-zinc-800/80 flex items-center justify-between">
+      <div className="p-4 border-b border-[#DED7CE] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#B7792B] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#B7792B]/20">
+          <div className="w-10 h-10 rounded-2xl bg-[#B6782B] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#B6782B]/20">
             RB
           </div>
           <div>
-            <h1 className="font-extrabold tracking-wider text-sm text-[#26231F] flex items-center gap-1.5">
+            <h1 className="font-black tracking-wider text-xs text-[#27231F] flex items-center gap-1.5">
               ROME BOIS
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#B7792B]/10 text-[#B7792B] border border-[#B7792B]/20">
+              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#B6782B]/15 text-[#B6782B] border border-[#B6782B]/30">
                 BARBERSHOP
               </span>
             </h1>
-            <p className="text-[10px] text-[#746E66] flex items-center gap-1 font-medium">
-              <Sparkles className="w-2.5 h-2.5 text-[#B7792B]" /> Technology by Altora
+            <p className="text-[10px] text-[#6F675F] flex items-center gap-1 font-medium">
+              <Sparkles className="w-2.5 h-2.5 text-[#B6782B]" /> Technology by Altora
             </p>
           </div>
         </div>
@@ -81,15 +81,15 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
         {/* Mobile close */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="md:hidden p-1.5 text-zinc-400 hover:text-zinc-100 rounded-lg"
+          className="md:hidden p-1.5 text-[#6F675F] hover:text-[#27231F] rounded-lg"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Navigation Menu */}
-      <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-zinc-400">
+      <div className="flex-1 py-4 px-1 space-y-1.5 overflow-y-auto">
+        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-[#91887F]">
           Menu Operasional
         </div>
 
@@ -102,32 +102,32 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
               key={item.name}
               href={item.href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+              className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all group ${
                 isActive
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30 shadow-md shadow-amber-500/5'
-                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/80 border border-transparent'
+                  ? 'bg-[#B6782B]/15 text-[#B6782B] border border-[#B6782B]/30 shadow-sm'
+                  : 'text-[#6F675F] hover:text-[#27231F] hover:bg-white/80 border border-transparent'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-amber-400' : 'text-zinc-400 group-hover:text-zinc-300'}`} />
+                <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#B6782B]' : 'text-[#6F675F] group-hover:text-[#27231F]'}`} />
                 <span>{item.name}</span>
               </div>
-              {isActive && <ChevronRight className="w-3.5 h-3.5 text-amber-400" />}
+              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#B6782B]" />}
             </Link>
           )
         })}
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-3 border-t border-zinc-800/80 bg-zinc-900/40">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60 mb-2">
+      <div className="p-2 border-t border-[#DED7CE] bg-white/60 rounded-2xl">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-[#DED7CE] mb-2">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center text-xs">
+            <div className="w-8 h-8 rounded-xl bg-[#B6782B]/15 text-[#B6782B] font-extrabold flex items-center justify-center text-xs">
               {username.charAt(0).toUpperCase()}
             </div>
             <div className="truncate">
-              <span className="block text-xs font-bold text-zinc-200 truncate">{username}</span>
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-amber-400/80">
+              <span className="block text-xs font-bold text-[#27231F] truncate">{username}</span>
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-[#B6782B]">
                 {userRole}
               </span>
             </div>
@@ -136,7 +136,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
         <button
           onClick={handleLogout}
-          className="w-full py-2 px-3 rounded-xl bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/40 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2 px-3 rounded-xl bg-[#B35E57]/10 hover:bg-[#B35E57]/20 text-[#B35E57] border border-[#B35E57]/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Keluar</span>
