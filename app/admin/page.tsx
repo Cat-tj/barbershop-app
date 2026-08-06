@@ -93,20 +93,17 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [uRes, sRes, qRes] = await Promise.all([
+      const [uRes, sRes, qRes, mRes] = await Promise.all([
         fetch('/api/admin/users').then(r => r.json()).catch(() => ({ users: [] })),
         fetch('/api/services').then(r => r.json()).catch(() => ({ services: [] })),
-        fetch('/api/admin/qris').then(r => r.json()).catch(() => ({ qris_static_payload: '' }))
+        fetch('/api/admin/qris').then(r => r.json()).catch(() => ({ qris_static_payload: '' })),
+        fetch('/api/member').then(r => r.json()).catch(() => ({ members: [] }))
       ])
       
       if (uRes.users) setUsers(uRes.users)
       if (sRes.services) setServices(sRes.services)
       if (qRes.qris_static_payload) setQrisStaticPayload(qRes.qris_static_payload)
-
-      setMembers([
-        { id: 1, name: 'Alexander The Great', phone: '085200000000', tier_id: 1, total_points: 120, total_spent: 350000, visit_count: 5, tier_name: 'Silver', color: '#f59e0b' },
-        { id: 2, name: 'Budi Santoso', phone: '081299887766', tier_id: 2, total_points: 340, total_spent: 850000, visit_count: 12, tier_name: 'Gold', color: '#eab308' }
-      ])
+      if (mRes.members) setMembers(mRes.members)
       setCapsters([
         { id: 1, name: 'Budi Barbershop', phone: '081234567890', active: true },
         { id: 2, name: 'Rian Hair Stylist', phone: '081298765432', active: true },

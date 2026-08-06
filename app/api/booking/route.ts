@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
       services,
       booking_type,
       notes,
-      is_new_member,
     } = body as {
       customer_name: string
       customer_phone?: string | null
@@ -29,7 +28,6 @@ export async function POST(request: NextRequest) {
       services: BookingService[]
       booking_type?: string
       notes?: string | null
-      is_new_member?: boolean
     }
 
     if (!customer_name?.trim()) {
@@ -48,14 +46,19 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'At least one service is required.' }, { status: 400 })
     }
 
-    if (is_new_member && customer_phone?.trim()) {
+    // AUTOMATIC MEMBER REGISTRATION (Always create/update member upon reservation)
+    if (customer_phone?.trim()) {
       const phone = customer_phone.trim()
       const existing = db.prepare('SELECT id FROM members WHERE phone = ?').get(phone)
       if (!existing) {
         db.prepare(`
           INSERT INTO members (name, phone, tier_id, total_points, total_spent, visit_count)
-          VALUES (?, ?, 1, 0, 0, 0)
+          VALUES (?, ?, 1, 10, 0, 1)
         `).run(customer_name.trim(), phone)
+      } else {
+        db.prepare(`
+          UPDATE members SET visit_count = visit_count + 1 WHERE phone = ?
+        `).run(phone)
       }
     }
 
