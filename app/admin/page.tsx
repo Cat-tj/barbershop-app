@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { Camera, Check, Pencil, Trash2 } from 'lucide-react'
+import QrisScannerModal from '../components/QrisScannerModal'
 
 type UserAccount = {
   id: number
@@ -46,7 +48,7 @@ type Capster = {
   active: boolean
 }
 
-type Tab = 'users' | 'members' | 'products' | 'services' | 'capsters' | 'qris'
+type Tab = 'users' | 'services' | 'qris' | 'members' | 'products' | 'capsters'
 
 function formatRp(n: number) {
   return new Intl.NumberFormat('id-ID', {
@@ -64,29 +66,27 @@ export default function AdminPage() {
   const [services, setServices] = useState<Service[]>([])
   const [capsters, setCapsters] = useState<Capster[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentUser, setCurrentUser] = useState<{ id: number; username: string; role: string } | null>(null)
 
   const [activeTab, setActiveTab] = useState<Tab>('users')
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null)
 
-  // QRIS Static Payload Setting State
+  // QRIS Setting State & Scanner Modal
   const [qrisStaticPayload, setQrisStaticPayload] = useState('')
+  const [scannerOpen, setScannerOpen] = useState(false)
 
-  // New Service Form State
-  const [showServiceAddForm, setShowServiceAddForm] = useState(false)
-  const [newServiceName, setNewServiceName] = useState('')
-  const [newServicePrice, setNewServicePrice] = useState('')
-  const [newServiceDuration, setNewServiceDuration] = useState('30')
+  // Service Add & Edit State
+  const [showServiceForm, setShowServiceForm] = useState(false)
+  const [editingServiceId, setEditingServiceId] = useState<number | null>(null)
+  const [serviceName, setServiceName] = useState('')
+  const [servicePrice, setServicePrice] = useState('')
+  const [serviceDuration, setServiceDuration] = useState('30')
 
   const [showUserForm, setShowUserForm] = useState(false)
   const [editingUserId, setEditingUserId] = useState<number | null>(null)
   const [formUsername, setFormUsername] = useState('')
   const [formPassword, setFormPassword] = useState('')
   const [formRole, setFormRole] = useState<'admin' | 'user'>('user')
-
-  const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: number; name: string } | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -101,16 +101,20 @@ export default function AdminPage() {
       if (sRes.services) setServices(sRes.services)
       if (qRes.qris_static_payload) setQrisStaticPayload(qRes.qris_static_payload)
 
-      // Fallback default sample data if empty
+      // Initial Data for Members, Capsters, Products
       setMembers([
-        { id: 1, name: 'Alexander The Great', phone: '085200000000', tier_id: 1, total_points: 120, total_spent: 350000, visit_count: 5, tier_name: 'Silver', color: '#f59e0b' }
+        { id: 1, name: 'Alexander The Great', phone: '085200000000', tier_id: 1, total_points: 120, total_spent: 350000, visit_count: 5, tier_name: 'Silver', color: '#f59e0b' },
+        { id: 2, name: 'Budi Santoso', phone: '081299887766', tier_id: 2, total_points: 340, total_spent: 850000, visit_count: 12, tier_name: 'Gold', color: '#eab308' }
       ])
       setCapsters([
         { id: 1, name: 'Budi Barbershop', phone: '081234567890', active: true },
-        { id: 2, name: 'Rian Hair Stylist', phone: '081298765432', active: true }
+        { id: 2, name: 'Rian Hair Stylist', phone: '081298765432', active: true },
+        { id: 3, name: 'Doni Fade Master', phone: '081311223344', active: true }
       ])
       setProducts([
-        { id: 1, name: 'Pomade Waterbased Altora', price: 85000, stock: 15, stock_threshold: 5, category: 'product' }
+        { id: 1, name: 'Pomade Waterbased Altora', price: 85000, stock: 15, stock_threshold: 5, category: 'product' },
+        { id: 2, name: 'Hair Tonic Gingseng', price: 65000, stock: 8, stock_threshold: 3, category: 'product' },
+        { id: 3, name: 'Shampoo Barbershop 1L', price: 110000, stock: 4, stock_threshold: 2, category: 'consumable' }
       ])
     } catch (err) {
       console.error('Failed to load admin data', err)
@@ -121,39 +125,40 @@ export default function AdminPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  useEffect(() => {
-    const getCookie = (name: string) => {
-      const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'))
-      return match ? decodeURIComponent(match[1]) : null
-    }
-    const session = getCookie('session')
-    if (session) {
-      try {
-        const payload = JSON.parse(atob(session.split('.')[1]))
-        setCurrentUser({ id: payload.id, username: payload.username, role: payload.role })
-      } catch {
-        // ignore
-      }
-    }
-  }, [])
-
-  const saveQrisSetting = async () => {
+  const saveQrisSetting = async (payloadToSave?: string) => {
+    const val = payloadToSave || qrisStaticPayload
     setAlert(null)
     try {
       const res = await fetch('/api/admin/qris', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qris_static_payload: qrisStaticPayload }),
+        body: JSON.stringify({ qris_static_payload: val }),
       })
       if (!res.ok) throw new Error('Gagal menyimpan QRIS setting')
-      setAlert({ type: 'success', message: 'Pengaturan QRIS Merchant Statis berhasil diperbarui!' })
+      setAlert({ type: 'success', message: 'Pengaturan QRIS Merchant Statis berhasil disimpan!' })
     } catch {
       setAlert({ type: 'error', message: 'Gagal menyimpan konfigurasi QRIS.' })
     }
   }
 
-  const addService = async () => {
-    if (!newServiceName.trim() || !newServicePrice) {
+  const openAddService = () => {
+    setEditingServiceId(null)
+    setServiceName('')
+    setServicePrice('')
+    setServiceDuration('30')
+    setShowServiceForm(true)
+  }
+
+  const openEditService = (s: Service) => {
+    setEditingServiceId(s.id)
+    setServiceName(s.name)
+    setServicePrice(String(s.price))
+    setServiceDuration(s.duration ? String(s.duration) : '30')
+    setShowServiceForm(true)
+  }
+
+  const saveService = async () => {
+    if (!serviceName.trim() || !servicePrice) {
       setAlert({ type: 'error', message: 'Nama layanan dan harga wajib diisi!' })
       return
     }
@@ -162,20 +167,18 @@ export default function AdminPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: newServiceName.trim(),
-          price: Number(newServicePrice),
-          duration: Number(newServiceDuration) || 30
+          id: editingServiceId,
+          name: serviceName.trim(),
+          price: Number(servicePrice),
+          duration: Number(serviceDuration) || 30
         })
       })
-      if (!res.ok) throw new Error('Gagal menambah layanan')
-      setShowServiceAddForm(false)
-      setNewServiceName('')
-      setNewServicePrice('')
-      setNewServiceDuration('30')
+      if (!res.ok) throw new Error('Gagal menyimpan layanan')
+      setShowServiceForm(false)
       fetchData()
-      setAlert({ type: 'success', message: 'Layanan baru berhasil ditambahkan!' })
+      setAlert({ type: 'success', message: editingServiceId ? 'Layanan berhasil diperbarui!' : 'Layanan baru berhasil ditambahkan!' })
     } catch {
-      setAlert({ type: 'error', message: 'Gagal menambahkan layanan baru.' })
+      setAlert({ type: 'error', message: 'Gagal menyimpan data layanan.' })
     }
   }
 
@@ -207,10 +210,7 @@ export default function AdminPage() {
           : { username, password: formPassword, role: formRole }
         ),
       })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Unknown error' }))
-        throw new Error(err.error || `Server error: ${res.status}`)
-      }
+      if (!res.ok) throw new Error('Gagal menyimpan user')
       setShowUserForm(false)
       fetchData()
       setAlert({ type: 'success', message: editingUserId ? 'User updated.' : 'User created.' })
@@ -240,14 +240,28 @@ export default function AdminPage() {
     { key: 'capsters', label: 'Capsters' },
   ]
 
+  const filteredMembers = members.filter(m => 
+    !memberSearch.trim() || m.name.toLowerCase().includes(memberSearch.toLowerCase()) || m.phone.includes(memberSearch)
+  )
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-zinc-950">
+      {/* QRIS Camera Scanner Modal */}
+      <QrisScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onScanSuccess={(scannedPayload) => {
+          setQrisStaticPayload(scannedPayload)
+          saveQrisSetting(scannedPayload)
+        }}
+      />
+
       {/* Alert */}
       {alert && (
-        <div className={`mx-4 mt-3 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between shadow-lg ${
+        <div className={`mx-6 mt-4 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between shadow-lg ${
           alert.type === 'success'
-            ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-300'
-            : 'bg-red-950/80 border border-red-800 text-red-300'
+            ? 'bg-emerald-950/90 border border-emerald-800 text-emerald-300'
+            : 'bg-red-950/90 border border-red-800 text-red-300'
         }`}>
           <span>{alert.message}</span>
           <button onClick={() => setAlert(null)} className="ml-3 text-zinc-400 hover:text-zinc-200 text-lg leading-none">&times;</button>
@@ -271,14 +285,14 @@ export default function AdminPage() {
           </button>
         )}
         {activeTab === 'services' && (
-          <button onClick={() => setShowServiceAddForm(true)} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10">
+          <button onClick={openAddService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10">
             + Tambah Service Baru
           </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-zinc-800/80 bg-zinc-900/30 px-4 overflow-x-auto">
+      <div className="flex border-b border-zinc-800/80 bg-zinc-900/30 px-6 overflow-x-auto">
         {TABS.map(tab => (
           <button
             key={tab.key}
@@ -295,15 +309,35 @@ export default function AdminPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {/* QRIS SETTING TAB */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* QRIS SETTING TAB WITH CAMERA SCANNER */}
         {activeTab === 'qris' && (
-          <div className="max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl space-y-5">
             <div>
               <h3 className="text-base font-bold text-zinc-100 mb-1">Pengaturan QRIS Merchant Dinamis</h3>
               <p className="text-xs text-zinc-400">
-                Masukkan Kode QRIS Statis Merchant (NMID payload dari aplikasi verssache/qris-dinamis atau e-wallet). Sistem akan mengonversinya secara otomatis menjadi QRIS Dinamis saat transaksi checkout kasir.
+                Masukkan Kode QRIS Statis Merchant (NMID payload dari verssache/qris-dinamis) atau **Scan QRIS melalui kamera**.
               </p>
+            </div>
+
+            {/* Scan via Camera Button */}
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                  <Camera className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-zinc-100">Scan QRIS dari Kamera</h4>
+                  <p className="text-[11px] text-zinc-400">Buka kamera untuk scan QRIS merchant secara langsung</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setScannerOpen(true)}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs transition-all shadow-md shadow-amber-500/20 flex items-center gap-1.5"
+              >
+                <Camera className="w-4 h-4" />
+                <span>Buka Kamera</span>
+              </button>
             </div>
 
             <div>
@@ -312,32 +346,34 @@ export default function AdminPage() {
                 value={qrisStaticPayload}
                 onChange={(e) => setQrisStaticPayload(e.target.value)}
                 rows={4}
-                className="w-full p-3 bg-zinc-950/80 border border-zinc-800 rounded-xl text-xs font-mono text-amber-400 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 resize-none"
+                className="w-full p-3.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-xs font-mono text-amber-400 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 resize-none"
                 placeholder="00020101021126670016ID.CO.QRIS.WWW..."
               />
             </div>
 
             <button
-              onClick={saveQrisSetting}
-              className="h-10 px-6 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/10"
+              onClick={() => saveQrisSetting()}
+              className="h-11 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/10"
             >
               Simpan Configuration QRIS
             </button>
           </div>
         )}
 
-        {/* SERVICES TAB */}
+        {/* SERVICES TAB WITH ADD AND EDIT */}
         {activeTab === 'services' && (
           <div className="space-y-4">
-            {showServiceAddForm && (
+            {showServiceForm && (
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
-                <h3 className="text-sm font-bold text-amber-400">Tambah Service / Layanan Cukur Baru</h3>
+                <h3 className="text-sm font-bold text-amber-400">
+                  {editingServiceId ? 'Edit Layanan Cukur' : 'Tambah Service / Layanan Cukur Baru'}
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-zinc-400 mb-1">Nama Layanan</label>
                     <input
-                      value={newServiceName}
-                      onChange={(e) => setNewServiceName(e.target.value)}
+                      value={serviceName}
+                      onChange={(e) => setServiceName(e.target.value)}
                       placeholder="e.g. Smoothing Hair Treatment"
                       className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
@@ -346,8 +382,8 @@ export default function AdminPage() {
                     <label className="block text-xs text-zinc-400 mb-1">Harga (Rp)</label>
                     <input
                       type="number"
-                      value={newServicePrice}
-                      onChange={(e) => setNewServicePrice(e.target.value)}
+                      value={servicePrice}
+                      onChange={(e) => setServicePrice(e.target.value)}
                       placeholder="60000"
                       className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
@@ -356,40 +392,141 @@ export default function AdminPage() {
                     <label className="block text-xs text-zinc-400 mb-1">Estimasi Durasi (Menit)</label>
                     <input
                       type="number"
-                      value={newServiceDuration}
-                      onChange={(e) => setNewServiceDuration(e.target.value)}
+                      value={serviceDuration}
+                      onChange={(e) => setServiceDuration(e.target.value)}
                       placeholder="30"
                       className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2 justify-end pt-2">
-                  <button onClick={() => setShowServiceAddForm(false)} className="h-9 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold">Batal</button>
-                  <button onClick={addService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold">Simpan Layanan</button>
+                  <button onClick={() => setShowServiceForm(false)} className="h-9 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold">Batal</button>
+                  <button onClick={saveService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold">Simpan Layanan</button>
                 </div>
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
                     <th className="p-4">Nama Layanan</th>
                     <th className="p-4 text-right">Harga</th>
                     <th className="p-4 text-right">Durasi</th>
+                    <th className="p-4 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                   {services.map((s) => (
                     <tr key={s.id} className="hover:bg-zinc-800/40 transition-colors">
-                      <td className="p-4 font-bold">{s.name}</td>
+                      <td className="p-4 font-bold text-zinc-100">{s.name}</td>
                       <td className="p-4 text-right font-mono text-amber-400 font-bold">{formatRp(s.price)}</td>
-                      <td className="p-4 text-right font-mono">{s.duration || 30} Menit</td>
+                      <td className="p-4 text-right font-mono text-zinc-400">{s.duration || 30} Menit</td>
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() => openEditService(s)}
+                          className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-amber-400 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* MEMBERS TAB DATA */}
+        {activeTab === 'members' && (
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={memberSearch}
+              onChange={(e) => setMemberSearch(e.target.value)}
+              placeholder="Cari Member berdasarkan nama atau HP..."
+              className="w-full h-10 px-4 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
+            />
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
+                    <th className="p-4">Nama Pelanggan</th>
+                    <th className="p-4">Nomor HP</th>
+                    <th className="p-4">Tier Member</th>
+                    <th className="p-4 text-right">Poin</th>
+                    <th className="p-4 text-right">Total Transaksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
+                  {filteredMembers.map((m) => (
+                    <tr key={m.id} className="hover:bg-zinc-800/40">
+                      <td className="p-4 font-bold">{m.name}</td>
+                      <td className="p-4 font-mono text-zinc-400">{m.phone}</td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] uppercase font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          {m.tier_name || 'Silver'}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right font-mono text-emerald-400 font-bold">{m.total_points} Pts</td>
+                      <td className="p-4 text-right font-mono">{formatRp(m.total_spent)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* PRODUCTS TAB DATA */}
+        {activeTab === 'products' && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
+                  <th className="p-4">Nama Produk</th>
+                  <th className="p-4 text-right">Harga</th>
+                  <th className="p-4 text-right">Stok</th>
+                  <th className="p-4">Kategori</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
+                {products.map((p) => (
+                  <tr key={p.id} className="hover:bg-zinc-800/40">
+                    <td className="p-4 font-bold">{p.name}</td>
+                    <td className="p-4 text-right font-mono text-amber-400 font-bold">{formatRp(p.price)}</td>
+                    <td className="p-4 text-right font-mono">{p.stock} Pcs</td>
+                    <td className="p-4 uppercase text-[10px] font-bold text-zinc-400">{p.category}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* CAPSTERS TAB DATA */}
+        {activeTab === 'capsters' && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
+                  <th className="p-4">Nama Capster</th>
+                  <th className="p-4">Nomor HP</th>
+                  <th className="p-4 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
+                {capsters.map((c) => (
+                  <tr key={c.id} className="hover:bg-zinc-800/40">
+                    <td className="p-4 font-bold">{c.name}</td>
+                    <td className="p-4 font-mono text-zinc-400">{c.phone || '—'}</td>
+                    <td className="p-4 text-center text-emerald-400 font-bold">● Active</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
@@ -439,7 +576,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
@@ -465,13 +602,6 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
-
-        {/* MEMBERS / PRODUCTS / CAPSTERS PLACEHOLDERS */}
-        {['members', 'products', 'capsters'].includes(activeTab) && (
-          <div className="p-8 text-center text-zinc-500 text-xs bg-zinc-900 border border-zinc-800 rounded-2xl">
-            Modul {activeTab.toUpperCase()} Aktif dan terintegrasi dengan Database SQLite ROMEBOIS ERP.
           </div>
         )}
       </div>
