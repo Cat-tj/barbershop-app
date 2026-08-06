@@ -16,14 +16,7 @@ interface Product {
   price: number
 }
 
-function formatRp(n: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n)
-}
+import { formatRupiah as formatRp } from '@/lib/currency'
 
 function formatDuration(minutes: number): string {
   const h = Math.floor(minutes / 60)

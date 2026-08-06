@@ -12,14 +12,7 @@ interface DashboardData {
   revenue_last_7_days: { date: string; revenue: number }[]
 }
 
-function formatRp(n: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n)
-}
+import { formatRupiah as formatRp } from '@/lib/currency'
 
 function formatShortRp(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`

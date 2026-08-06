@@ -43,14 +43,7 @@ interface NextTier {
   color: string
 }
 
-function formatRp(n: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n)
-}
+import { formatRupiah as formatRp } from '@/lib/currency'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: 'bg-amber-700/30 text-amber-400 border-amber-700',

@@ -103,20 +103,23 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Step 1: Input Uang Laci Awal */}
-          <div>
             <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
-              <DollarSign className="w-4 h-4 text-amber-400" /> 1. Input Nominal Uang Modal Laci Awal (Rp)
+              <DollarSign className="w-4 h-4 text-amber-400" /> 1. Input Nominal Uang Modal Laci Awal
             </label>
-            <input
-              type="number"
-              required
-              value={openingCash}
-              onChange={(e) => setOpeningCash(e.target.value)}
-              placeholder="200000"
-              className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500/60"
-            />
+            <div className="relative">
+              <input
+                type="number"
+                required
+                value={openingCash}
+                onChange={(e) => setOpeningCash(e.target.value)}
+                placeholder="200000"
+                className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500/60"
+              />
+              <div className="mt-1 text-right text-xs font-mono font-bold text-emerald-400">
+                Format: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(openingCash) || 0)}
+              </div>
+            </div>
             <p className="text-[11px] text-zinc-500 mt-1">Uang pecahan kembalian awal di laci meja kasir pagi ini.</p>
-          </div>
 
           {/* Step 2: Pilih Capster Shift Hari Ini */}
           <div>

@@ -33,14 +33,7 @@ type Capster = {
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
-function formatRp(n: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n)
-}
+import { formatRupiah as formatRp } from '@/lib/currency'
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                         */
