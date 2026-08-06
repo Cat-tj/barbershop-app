@@ -10,20 +10,20 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Username and password are required.' }, { status: 400 })
     }
 
-    const result = await login(username, password)
+    const cleanUsername = username.trim()
+    const result = await login(cleanUsername, password)
 
     if (!result) {
       return Response.json({ error: 'Invalid credentials.' }, { status: 401 })
     }
 
-    // Don't set httpOnly cookie server-side — it conflicts with client-side readable cookie.
-    // The login page sets the cookie client-side so JS can read it for session detection.
     return Response.json({
       user: { id: result.user.id, username: result.user.username, role: result.user.role },
       token: result.token,
     })
-  } catch (err) {
-    console.error('Login API error:', err)
-    return Response.json({ error: 'Internal server error.' }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Login API error:', message)
+    return Response.json({ error: 'Login failed: ' + message }, { status: 500 })
   }
 }
