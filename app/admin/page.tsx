@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Camera, Check, Pencil, Trash2 } from 'lucide-react'
+import { Camera, Check, Pencil, Trash2, Key, Shield, UserCheck, ShieldAlert } from 'lucide-react'
 import QrisScannerModal from '../components/QrisScannerModal'
 
 type UserAccount = {
@@ -82,11 +82,13 @@ export default function AdminPage() {
   const [servicePrice, setServicePrice] = useState('')
   const [serviceDuration, setServiceDuration] = useState('30')
 
+  // User Add & Edit Modal State
   const [showUserForm, setShowUserForm] = useState(false)
-  const [editingUserId, setEditingUserId] = useState<number | null>(null)
+  const [editingUser, setEditingUser] = useState<UserAccount | null>(null)
   const [formUsername, setFormUsername] = useState('')
   const [formPassword, setFormPassword] = useState('')
   const [formRole, setFormRole] = useState<'admin' | 'user'>('user')
+  const [formActive, setFormActive] = useState(true)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -182,39 +184,69 @@ export default function AdminPage() {
   }
 
   const openAddUser = () => {
-    setEditingUserId(null)
+    setEditingUser(null)
     setFormUsername('')
     setFormPassword('')
     setFormRole('user')
+    setFormActive(true)
+    setShowUserForm(true)
+  }
+
+  const openEditUser = (u: UserAccount) => {
+    setEditingUser(u)
+    setFormUsername(u.username)
+    setFormPassword('')
+    setFormRole(u.role)
+    setFormActive(u.active)
     setShowUserForm(true)
   }
 
   const saveUser = async () => {
     const username = formUsername.trim()
     if (!username) {
-      setAlert({ type: 'error', message: 'Username is required.' })
+      setAlert({ type: 'error', message: 'Username wajib diisi!' })
       return
     }
-    if (!editingUserId && !formPassword) {
-      setAlert({ type: 'error', message: 'Password is required for new users.' })
+    if (!editingUser && !formPassword) {
+      setAlert({ type: 'error', message: 'Password wajib diisi untuk user baru!' })
       return
     }
     setAlert(null)
     try {
       const res = await fetch('/api/admin/users', {
-        method: editingUserId ? 'PATCH' : 'POST',
+        method: editingUser ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingUserId
-          ? { id: editingUserId, username, role: formRole, password: formPassword || undefined }
+        body: JSON.stringify(editingUser
+          ? { id: editingUser.id, username, role: formRole, active: formActive, password: formPassword || undefined }
           : { username, password: formPassword, role: formRole }
         ),
       })
-      if (!res.ok) throw new Error('Gagal menyimpan user')
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Gagal menyimpan user')
+      }
       setShowUserForm(false)
       fetchData()
-      setAlert({ type: 'success', message: editingUserId ? 'User updated.' : 'User created.' })
+      setAlert({ type: 'success', message: editingUser ? `User ${username} berhasil diperbarui!` : `User ${username} berhasil dibuat!` })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save user.'
+      const message = err instanceof Error ? err.message : 'Gagal menyimpan user.'
+      setAlert({ type: 'error', message })
+    }
+  }
+
+  const deleteUser = async (id: number, username: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus user account "${username}"?`)) return
+    setAlert(null)
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Gagal menghapus user')
+      }
+      fetchData()
+      setAlert({ type: 'success', message: `User "${username}" berhasil dihapus.` })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Gagal menghapus user.'
       setAlert({ type: 'error', message })
     }
   }
@@ -231,7 +263,7 @@ export default function AdminPage() {
   }
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: 'users', label: 'Users' },
+    { key: 'users', label: 'Kelola User & Hak Akses' },
     { key: 'services', label: 'Layanan / Services' },
     { key: 'qris', label: 'Pengaturan QRIS' },
     { key: 'members', label: 'Members' },
@@ -276,11 +308,11 @@ export default function AdminPage() {
               ALTORA SYSTEM
             </span>
           </h1>
-          <p className="text-[11px] sm:text-xs text-zinc-400">Kelola Pengguna, QRIS, Layanan, dan Stok Toko</p>
+          <p className="text-[11px] sm:text-xs text-zinc-400">Kelola Pengguna, Hak Akses Role, QRIS, dan Database</p>
         </div>
         {activeTab === 'users' && (
-          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto">
-            + Tambah User
+          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto flex items-center gap-1.5">
+            <span>+ Tambah User Baru</span>
           </button>
         )}
         {activeTab === 'services' && (
@@ -309,6 +341,158 @@ export default function AdminPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        {/* USERS TAB WITH FULL EDIT & HAK AKSES */}
+        {activeTab === 'users' && (
+          <div className="space-y-6">
+            {/* Modal Form Edit/Add User */}
+            {showUserForm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-amber-400" />
+                      <span>{editingUser ? `Edit User: ${editingUser.username}` : 'Tambah User Account Baru'}</span>
+                    </h3>
+                    <button onClick={() => setShowUserForm(false)} className="text-zinc-400 hover:text-zinc-100">&times;</button>
+                  </div>
+
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block text-zinc-400 font-semibold mb-1">Username / Email Login</label>
+                      <input
+                        value={formUsername}
+                        onChange={e => setFormUsername(e.target.value)}
+                        className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 font-mono"
+                        placeholder="contoh: kasir1 / kasir@gmail.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-zinc-400 font-semibold mb-1">
+                        Password {editingUser && <span className="text-zinc-500 font-normal">(Kosongkan jika tidak ingin ubah password)</span>}
+                      </label>
+                      <input
+                        type="password"
+                        value={formPassword}
+                        onChange={e => setFormPassword(e.target.value)}
+                        className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 font-mono"
+                        placeholder="••••••••"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-zinc-400 font-semibold mb-1">Role / Peran Akses</label>
+                      <select
+                        value={formRole}
+                        onChange={e => setFormRole(e.target.value as 'admin' | 'user')}
+                        className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-amber-500/60"
+                      >
+                        <option value="user">User / Operator Kasir (Hanya POS Kasir & Transaksi)</option>
+                        <option value="admin">Admin System (Akses Penuh Seluruh Menu ERP)</option>
+                      </select>
+                    </div>
+
+                    {editingUser && (
+                      <div>
+                        <label className="block text-zinc-400 font-semibold mb-1">Status Akun</label>
+                        <select
+                          value={formActive ? 'active' : 'inactive'}
+                          onChange={e => setFormActive(e.target.value === 'active')}
+                          className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-amber-500/60"
+                        >
+                          <option value="active">● Aktif (Bisa Login)</option>
+                          <option value="inactive">○ Non-Aktif (Di-Blokir)</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Informasi Hak Akses Role */}
+                    <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-1 text-[11px] text-zinc-400">
+                      <div className="font-bold text-amber-400 flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Penjelasan Hak Akses Role:</span>
+                      </div>
+                      {formRole === 'admin' ? (
+                        <p className="text-zinc-300">
+                          👑 <strong>Admin</strong>: Memiliki akses 100% penuh ke POS Kasir, Laporan Omset, Pengaturan QRIS, Manajemen User, Edit Layanan, dan Stok Produk.
+                        </p>
+                      ) : (
+                        <p className="text-zinc-300">
+                          💈 <strong>User / Kasir</strong>: Memiliki akses ke POS Kasir (`/store`), Reservasi Antrian Cukur (`/queue`), dan Riwayat Belanja. *Tidak bisa mengakses Admin Panel.*
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button onClick={() => setShowUserForm(false)} className="flex-1 h-11 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold">Batal</button>
+                    <button onClick={saveUser} className="flex-1 h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold shadow-lg shadow-amber-500/20">Simpan User</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tabel Pengguna */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+              <table className="w-full text-left border-collapse min-w-[600px]">
+                <thead>
+                  <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
+                    <th className="p-3.5">Username / Login</th>
+                    <th className="p-3.5">Role / Peran</th>
+                    <th className="p-3.5">Hak Akses Menu</th>
+                    <th className="p-3.5 text-center">Status</th>
+                    <th className="p-3.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
+                  {users.map(u => (
+                    <tr key={u.id} className="hover:bg-zinc-800/40 transition-colors">
+                      <td className="p-3.5 font-bold font-mono text-zinc-100">{u.username}</td>
+                      <td className="p-3.5">
+                        <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-extrabold ${
+                          u.role === 'admin' 
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                        }`}>
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-[11px] text-zinc-400">
+                        {u.role === 'admin' ? 'Akses Full ERP + Admin Settings' : 'POS Kasir + Queue Antrian'}
+                      </td>
+                      <td className="p-3.5 text-center">
+                        {u.active ? (
+                          <span className="text-emerald-400 font-bold text-[11px]">● Aktif</span>
+                        ) : (
+                          <span className="text-zinc-500 font-bold text-[11px]">○ Non-Aktif</span>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => openEditUser(u)}
+                            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-amber-400 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => deleteUser(u.id, u.username)}
+                            className="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-red-950 text-zinc-400 hover:text-red-400 text-xs transition-colors"
+                            title="Hapus Account"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* QRIS SETTING TAB WITH CAMERA SCANNER */}
         {activeTab === 'qris' && (
           <div className="max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-5">
@@ -526,81 +710,6 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {/* USERS TAB */}
-        {activeTab === 'users' && (
-          <div className="space-y-4">
-            {showUserForm && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4">
-                  <h3 className="text-sm font-bold text-zinc-100">{editingUserId ? 'Edit User' : 'Tambah User Baru'}</h3>
-                  <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Username</label>
-                    <input
-                      value={formUsername}
-                      onChange={e => setFormUsername(e.target.value)}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
-                      placeholder="Username"
-                      disabled={!!editingUserId}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Password</label>
-                    <input
-                      type="password"
-                      value={formPassword}
-                      onChange={e => setFormPassword(e.target.value)}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
-                      placeholder="Password"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Role</label>
-                    <select
-                      value={formRole}
-                      onChange={e => setFormRole(e.target.value as 'admin' | 'user')}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
-                    >
-                      <option value="user">User (Kasir)</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <button onClick={() => setShowUserForm(false)} className="flex-1 h-10 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-semibold">Batal</button>
-                    <button onClick={saveUser} className="flex-1 h-10 rounded-xl bg-amber-500 text-zinc-950 text-xs font-bold">Simpan</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
-              <table className="w-full text-left border-collapse min-w-[400px]">
-                <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                    <th className="p-3.5">Username</th>
-                    <th className="p-3.5">Role</th>
-                    <th className="p-3.5 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
-                  {users.map(u => (
-                    <tr key={u.id} className="hover:bg-zinc-800/40">
-                      <td className="p-3.5 font-bold">{u.username}</td>
-                      <td className="p-3.5">
-                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${u.role === 'admin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-center">
-                        <span className="text-emerald-400 font-bold">● Active</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
         )}
       </div>
