@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Clock, User, Scissors, RefreshCw, CheckCircle2, Play, Check, X } from 'lucide-react'
+import ShiftClockInModal from '../components/ShiftClockInModal'
 
 interface BookingQueue {
   id: number
@@ -14,9 +15,22 @@ interface BookingQueue {
   capster_name?: string
 }
 
+interface Capster {
+  id: number
+  name: string
+}
+
 export default function QueuePage() {
   const [queue, setQueue] = useState<BookingQueue[]>([])
+  const [capsters, setCapsters] = useState<Capster[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Shift Modal State
+  const [showShiftModal, setShowShiftModal] = useState(false)
+
+  // Capster Picker Modal State on Start Haircut
+  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null)
+  const [pickerCapsterId, setPickerCapsterId] = useState<number | null>(null)
 
   const fetchQueue = async () => {
     try {
@@ -30,11 +44,63 @@ export default function QueuePage() {
     }
   }
 
+  const checkShift = async () => {
+    try {
+      const res = await fetch('/api/shift')
+      const data = await res.json()
+      if (!data.hasActiveShift) {
+        setShowShiftModal(true)
+      }
+    } catch (err) {
+      console.error('Shift check error', err)
+    }
+  }
+
+  const fetchCapsters = async () => {
+    try {
+      const res = await fetch('/api/admin/capsters')
+      const data = await res.json()
+      if (data.capsters) setCapsters(data.capsters)
+    } catch (err) {
+      console.error('Capsters fetch error', err)
+    }
+  }
+
   useEffect(() => {
     fetchQueue()
-    const interval = setInterval(fetchQueue, 5000) // Auto-refresh queue every 5s
+    checkShift()
+    fetchCapsters()
+    const interval = setInterval(fetchQueue, 5000)
     return () => clearInterval(interval)
   }, [])
+
+  const openStartHaircutModal = (bookingId: number) => {
+    setSelectedBookingId(bookingId)
+    if (capsters.length > 0) {
+      setPickerCapsterId(capsters[0].id)
+    }
+  }
+
+  const confirmStartHaircut = async () => {
+    if (!selectedBookingId) return
+    try {
+      const res = await fetch('/api/queue', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedBookingId,
+          status: 'in_progress',
+          capster_id: pickerCapsterId
+        })
+      })
+      if (res.ok) {
+        setSelectedBookingId(null)
+        fetchQueue()
+      }
+    } catch (err) {
+      console.error('Failed to start haircut', err)
+    }
+  }
 
   const updateStatus = async (id: number, status: 'confirmed' | 'in_progress' | 'completed' | 'cancelled') => {
     try {
@@ -53,7 +119,57 @@ export default function QueuePage() {
   const waitingQueue = queue.filter((q) => q.status === 'confirmed')
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950 p-4 sm:p-6 min-h-full">
+    <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950 p-4 sm:p-6 min-h-full relative">
+      {/* Shift Clock-in Modal */}
+      <ShiftClockInModal
+        isOpen={showShiftModal}
+        username="kasir"
+        onClockInSuccess={() => setShowShiftModal(false)}
+      />
+
+      {/* Capster Picker Modal for Mulai Cukur */}
+      {selectedBookingId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+                <Scissors className="w-4 h-4 text-amber-400" />
+                <span>Pilih Capster / Barber Cukur</span>
+              </h3>
+              <button onClick={() => setSelectedBookingId(null)} className="text-zinc-400 hover:text-zinc-100">&times;</button>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-zinc-300 mb-2">Siapa Barber yang Memotong?</label>
+              <select
+                value={pickerCapsterId || ''}
+                onChange={(e) => setPickerCapsterId(Number(e.target.value))}
+                className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 font-bold focus:outline-none focus:border-amber-500/60"
+              >
+                {capsters.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    💈 {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setSelectedBookingId(null)}
+                className="flex-1 h-11 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmStartHaircut}
+                className="flex-1 h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20"
+              >
+                Mulai Cukur Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-3xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
@@ -64,7 +180,7 @@ export default function QueuePage() {
                 OPERATOR CONTROL
               </span>
             </h1>
-            <p className="text-xs text-zinc-400">Tekan tombol aksi untuk mengubah status pelanggan (Mulai Cukur / Selesai)</p>
+            <p className="text-xs text-zinc-400">Tekan tombol aksi untuk memilih barber & mulai cukur</p>
           </div>
           <button
             onClick={fetchQueue}
@@ -87,7 +203,7 @@ export default function QueuePage() {
                 <p className="text-xs text-zinc-400 mt-1 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
                   Jam <strong className="text-amber-400 font-mono">{currentServing.start_time} - {currentServing.end_time}</strong>
-                  <span>&middot; HP: <strong className="text-zinc-200 font-mono">{currentServing.customer_phone || '—'}</strong></span>
+                  <span>&middot; Barber: <strong className="text-amber-400 font-bold">{currentServing.capster_name || 'Budi Barbershop'}</strong></span>
                 </p>
               </div>
               <button
@@ -100,7 +216,7 @@ export default function QueuePage() {
             </div>
           ) : (
             <div className="py-4 text-center text-zinc-500 text-sm font-semibold">
-              Belum ada pelanggan yang sedang dicukur. Pilih dari daftar antrian di bawah untuk memulai!
+              Belum ada pelanggan yang sedang dicukur. Klik tombol "Mulai Cukur" & pilih barber di bawah!
             </div>
           )}
         </div>
@@ -109,7 +225,7 @@ export default function QueuePage() {
         <div className="space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
             <span>Daftar Menunggu Antrian ({waitingQueue.length})</span>
-            <span className="text-[10px] text-zinc-500 font-normal">Tekan "Mulai Cukur" untuk memindahkan ke In Progress</span>
+            <span className="text-[10px] text-zinc-500 font-normal">Tekan "Mulai Cukur" untuk memilih barber bertugas</span>
           </h3>
 
           {waitingQueue.length === 0 ? (
@@ -135,7 +251,7 @@ export default function QueuePage() {
 
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-0 border-zinc-800/80">
                     <button
-                      onClick={() => updateStatus(item.id, 'in_progress')}
+                      onClick={() => openStartHaircutModal(item.id)}
                       className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-95 transition-all"
                     >
                       <Play className="w-3.5 h-3.5 fill-zinc-950" />

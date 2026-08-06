@@ -39,7 +39,22 @@ db.exec(`
     name TEXT NOT NULL,
     phone TEXT,
     active INTEGER DEFAULT 1,
+    base_salary REAL DEFAULT 0,
+    service_commission_type TEXT DEFAULT 'percent',
+    service_commission_val REAL DEFAULT 0,
+    product_commission_type TEXT DEFAULT 'percent',
+    product_commission_val REAL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS shifts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cashier_username TEXT NOT NULL,
+    opening_cash REAL NOT NULL DEFAULT 0,
+    shift_date TEXT NOT NULL,
+    opened_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status TEXT DEFAULT 'open',
+    capster_ids TEXT
   );
 
   CREATE TABLE IF NOT EXISTS orders (
@@ -114,6 +129,23 @@ db.exec(`
   );
 `)
 
+// Ensure salary columns exist on existing capsters table if migrated
+try {
+  db.exec("ALTER TABLE capsters ADD COLUMN base_salary REAL DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE capsters ADD COLUMN service_commission_type TEXT DEFAULT 'percent'")
+} catch {}
+try {
+  db.exec("ALTER TABLE capsters ADD COLUMN service_commission_val REAL DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE capsters ADD COLUMN product_commission_type TEXT DEFAULT 'percent'")
+} catch {}
+try {
+  db.exec("ALTER TABLE capsters ADD COLUMN product_commission_val REAL DEFAULT 0")
+} catch {}
+
 // Seed default settings (QRIS Static Payload)
 db.prepare(`
   INSERT OR IGNORE INTO settings (key, value) VALUES ('qris_static_payload', '00020101021226670016ID.CO.QRIS.WWW01189360091430000000000215ID10200000000000303039365204581253033605802ID5914ROMEBOIS POS6007JAKARTA610512110622207QRIS1234566304ABCD')
@@ -132,10 +164,13 @@ if (countServices === 0) {
 // Seed default capsters
 const countCapsters = (db.prepare('SELECT COUNT(*) as count FROM capsters').get() as { count: number }).count
 if (countCapsters === 0) {
-  const insertCapster = db.prepare('INSERT INTO capsters (name, phone, active) VALUES (?, ?, 1)')
-  insertCapster.run('Budi Barbershop', '081234567890')
-  insertCapster.run('Rian Hair Stylist', '081298765432')
-  insertCapster.run('Doni Fade Master', '081311223344')
+  const insertCapster = db.prepare(`
+    INSERT INTO capsters (name, phone, active, base_salary, service_commission_type, service_commission_val, product_commission_type, product_commission_val) 
+    VALUES (?, ?, 1, ?, ?, ?, ?, ?)
+  `)
+  insertCapster.run('Budi Barbershop', '081234567890', 2500000, 'percent', 40, 'percent', 10)
+  insertCapster.run('Rian Hair Stylist', '081298765432', 2800000, 'percent', 45, 'fixed', 5000)
+  insertCapster.run('Doni Fade Master', '081311223344', 3000000, 'fixed', 20000, 'percent', 10)
 }
 
 // Seed default products

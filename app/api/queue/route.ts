@@ -39,15 +39,23 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, status } = body as { id: number; status: 'confirmed' | 'in_progress' | 'completed' | 'cancelled' }
+    const { id, status, capster_id } = body as {
+      id: number
+      status: 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
+      capster_id?: number
+    }
 
     if (!id || !status) {
       return Response.json({ error: 'ID and status are required' }, { status: 400 })
     }
 
-    db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
+    if (capster_id) {
+      db.prepare('UPDATE bookings SET status = ?, capster_id = ? WHERE id = ?').run(status, capster_id, id)
+    } else {
+      db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
+    }
 
-    return Response.json({ success: true, id, status })
+    return Response.json({ success: true, id, status, capster_id })
   } catch (err) {
     console.error('Failed to update booking status:', err)
     return Response.json({ error: 'Internal server error' }, { status: 500 })

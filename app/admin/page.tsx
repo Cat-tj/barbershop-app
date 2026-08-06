@@ -46,6 +46,11 @@ type Capster = {
   name: string
   phone: string | null
   active: boolean
+  base_salary?: number
+  service_commission_type?: 'percent' | 'fixed'
+  service_commission_val?: number
+  product_commission_type?: 'percent' | 'fixed'
+  product_commission_val?: number
 }
 
 type Tab = 'users' | 'services' | 'qris' | 'members' | 'products' | 'capsters'
@@ -71,6 +76,17 @@ export default function AdminPage() {
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
 
+  // Capster Salary & Commission Modal State
+  const [showCapsterForm, setShowCapsterForm] = useState(false)
+  const [editingCapster, setEditingCapster] = useState<Capster | null>(null)
+  const [capsterName, setCapsterName] = useState('')
+  const [capsterPhone, setCapsterPhone] = useState('')
+  const [capsterBaseSalary, setCapsterBaseSalary] = useState('0')
+  const [capsterServiceCommType, setCapsterServiceCommType] = useState<'percent' | 'fixed'>('percent')
+  const [capsterServiceCommVal, setCapsterServiceCommVal] = useState('0')
+  const [capsterProductCommType, setCapsterProductCommType] = useState<'percent' | 'fixed'>('percent')
+  const [capsterProductCommVal, setCapsterProductCommVal] = useState('0')
+
   // QRIS Setting State & Scanner Modal
   const [qrisStaticPayload, setQrisStaticPayload] = useState('')
   const [scannerOpen, setScannerOpen] = useState(false)
@@ -93,22 +109,19 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [uRes, sRes, qRes, mRes] = await Promise.all([
+      const [uRes, sRes, qRes, mRes, cRes] = await Promise.all([
         fetch('/api/admin/users').then(r => r.json()).catch(() => ({ users: [] })),
         fetch('/api/services').then(r => r.json()).catch(() => ({ services: [] })),
         fetch('/api/admin/qris').then(r => r.json()).catch(() => ({ qris_static_payload: '' })),
-        fetch('/api/member').then(r => r.json()).catch(() => ({ members: [] }))
+        fetch('/api/member').then(r => r.json()).catch(() => ({ members: [] })),
+        fetch('/api/admin/capsters').then(r => r.json()).catch(() => ({ capsters: [] }))
       ])
       
       if (uRes.users) setUsers(uRes.users)
       if (sRes.services) setServices(sRes.services)
       if (qRes.qris_static_payload) setQrisStaticPayload(qRes.qris_static_payload)
       if (mRes.members) setMembers(mRes.members)
-      setCapsters([
-        { id: 1, name: 'Budi Barbershop', phone: '081234567890', active: true },
-        { id: 2, name: 'Rian Hair Stylist', phone: '081298765432', active: true },
-        { id: 3, name: 'Doni Fade Master', phone: '081311223344', active: true }
-      ])
+      if (cRes.capsters) setCapsters(cRes.capsters)
       setProducts([
         { id: 1, name: 'Pomade Waterbased Altora', price: 85000, stock: 15, stock_threshold: 5, category: 'product' },
         { id: 2, name: 'Hair Tonic Gingseng', price: 65000, stock: 8, stock_threshold: 3, category: 'product' },
@@ -245,6 +258,60 @@ export default function AdminPage() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Gagal menghapus user.'
       setAlert({ type: 'error', message })
+    }
+  }
+  const openAddCapster = () => {
+    setEditingCapster(null)
+    setCapsterName('')
+    setCapsterPhone('')
+    setCapsterBaseSalary('2500000')
+    setCapsterServiceCommType('percent')
+    setCapsterServiceCommVal('40')
+    setCapsterProductCommType('percent')
+    setCapsterProductCommVal('10')
+    setShowCapsterForm(true)
+  }
+
+  const openEditCapster = (c: Capster) => {
+    setEditingCapster(c)
+    setCapsterName(c.name)
+    setCapsterPhone(c.phone || '')
+    setCapsterBaseSalary(String(c.base_salary || 0))
+    setCapsterServiceCommType(c.service_commission_type || 'percent')
+    setCapsterServiceCommVal(String(c.service_commission_val || 0))
+    setCapsterProductCommType(c.product_commission_type || 'percent')
+    setCapsterProductCommVal(String(c.product_commission_val || 0))
+    setShowCapsterForm(true)
+  }
+
+  const saveCapster = async () => {
+    if (!capsterName.trim()) {
+      setAlert({ type: 'error', message: 'Nama Capster wajib diisi!' })
+      return
+    }
+    setAlert(null)
+    try {
+      const res = await fetch('/api/admin/capsters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingCapster?.id,
+          name: capsterName.trim(),
+          phone: capsterPhone.trim() || null,
+          active: 1,
+          base_salary: Number(capsterBaseSalary) || 0,
+          service_commission_type: capsterServiceCommType,
+          service_commission_val: Number(capsterServiceCommVal) || 0,
+          product_commission_type: capsterProductCommType,
+          product_commission_val: Number(capsterProductCommVal) || 0,
+        }),
+      })
+      if (!res.ok) throw new Error('Gagal menyimpan capster')
+      setShowCapsterForm(false)
+      fetchData()
+      setAlert({ type: 'success', message: editingCapster ? `Pengaturan gaji Capster ${capsterName} berhasil diperbarui!` : `Capster ${capsterName} berhasil ditambahkan!` })
+    } catch {
+      setAlert({ type: 'error', message: 'Gagal menyimpan data capster.' })
     }
   }
 
