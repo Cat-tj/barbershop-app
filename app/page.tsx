@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import QrisModal from "./components/QrisModal";
+import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 
 type Product = {
   id: number;
@@ -9,7 +10,6 @@ type Product = {
   price: number;
   stock: number;
   category: "product" | "consumable";
-  stock_threshold?: number;
 };
 
 type Service = {
@@ -36,16 +36,6 @@ type CartItem = {
   qty: number;
   capsterId?: number;
   capsterName?: string;
-};
-
-type Member = {
-  id: number;
-  name: string;
-  phone: string;
-  tier_id: number;
-  total_points: number;
-  total_spent: number;
-  visit_count: number;
 };
 
 type ReceiptData = {
@@ -100,14 +90,13 @@ export default function POSPage() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [discount, setDiscount] = useState(0);
-  const [detectedMember, setDetectedMember] = useState<Member | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState<{
     type: "success" | "error";
     message: string;
   } | null>(null);
   const [selectedCapsterId, setSelectedCapsterId] = useState<number | null>(null);
-  const [cartOpen, setCartOpen] = useState(false);
+  const [cartOpenMobile, setCartOpenMobile] = useState(false);
 
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [qrisOpen, setQrisOpen] = useState(false);
@@ -210,10 +199,6 @@ export default function POSPage() {
     );
   }, []);
 
-  const removeItem = useCallback((id: string) => {
-    setCart((prev) => prev.filter((ci) => ci.id !== id));
-  }, []);
-
   const subtotal = useMemo(
     () => cart.reduce((sum, ci) => sum + ci.price * ci.qty, 0),
     [cart]
@@ -276,7 +261,7 @@ export default function POSPage() {
       setCustomerName("");
       setCustomerPhone("");
       setDiscount(0);
-      setCartOpen(false);
+      setCartOpenMobile(false);
     } catch {
       setAlert({ type: "error", message: "Gagal memproses transaksi." });
     } finally {
@@ -295,10 +280,92 @@ export default function POSPage() {
     );
   }
 
+  const renderCartInner = () => (
+    <div className="flex flex-col h-full bg-zinc-900">
+      <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+        <h2 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+          <span>Keranjang Kasir ({cart.length})</span>
+        </h2>
+        {cart.length > 0 && (
+          <button onClick={() => setCart([])} className="text-xs text-red-400 hover:underline">
+            Kosongkan
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-zinc-800/60">
+        {cart.length === 0 ? (
+          <div className="text-center py-10 text-zinc-500 text-xs">
+            Keranjang masih kosong.<br />Klik (+) pada Layanan/Produk untuk menambahkan.
+          </div>
+        ) : (
+          cart.map((item) => (
+            <div key={item.id} className="pt-2 flex items-center justify-between text-xs">
+              <div>
+                <div className="font-bold text-zinc-200">{item.name}</div>
+                <div className="text-[10px] text-zinc-500">{formatRp(item.price)} x {item.qty}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => updateQty(item.id, -1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">&minus;</button>
+                <span className="font-bold font-mono">{item.qty}</span>
+                <button onClick={() => updateQty(item.id, 1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">+</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="p-4 border-t border-zinc-800 space-y-3 bg-zinc-950/60">
+        <input
+          type="text"
+          placeholder="Nama Pelanggan"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
+        />
+        <input
+          type="text"
+          placeholder="No HP / WhatsApp"
+          value={customerPhone}
+          onChange={(e) => setCustomerPhone(e.target.value)}
+          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
+        />
+
+        <div className="flex gap-2">
+          {['cash', 'qris', 'debit'].map((m) => (
+            <button
+              key={m}
+              onClick={() => setPaymentMethod(m)}
+              className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-amber-500 text-zinc-950 shadow-md' : 'bg-zinc-800 text-zinc-400'}`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-zinc-800">
+          <span className="text-zinc-400">Total Tagihan</span>
+          <span className="text-amber-400 font-mono text-base">{formatRp(total)}</span>
+        </div>
+
+        <button
+          onClick={() => {
+            if (paymentMethod === 'qris') setQrisOpen(true)
+            else processOrder()
+          }}
+          disabled={cart.length === 0 || submitting}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 font-bold text-sm shadow-lg shadow-amber-500/10 active:scale-[0.98] disabled:opacity-50"
+        >
+          Bayar / Charge {formatRp(total)}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-zinc-950">
+    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-zinc-950 relative">
       {/* LEFT AREA: SERVICES & PRODUCTS ALL-IN-ONE SINGLE PAGE */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden p-6 space-y-6">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden p-4 sm:p-6 space-y-4 sm:space-y-6 pb-20 md:pb-6">
         {/* Top Search Bar */}
         <div className="flex items-center gap-3">
           <input
@@ -317,7 +384,7 @@ export default function POSPage() {
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+        <div className="flex-1 overflow-y-auto space-y-6 pr-1">
           {/* SECTION 1: LAYANAN / SERVICES (ATAS) */}
           <div className="space-y-3">
             <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
@@ -372,74 +439,49 @@ export default function POSPage() {
         </div>
       </div>
 
-      {/* RIGHT AREA: CART & CHECKOUT SIDEBAR */}
-      <div className="w-full md:w-96 bg-zinc-900/90 border-l border-zinc-800 flex flex-col h-full">
-        <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-zinc-100">Keranjang Kasir ({cart.length})</h2>
-          {cart.length > 0 && <button onClick={() => setCart([])} className="text-xs text-red-400 hover:underline">Kosongkan</button>}
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-zinc-800/60">
-          {cart.map((item) => (
-            <div key={item.id} className="pt-2 flex items-center justify-between text-xs">
-              <div>
-                <div className="font-bold text-zinc-200">{item.name}</div>
-                <div className="text-[10px] text-zinc-500">{formatRp(item.price)} x {item.qty}</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => updateQty(item.id, -1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">&minus;</button>
-                <span className="font-bold font-mono">{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">+</button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="p-4 border-t border-zinc-800 space-y-3 bg-zinc-950/60">
-          <input
-            type="text"
-            placeholder="Nama Pelanggan"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
-          />
-          <input
-            type="text"
-            placeholder="No HP / WhatsApp"
-            value={customerPhone}
-            onChange={(e) => setCustomerPhone(e.target.value)}
-            className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
-          />
-
-          <div className="flex gap-2">
-            {['cash', 'qris', 'debit'].map((m) => (
-              <button
-                key={m}
-                onClick={() => setPaymentMethod(m)}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-amber-500 text-zinc-950 shadow-md' : 'bg-zinc-800 text-zinc-400'}`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-zinc-800">
-            <span className="text-zinc-400">Total Tagihan</span>
-            <span className="text-amber-400 font-mono text-base">{formatRp(total)}</span>
-          </div>
-
-          <button
-            onClick={() => {
-              if (paymentMethod === 'qris') setQrisOpen(true)
-              else processOrder()
-            }}
-            disabled={cart.length === 0 || submitting}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 font-bold text-sm shadow-lg shadow-amber-500/10 active:scale-[0.98]"
-          >
-            Bayar / Charge {formatRp(total)}
-          </button>
-        </div>
+      {/* DESKTOP RIGHT SIDEBAR */}
+      <div className="hidden md:flex md:w-96 md:flex-col md:h-full border-l border-zinc-800">
+        {renderCartInner()}
       </div>
+
+      {/* MOBILE FLOATING BOTTOM CART BAR */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 p-3 z-30 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 relative">
+            <ShoppingCart className="w-5 h-5" />
+            {cart.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-zinc-950 font-bold text-[10px] flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
+          </div>
+          <div>
+            <span className="text-[10px] text-zinc-400 uppercase font-bold block">Total Kasir</span>
+            <span className="text-sm font-extrabold text-amber-400 font-mono">{formatRp(total)}</span>
+          </div>
+        </div>
+        <button
+          onClick={() => setCartOpenMobile(true)}
+          className="px-5 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20 active:scale-95"
+        >
+          Lihat Keranjang ({cart.length})
+        </button>
+      </div>
+
+      {/* MOBILE CART OVERLAY SLIDE-UP */}
+      {cartOpenMobile && (
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900 border-t border-zinc-800 rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
+            <button
+              onClick={() => setCartOpenMobile(false)}
+              className="absolute top-3 right-3 p-2 text-zinc-400 hover:text-zinc-100 rounded-full z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            {renderCartInner()}
+          </div>
+        </div>
+      )}
 
       <QrisModal
         isOpen={qrisOpen}
