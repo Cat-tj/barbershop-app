@@ -101,7 +101,6 @@ export default function AdminPage() {
       if (sRes.services) setServices(sRes.services)
       if (qRes.qris_static_payload) setQrisStaticPayload(qRes.qris_static_payload)
 
-      // Initial Data for Members, Capsters, Products
       setMembers([
         { id: 1, name: 'Alexander The Great', phone: '085200000000', tier_id: 1, total_points: 120, total_spent: 350000, visit_count: 5, tier_name: 'Silver', color: '#f59e0b' },
         { id: 2, name: 'Budi Santoso', phone: '081299887766', tier_id: 2, total_points: 340, total_spent: 850000, visit_count: 12, tier_name: 'Gold', color: '#eab308' }
@@ -245,7 +244,7 @@ export default function AdminPage() {
   )
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-zinc-950">
+    <div className="flex-1 flex flex-col h-full overflow-x-hidden bg-zinc-950 max-w-full">
       {/* QRIS Camera Scanner Modal */}
       <QrisScannerModal
         isOpen={scannerOpen}
@@ -258,7 +257,7 @@ export default function AdminPage() {
 
       {/* Alert */}
       {alert && (
-        <div className={`mx-6 mt-4 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between shadow-lg ${
+        <div className={`mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between shadow-lg ${
           alert.type === 'success'
             ? 'bg-emerald-950/90 border border-emerald-800 text-emerald-300'
             : 'bg-red-950/90 border border-red-800 text-red-300'
@@ -269,35 +268,35 @@ export default function AdminPage() {
       )}
 
       {/* Header */}
-      <div className="px-6 py-4 border-b border-zinc-800/80 flex items-center justify-between bg-zinc-900/60 backdrop-blur-md">
+      <div className="px-4 sm:px-6 py-4 border-b border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-md">
         <div>
-          <h1 className="text-lg font-black tracking-wider text-zinc-100 flex items-center gap-2">
+          <h1 className="text-base sm:text-lg font-black tracking-wider text-zinc-100 flex items-center gap-2">
             ADMIN PANEL
-            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
               ALTORA SYSTEM
             </span>
           </h1>
-          <p className="text-xs text-zinc-400">Kelola Pengguna, QRIS, Layanan, dan Stok Toko</p>
+          <p className="text-[11px] sm:text-xs text-zinc-400">Kelola Pengguna, QRIS, Layanan, dan Stok Toko</p>
         </div>
         {activeTab === 'users' && (
-          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10">
+          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto">
             + Tambah User
           </button>
         )}
         {activeTab === 'services' && (
-          <button onClick={openAddService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10">
+          <button onClick={openAddService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto">
             + Tambah Service Baru
           </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-zinc-800/80 bg-zinc-900/30 px-6 overflow-x-auto">
+      <div className="flex border-b border-zinc-800/80 bg-zinc-900/30 px-4 sm:px-6 overflow-x-auto no-scrollbar">
         {TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-shrink-0 px-4 py-3 text-xs font-bold transition-all ${
+            className={`flex-shrink-0 px-3.5 py-3 text-xs font-bold transition-all ${
               activeTab === tab.key
                 ? 'text-amber-400 border-b-2 border-amber-500 bg-amber-500/5'
                 : 'text-zinc-500 hover:text-zinc-300'
@@ -309,21 +308,21 @@ export default function AdminPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
         {/* QRIS SETTING TAB WITH CAMERA SCANNER */}
         {activeTab === 'qris' && (
-          <div className="max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl space-y-5">
+          <div className="max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-5">
             <div>
-              <h3 className="text-base font-bold text-zinc-100 mb-1">Pengaturan QRIS Merchant Dinamis</h3>
+              <h3 className="text-sm sm:text-base font-bold text-zinc-100 mb-1">Pengaturan QRIS Merchant Dinamis</h3>
               <p className="text-xs text-zinc-400">
                 Masukkan Kode QRIS Statis Merchant (NMID payload dari verssache/qris-dinamis) atau **Scan QRIS melalui kamera**.
               </p>
             </div>
 
             {/* Scan via Camera Button */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
                   <Camera className="w-5 h-5" />
                 </div>
                 <div>
@@ -333,7 +332,7 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => setScannerOpen(true)}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs transition-all shadow-md shadow-amber-500/20 flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 shrink-0"
               >
                 <Camera className="w-4 h-4" />
                 <span>Buka Kamera</span>
@@ -353,7 +352,7 @@ export default function AdminPage() {
 
             <button
               onClick={() => saveQrisSetting()}
-              className="h-11 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/10"
+              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/10"
             >
               Simpan Configuration QRIS
             </button>
@@ -364,18 +363,18 @@ export default function AdminPage() {
         {activeTab === 'services' && (
           <div className="space-y-4">
             {showServiceForm && (
-              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 space-y-3">
                 <h3 className="text-sm font-bold text-amber-400">
                   {editingServiceId ? 'Edit Layanan Cukur' : 'Tambah Service / Layanan Cukur Baru'}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-zinc-400 mb-1">Nama Layanan</label>
                     <input
                       value={serviceName}
                       onChange={(e) => setServiceName(e.target.value)}
                       placeholder="e.g. Smoothing Hair Treatment"
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
                   </div>
                   <div>
@@ -385,7 +384,7 @@ export default function AdminPage() {
                       value={servicePrice}
                       onChange={(e) => setServicePrice(e.target.value)}
                       placeholder="60000"
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
                   </div>
                   <div>
@@ -395,7 +394,7 @@ export default function AdminPage() {
                       value={serviceDuration}
                       onChange={(e) => setServiceDuration(e.target.value)}
                       placeholder="30"
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     />
                   </div>
                 </div>
@@ -406,23 +405,23 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-              <table className="w-full text-left border-collapse">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+              <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                    <th className="p-4">Nama Layanan</th>
-                    <th className="p-4 text-right">Harga</th>
-                    <th className="p-4 text-right">Durasi</th>
-                    <th className="p-4 text-center">Aksi</th>
+                    <th className="p-3.5">Nama Layanan</th>
+                    <th className="p-3.5 text-right">Harga</th>
+                    <th className="p-3.5 text-right">Durasi</th>
+                    <th className="p-3.5 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                   {services.map((s) => (
                     <tr key={s.id} className="hover:bg-zinc-800/40 transition-colors">
-                      <td className="p-4 font-bold text-zinc-100">{s.name}</td>
-                      <td className="p-4 text-right font-mono text-amber-400 font-bold">{formatRp(s.price)}</td>
-                      <td className="p-4 text-right font-mono text-zinc-400">{s.duration || 30} Menit</td>
-                      <td className="p-4 text-center">
+                      <td className="p-3.5 font-bold text-zinc-100">{s.name}</td>
+                      <td className="p-3.5 text-right font-mono text-amber-400 font-bold">{formatRp(s.price)}</td>
+                      <td className="p-3.5 text-right font-mono text-zinc-400">{s.duration || 30} Menit</td>
+                      <td className="p-3.5 text-center">
                         <button
                           onClick={() => openEditService(s)}
                           className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-amber-400 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
@@ -449,29 +448,29 @@ export default function AdminPage() {
               placeholder="Cari Member berdasarkan nama atau HP..."
               className="w-full h-10 px-4 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
             />
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-              <table className="w-full text-left border-collapse">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+              <table className="w-full text-left border-collapse min-w-[600px]">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                    <th className="p-4">Nama Pelanggan</th>
-                    <th className="p-4">Nomor HP</th>
-                    <th className="p-4">Tier Member</th>
-                    <th className="p-4 text-right">Poin</th>
-                    <th className="p-4 text-right">Total Transaksi</th>
+                    <th className="p-3.5">Nama Pelanggan</th>
+                    <th className="p-3.5">Nomor HP</th>
+                    <th className="p-3.5">Tier Member</th>
+                    <th className="p-3.5 text-right">Poin</th>
+                    <th className="p-3.5 text-right">Total Transaksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                   {filteredMembers.map((m) => (
                     <tr key={m.id} className="hover:bg-zinc-800/40">
-                      <td className="p-4 font-bold">{m.name}</td>
-                      <td className="p-4 font-mono text-zinc-400">{m.phone}</td>
-                      <td className="p-4">
+                      <td className="p-3.5 font-bold">{m.name}</td>
+                      <td className="p-3.5 font-mono text-zinc-400">{m.phone}</td>
+                      <td className="p-3.5">
                         <span className="px-2.5 py-0.5 rounded text-[10px] uppercase font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
                           {m.tier_name || 'Silver'}
                         </span>
                       </td>
-                      <td className="p-4 text-right font-mono text-emerald-400 font-bold">{m.total_points} Pts</td>
-                      <td className="p-4 text-right font-mono">{formatRp(m.total_spent)}</td>
+                      <td className="p-3.5 text-right font-mono text-emerald-400 font-bold">{m.total_points} Pts</td>
+                      <td className="p-3.5 text-right font-mono">{formatRp(m.total_spent)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -482,23 +481,23 @@ export default function AdminPage() {
 
         {/* PRODUCTS TAB DATA */}
         {activeTab === 'products' && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+            <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
                 <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                  <th className="p-4">Nama Produk</th>
-                  <th className="p-4 text-right">Harga</th>
-                  <th className="p-4 text-right">Stok</th>
-                  <th className="p-4">Kategori</th>
+                  <th className="p-3.5">Nama Produk</th>
+                  <th className="p-3.5 text-right">Harga</th>
+                  <th className="p-3.5 text-right">Stok</th>
+                  <th className="p-3.5">Kategori</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-zinc-800/40">
-                    <td className="p-4 font-bold">{p.name}</td>
-                    <td className="p-4 text-right font-mono text-amber-400 font-bold">{formatRp(p.price)}</td>
-                    <td className="p-4 text-right font-mono">{p.stock} Pcs</td>
-                    <td className="p-4 uppercase text-[10px] font-bold text-zinc-400">{p.category}</td>
+                    <td className="p-3.5 font-bold">{p.name}</td>
+                    <td className="p-3.5 text-right font-mono text-amber-400 font-bold">{formatRp(p.price)}</td>
+                    <td className="p-3.5 text-right font-mono">{p.stock} Pcs</td>
+                    <td className="p-3.5 uppercase text-[10px] font-bold text-zinc-400">{p.category}</td>
                   </tr>
                 ))}
               </tbody>
@@ -508,21 +507,21 @@ export default function AdminPage() {
 
         {/* CAPSTERS TAB DATA */}
         {activeTab === 'capsters' && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+            <table className="w-full text-left border-collapse min-w-[400px]">
               <thead>
                 <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                  <th className="p-4">Nama Capster</th>
-                  <th className="p-4">Nomor HP</th>
-                  <th className="p-4 text-center">Status</th>
+                  <th className="p-3.5">Nama Capster</th>
+                  <th className="p-3.5">Nomor HP</th>
+                  <th className="p-3.5 text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                 {capsters.map((c) => (
                   <tr key={c.id} className="hover:bg-zinc-800/40">
-                    <td className="p-4 font-bold">{c.name}</td>
-                    <td className="p-4 font-mono text-zinc-400">{c.phone || '—'}</td>
-                    <td className="p-4 text-center text-emerald-400 font-bold">● Active</td>
+                    <td className="p-3.5 font-bold">{c.name}</td>
+                    <td className="p-3.5 font-mono text-zinc-400">{c.phone || '—'}</td>
+                    <td className="p-3.5 text-center text-emerald-400 font-bold">● Active</td>
                   </tr>
                 ))}
               </tbody>
@@ -534,15 +533,15 @@ export default function AdminPage() {
         {activeTab === 'users' && (
           <div className="space-y-4">
             {showUserForm && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-90 space-y-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4">
                   <h3 className="text-sm font-bold text-zinc-100">{editingUserId ? 'Edit User' : 'Tambah User Baru'}</h3>
                   <div>
                     <label className="block text-xs text-zinc-400 mb-1">Username</label>
                     <input
                       value={formUsername}
                       onChange={e => setFormUsername(e.target.value)}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                       placeholder="Username"
                       disabled={!!editingUserId}
                     />
@@ -553,7 +552,7 @@ export default function AdminPage() {
                       type="password"
                       value={formPassword}
                       onChange={e => setFormPassword(e.target.value)}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                       placeholder="Password"
                     />
                   </div>
@@ -562,7 +561,7 @@ export default function AdminPage() {
                     <select
                       value={formRole}
                       onChange={e => setFormRole(e.target.value as 'admin' | 'user')}
-                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-amber-500/50"
                     >
                       <option value="user">User (Kasir)</option>
                       <option value="admin">Admin</option>
@@ -576,25 +575,25 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
-              <table className="w-full text-left border-collapse">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto shadow-xl">
+              <table className="w-full text-left border-collapse min-w-[400px]">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950/60 text-zinc-400 text-xs font-semibold">
-                    <th className="p-4">Username</th>
-                    <th className="p-4">Role</th>
-                    <th className="p-4 text-center">Status</th>
+                    <th className="p-3.5">Username</th>
+                    <th className="p-3.5">Role</th>
+                    <th className="p-3.5 text-center">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-xs text-zinc-200">
                   {users.map(u => (
                     <tr key={u.id} className="hover:bg-zinc-800/40">
-                      <td className="p-4 font-bold">{u.username}</td>
-                      <td className="p-4">
+                      <td className="p-3.5 font-bold">{u.username}</td>
+                      <td className="p-3.5">
                         <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${u.role === 'admin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
                           {u.role}
                         </span>
                       </td>
-                      <td className="p-4 text-center">
+                      <td className="p-3.5 text-center">
                         <span className="text-emerald-400 font-bold">● Active</span>
                       </td>
                     </tr>

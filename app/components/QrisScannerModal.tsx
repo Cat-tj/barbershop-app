@@ -27,21 +27,15 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
       return
     }
 
-    const isSecureContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-
-    if (!isSecureContext) {
-      setErrorMsg('Akses kamera langsung dibatasi browser pada koneksi HTTP. Silakan gunakan tombol "Upload Gambar QRIS" di bawah, atau buka via HTTPS / domain SSL.')
-      return
-    }
-
     const timeout = setTimeout(() => {
       try {
         const scanner = new Html5QrcodeScanner(
           'qr-reader-container',
           {
             fps: 10,
-            qrbox: { width: 250, height: 250 },
+            qrbox: { width: 220, height: 220 },
             aspectRatio: 1.0,
+            rememberLastUsedCamera: true,
           },
           false
         )
@@ -58,7 +52,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
         scannerRef.current = scanner
       } catch (err) {
         console.error('Failed to init camera scanner:', err)
-        setErrorMsg('Tidak dapat mengakses kamera. Silakan gunakan opsi Upload Gambar QRIS di bawah.')
+        setErrorMsg('Tidak dapat membuka kamera. Pastikan izin kamera telah diberikan atau gunakan tombol Upload di bawah.')
       }
     }, 300)
 
@@ -82,7 +76,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
       onScanSuccess(result)
       html5QrCode.clear()
     } catch {
-      setErrorMsg('Gagal membaca QR code dari gambar. Pastikan gambar QRIS jelas dan terang.')
+      setErrorMsg('Gagal membaca QR code dari gambar. Pastikan foto QRIS jelas dan terang.')
     }
   }
 
@@ -90,7 +84,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-5 shadow-2xl overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -106,17 +100,14 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
           </div>
           <div>
             <h3 className="text-base font-bold text-zinc-100">Scan / Upload QRIS Merchant</h3>
-            <p className="text-xs text-zinc-400">Scan via kamera atau upload gambar foto QRIS</p>
+            <p className="text-xs text-zinc-400">Scan via kamera atau upload foto QRIS</p>
           </div>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3.5 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-start gap-2.5">
+          <div className="mb-4 p-3 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-start gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold block">Pemberitahuan Browser Security:</span>
-              <span>{errorMsg}</span>
-            </div>
+            <span>{errorMsg}</span>
           </div>
         )}
 
@@ -138,7 +129,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
           </div>
         ) : (
           <div className="space-y-4">
-            <div id="qr-reader-container" className="overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-zinc-950 min-h-[220px]" />
+            <div id="qr-reader-container" className="overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-zinc-950 min-h-[250px]" />
             <div id="qr-reader-file-temp" className="hidden" />
 
             {/* Upload Fallback Option */}
