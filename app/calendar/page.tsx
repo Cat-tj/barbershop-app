@@ -1,305 +1,273 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { Calendar as CalendarIcon, Scissors, DollarSign, Award, Clock, ChevronLeft, ChevronRight, User } from 'lucide-react'
 
-interface Capster {
+interface CapsterKPI {
   id: number
   name: string
+  base_salary: number
+  total_haircuts: number
+  total_shift_days: number
+  total_revenue: number
+  estimated_commission: number
+  daily: Record<string, { haircuts: number; revenue: number; commission: number; attended: boolean }>
 }
 
-interface Booking {
-  id: number
-  customer_name: string
-  customer_phone: string | null
-  capster_id: number
-  booking_date: string
-  start_time: string
-  end_time: string
-  booking_type: string
-  notes: string | null
-  services?: { name: string }[]
+function formatRp(n: number) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n)
 }
 
-function generateTimeSlots(): string[] {
-  const slots: string[] = []
-  for (let h = 9; h < 21; h++) {
-    const hh = h.toString().padStart(2, '0')
-    slots.push(`${hh}:00`)
-    slots.push(`${hh}:30`)
-  }
-  slots.push('21:00')
-  return slots
-}
-
-function getWeekDates(date: Date): Date[] {
-  const day = date.getDay()
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1) // Monday start
-  const monday = new Date(date.getFullYear(), date.getMonth(), diff)
-  const dates: Date[] = []
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    dates.push(d)
-  }
-  return dates
-}
-
-function formatDate(d: Date): string {
-  return d.toISOString().split('T')[0]
-}
-
-function formatDayShort(d: Date): string {
-  const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
-  return days[d.getDay()]
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate()
 }
 
 export default function CalendarPage() {
-  const [capsters, setCapsters] = useState<Capster[]>([])
-  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
-    const now = new Date()
-    const day = now.getDay()
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1)
-    const monday = new Date(now.getFullYear(), now.getMonth(), diff)
-    return monday
-  })
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7)) // YYYY-MM
+  const [selectedCapsterId, setSelectedCapsterId] = useState<string>('all')
+  const [kpiData, setKpiData] = useState<CapsterKPI[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
 
-  const weekDates = getWeekDates(currentWeekStart)
-  const timeSlots = generateTimeSlots()
+  const [year, monthNum] = selectedMonth.split('-').map(Number)
+  const monthDate = new Date(year, monthNum - 1, 1)
 
-  // Fetch capsters
-  useEffect(() => {
-    supabase
-      .from('capsters')
-      .select('id, name')
-      .eq('active', true)
-      .order('name')
-      .then(({ data }) => {
-        if (data) setCapsters(data)
-      })
-  }, [])
-
-  // Fetch bookings for the week
-  useEffect(() => {
+  const fetchKpi = async () => {
     setLoading(true)
-    const startDate = formatDate(weekDates[0])
-    const endDate = formatDate(weekDates[6])
-
-    async function fetchBookings() {
-      const { data } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          customer_name,
-          customer_phone,
-          capster_id,
-          booking_date,
-          start_time,
-          end_time,
-          booking_type,
-          notes,
-          booking_items(
-            services(name)
-          )
-        `)
-        .gte('booking_date', startDate)
-        .lte('booking_date', endDate)
-        .neq('status', 'cancelled')
-
-      if (data) {
-        const enriched = data.map((b: Record<string, unknown>) => {
-          const items = b.booking_items as { services: { name: string } }[] | undefined
-          const serviceNames = items?.map(i => i.services?.name).filter(Boolean) || []
-          return {
-            ...b,
-            services: serviceNames.map(n => ({ name: n })),
-          } as Booking
-        })
-        setBookings(enriched)
-      }
+    try {
+      const url = `/api/kpi?month=${selectedMonth}${selectedCapsterId !== 'all' ? `&capster_id=${selectedCapsterId}` : ''}`
+      const res = await fetch(url)
+      const data = await res.json()
+      if (data.capsters) setKpiData(data.capsters)
+    } catch (err) {
+      console.error('Failed to fetch KPI', err)
+    } finally {
       setLoading(false)
     }
-    fetchBookings().catch(() => setLoading(false))
-  }, [currentWeekStart])
-
-  // Build booking map: key = "date|capster_id|time" -> Booking
-  const bookingMap = new Map<string, Booking>()
-  for (const b of bookings) {
-    const time = b.start_time?.substring(0, 5)
-    if (time) {
-      const key = `${b.booking_date}|${b.capster_id}|${time}`
-      bookingMap.set(key, b)
-    }
   }
 
-  const prevWeek = () => {
-    const d = new Date(currentWeekStart)
-    d.setDate(d.getDate() - 7)
-    setCurrentWeekStart(d)
+  useEffect(() => {
+    fetchKpi()
+  }, [selectedMonth, selectedCapsterId])
+
+  const prevMonth = () => {
+    const d = new Date(year, monthNum - 2, 1)
+    setSelectedMonth(d.toISOString().substring(0, 7))
   }
 
-  const nextWeek = () => {
-    const d = new Date(currentWeekStart)
-    d.setDate(d.getDate() + 7)
-    setCurrentWeekStart(d)
+  const nextMonth = () => {
+    const d = new Date(year, monthNum, 1)
+    setSelectedMonth(d.toISOString().substring(0, 7))
   }
 
-  const weekLabel = `${weekDates[0].getDate()}-${weekDates[6].getDate()} ${weekDates[0].toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`
+  // Summary aggregation across displayed capsters
+  const totalHaircuts = kpiData.reduce((acc, c) => acc + c.total_haircuts, 0)
+  const totalShiftDays = kpiData.reduce((acc, c) => acc + c.total_shift_days, 0)
+  const totalRevenue = kpiData.reduce((acc, c) => acc + c.total_revenue, 0)
+  const totalCommission = kpiData.reduce((acc, c) => acc + c.estimated_commission, 0)
 
-  if (capsters.length === 0 && !loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-zinc-950 p-4">
-        <p className="text-zinc-500 text-sm">No active capsters found.</p>
-      </div>
-    )
-  }
+  // Calendar Days Grid Construction
+  const daysInMonth = getDaysInMonth(year, monthNum - 1)
+  const firstDayOfWeek = (new Date(year, monthNum - 1, 1).getDay() + 6) % 7 // Monday start (0=Mon, 6=Sun)
+
+  const monthName = monthDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-zinc-950">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800">
-        <h1 className="text-base font-bold text-zinc-100">Calendar</h1>
-        <p className="text-xs text-zinc-500">{weekLabel}</p>
-      </div>
-
-      {/* Week Navigator */}
-      <div className="flex items-center border-b border-zinc-800">
-        <button
-          onClick={prevWeek}
-          className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
-        >
-          ◀
-        </button>
-        <div className="flex-1 grid grid-cols-7">
-          {weekDates.map((d, i) => (
-            <div key={i} className="text-center py-2">
-              <p className="text-[10px] text-zinc-500">{formatDayShort(d)}</p>
-              <p className="text-xs font-medium text-zinc-300">{d.getDate()}</p>
-            </div>
-          ))}
+    <div className="flex-1 flex flex-col bg-zinc-950 p-4 sm:p-6 min-h-full space-y-6">
+      {/* Header Controls */}
+      <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-black text-zinc-100 flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-amber-400" />
+            KALENDER HARI KERJA & KPI BARBER
+          </h1>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Pantau kehadiran shift turun kerja, jumlah cukur, & estimasi komisi bulanan
+          </p>
         </div>
-        <button
-          onClick={nextWeek}
-          className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
-        >
-          ▶
-        </button>
-      </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : (
-        <div className="flex-1 overflow-auto">
-          <table className="w-full border-collapse">
-            <thead className="sticky top-0 z-10 bg-zinc-950">
-              <tr>
-                <th className="sticky left-0 z-20 bg-zinc-950 border-b border-zinc-800 px-2 py-1.5 text-left text-[10px] text-zinc-500 font-medium w-12">
-                  Time
-                </th>
-                {capsters.map(c => (
-                  <th
-                    key={c.id}
-                    className="border-b border-zinc-800 px-1 py-1.5 text-center text-[10px] text-zinc-400 font-medium min-w-[80px]"
-                  >
-                    {c.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {weekDates.map((date, dateIdx) => {
-                const dateStr = formatDate(date)
-                return timeSlots.map((time, timeIdx) => (
-                  <tr key={`${dateStr}-${time}`}>
-                    {timeIdx === 0 && (
-                      <td
-                        className="sticky left-0 z-10 bg-zinc-950 border-b border-zinc-800 px-2 py-0.5 text-left text-[10px] text-zinc-500 font-medium"
-                        rowSpan={timeSlots.length}
-                      >
-                        <div className="text-xs font-semibold text-zinc-300">{formatDayShort(date)}</div>
-                        <div className="text-[10px]">{date.getDate()}/{date.getMonth() + 1}</div>
-                      </td>
-                    )}
-                    <td className="border-b border-zinc-800/50 px-0.5 py-0.5 text-center text-[10px] text-zinc-600">
-                      {time}
-                    </td>
-                    {capsters.map(cap => {
-                      const key = `${dateStr}|${cap.id}|${time}`
-                      const booking = bookingMap.get(key)
-                      return (
-                        <td
-                          key={cap.id}
-                          className={`border-b border-zinc-800/50 px-1 py-0.5 align-top ${booking ? 'cursor-pointer hover:opacity-80' : ''}`}
-                          onClick={() => booking && setSelectedBooking(booking)}
-                        >
-                          {booking ? (
-                            <div className="bg-green-900/40 border border-green-800/50 rounded px-1 py-0.5 text-[10px] leading-tight">
-                              <p className="text-green-300 font-medium truncate">{booking.customer_name}</p>
-                            </div>
-                          ) : (
-                            <div className="h-5" />
-                          )}
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Booking Popup */}
-      {selectedBooking && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setSelectedBooking(null)}
-        >
-          <div
-            className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 max-w-xs w-full space-y-2"
-            onClick={e => e.stopPropagation()}
+        {/* Filter Controls */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* Capster Selector */}
+          <select
+            value={selectedCapsterId}
+            onChange={(e) => setSelectedCapsterId(e.target.value)}
+            className="h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-200 focus:outline-none focus:border-amber-500/60"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-zinc-100">{selectedBooking.customer_name}</h3>
-              <button
-                onClick={() => setSelectedBooking(null)}
-                className="text-zinc-500 hover:text-zinc-300 text-lg leading-none"
-              >
-                ×
-              </button>
-            </div>
-            {selectedBooking.customer_phone && (
-              <p className="text-xs text-zinc-400">📱 {selectedBooking.customer_phone}</p>
-            )}
-            <p className="text-xs text-zinc-400">
-              📅 {selectedBooking.booking_date} · {selectedBooking.start_time?.substring(0, 5)} - {selectedBooking.end_time?.substring(0, 5)}
-            </p>
-            {selectedBooking.services && selectedBooking.services.length > 0 && (
-              <div>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Services</p>
-                <div className="space-y-0.5">
-                  {selectedBooking.services.map((s, i) => (
-                    <p key={i} className="text-xs text-zinc-300">{s.name}</p>
-                  ))}
-                </div>
-              </div>
-            )}
-            <p className="text-xs text-zinc-500">
-              Type: {selectedBooking.booking_type === 'dipanggil' ? 'Dipanggil' : 'Potong di Tempat'}
-            </p>
-            {selectedBooking.notes && (
-              <p className="text-xs text-zinc-500 italic">Note: {selectedBooking.notes}</p>
-            )}
+            <option value="all">💈 Semua Capster / Barber</option>
+            {kpiData.map((c) => (
+              <option key={c.id} value={c.id}>
+                👤 {c.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Month Navigator */}
+          <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl p-1 shrink-0">
+            <button
+              onClick={prevMonth}
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs font-mono font-bold text-amber-400 px-3 capitalize">{monthName}</span>
+            <button
+              onClick={nextMonth}
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* KPI Cards Summary */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+            <Scissors className="w-3.5 h-3.5 text-amber-400" /> Total Potong Cukur
+          </span>
+          <p className="text-2xl font-black text-zinc-100 font-mono">{loading ? '...' : `${totalHaircuts} Kepala`}</p>
+          <p className="text-[11px] text-zinc-500">Jumlah cukur selesai bulan ini</p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-emerald-400" /> Total Shift Turun Kerja
+          </span>
+          <p className="text-2xl font-black text-emerald-400 font-mono">{loading ? '...' : `${totalShiftDays} Hari`}</p>
+          <p className="text-[11px] text-zinc-500">Jumlah hari buka toko / clock-in</p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+            <DollarSign className="w-3.5 h-3.5 text-blue-400" /> Total Omset Tercipta
+          </span>
+          <p className="text-xl font-black text-zinc-100 font-mono">{loading ? '...' : formatRp(totalRevenue)}</p>
+          <p className="text-[11px] text-zinc-500">Total nilai transaksi jasa + produk</p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-zinc-900 to-zinc-900 border border-amber-500/40 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-amber-400 flex items-center gap-1.5">
+            <Award className="w-3.5 h-3.5 text-amber-400" /> Estimasi Total Komisi
+          </span>
+          <p className="text-xl font-black text-amber-400 font-mono">{loading ? '...' : formatRp(totalCommission)}</p>
+          <p className="text-[11px] text-zinc-400">Komisi belum termasuk gaji pokok</p>
+        </div>
+      </div>
+
+      {/* Monthly Attendance & Haircuts Calendar Grid */}
+      <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+            <span>KALENDER KEHADIRAN & DETAIL HARIAN ({monthName})</span>
+          </h3>
+          <div className="flex items-center gap-3 text-[10px]">
+            <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Turun Kerja
+            </span>
+            <span className="flex items-center gap-1 text-amber-400 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span> Ada Cukur
+            </span>
+          </div>
+        </div>
+
+        {/* Days Header */}
+        <div className="grid grid-cols-7 gap-1 text-center font-bold text-xs text-zinc-500 pb-1 border-b border-zinc-800/60">
+          <div>Sen</div>
+          <div>Sel</div>
+          <div>Rab</div>
+          <div>Kam</div>
+          <div>Jum</div>
+          <div>Sab</div>
+          <div>Min</div>
+        </div>
+
+        {/* Calendar Days */}
+        {loading ? (
+          <div className="py-12 text-center text-xs text-zinc-500 flex justify-center">
+            <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-7 gap-1.5">
+            {/* Empty slots before first day */}
+            {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+              <div key={`empty-${i}`} className="min-h-[85px] bg-zinc-950/30 rounded-xl border border-zinc-900 opacity-30" />
+            ))}
+
+            {/* Calendar Days */}
+            {Array.from({ length: daysInMonth }).map((_, dayIdx) => {
+              const dayNum = dayIdx + 1
+              const dayStr = dayNum.toString().padStart(2, '0')
+              const fullDateStr = `${selectedMonth}-${dayStr}`
+
+              // Gather stats for this date across selected capster(s)
+              let dayAttended = false
+              let dayHaircuts = 0
+              let dayRevenue = 0
+              let dayCommission = 0
+
+              kpiData.forEach((c) => {
+                const stat = c.daily[fullDateStr]
+                if (stat) {
+                  if (stat.attended) dayAttended = true
+                  dayHaircuts += stat.haircuts
+                  dayRevenue += stat.revenue
+                  dayCommission += stat.commission
+                }
+              })
+
+              return (
+                <div
+                  key={fullDateStr}
+                  className={`min-h-[90px] p-2 rounded-xl border flex flex-col justify-between transition-all ${
+                    dayAttended
+                      ? 'bg-gradient-to-b from-emerald-500/10 via-zinc-900 to-zinc-900 border-emerald-500/40 shadow-sm'
+                      : dayHaircuts > 0
+                      ? 'bg-zinc-900 border-amber-500/30'
+                      : 'bg-zinc-950/80 border-zinc-800/80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs font-mono font-bold ${dayAttended ? 'text-emerald-400' : 'text-zinc-400'}`}>
+                      {dayNum}
+                    </span>
+                    {dayAttended && (
+                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        SHIFT
+                      </span>
+                    )}
+                  </div>
+
+                  {dayHaircuts > 0 || dayRevenue > 0 ? (
+                    <div className="space-y-0.5 mt-1">
+                      <p className="text-[11px] font-bold text-amber-400 flex items-center justify-between">
+                        <span>✂️ {dayHaircuts} Cukur</span>
+                      </p>
+                      <p className="text-[10px] font-mono text-zinc-300">
+                        {formatRp(dayRevenue)}
+                      </p>
+                      {dayCommission > 0 && (
+                        <p className="text-[9px] font-mono text-emerald-400 font-semibold">
+                          +{formatRp(dayCommission)}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-[10px] text-zinc-600 italic">
+                      {dayAttended ? 'Libur cukur' : 'Off'}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
