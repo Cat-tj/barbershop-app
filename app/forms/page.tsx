@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Calendar, Clock, User, Phone, Scissors, CheckCircle2, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
+import { Calendar, Clock, User, Phone, Scissors, CheckCircle2, Sparkles, AlertCircle, Loader2, Award, Search, Check } from 'lucide-react'
+import { formatRupiah } from '@/lib/currency'
 
 interface Service {
   id: number
@@ -15,6 +16,17 @@ interface Slot {
   status: 'available' | 'taken' | 'mine'
 }
 
+interface MemberInfo {
+  id: number
+  name_masked: string
+  phone: string
+  tier_name: string
+  total_points: number
+  total_spent: number
+  visit_count: number
+  rewards_available: number
+}
+
 export default function PublicBookingForm() {
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
@@ -23,6 +35,12 @@ export default function PublicBookingForm() {
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [services, setServices] = useState<Service[]>([])
   const [slots, setSlots] = useState<Slot[]>([])
+  
+  // Member Lookup State
+  const [checkingMember, setCheckingMember] = useState(false)
+  const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null)
+  const [memberMessage, setMemberMessage] = useState('')
+
   const [loadingServices, setLoadingServices] = useState(true)
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -61,7 +79,6 @@ export default function PublicBookingForm() {
       .then((res) => res.json())
       .then((data) => {
         if (data.slots) {
-          // Filter slots from 10:00 to 22:00
           const filtered = data.slots.filter((s: Slot) => {
             const hour = parseInt(s.time.split(':')[0], 10)
             return hour >= 10 && hour <= 22
@@ -70,7 +87,6 @@ export default function PublicBookingForm() {
         }
       })
       .catch(() => {
-        // Fallback slots 10:00 to 22:00
         const defaultSlots: Slot[] = []
         for (let h = 10; h <= 22; h++) {
           const hh = h.toString().padStart(2, '0')
@@ -81,6 +97,27 @@ export default function PublicBookingForm() {
       })
       .finally(() => setLoadingSlots(false))
   }, [bookingDate, customerPhone])
+
+  // Automatic Customer Point Lookup on Phone blur/change
+  const handleCheckMember = async () => {
+    if (!customerPhone.trim() || customerPhone.length < 8) return
+    setCheckingMember(true)
+    setMemberMessage('')
+    try {
+      const res = await fetch(`/api/member/lookup?phone=${encodeURIComponent(customerPhone.trim())}`)
+      const data = await res.json()
+      if (data.found && data.member) {
+        setMemberInfo(data.member)
+      } else {
+        setMemberInfo(null)
+        setMemberMessage(data.message || 'Nomor ini belum terdaftar sebagai member Rome Bois.')
+      }
+    } catch {
+      setMemberInfo(null)
+    } finally {
+      setCheckingMember(false)
+    }
+  }
 
   function toggleService(id: number) {
     if (selectedServices.includes(id)) {
@@ -152,50 +189,46 @@ export default function PublicBookingForm() {
     .reduce((sum, s) => sum + s.price, 0)
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Ambient Glow */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-xl bg-zinc-900/80 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative z-10 my-8">
-        {/* Header */}
+    <div className="min-h-screen bg-[#F7F4EF] text-[#26231F] flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Header Branding */}
+      <div className="w-full max-w-xl bg-white border border-[#DED7CE] rounded-3xl p-6 sm:p-8 shadow-xl relative z-10 my-8">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-zinc-950 font-black text-2xl flex items-center justify-center mb-3 shadow-lg shadow-amber-500/20">
-            R
+          <div className="w-16 h-16 rounded-2xl bg-[#B7792B] text-white font-black text-2xl flex items-center justify-center mb-3 shadow-lg shadow-[#B7792B]/20">
+            RB
           </div>
-          <h1 className="text-2xl font-black tracking-wider flex items-center gap-2">
-            ROMEBOIS
-            <span className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              RESERVATION
+          <h1 className="text-2xl font-black tracking-wider flex items-center gap-2 text-[#26231F]">
+            ROME BOIS
+            <span className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#B7792B]/10 text-[#B7792B] border border-[#B7792B]/30">
+              BARBERSHOP
             </span>
           </h1>
-          <p className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Booking Cukur & Jadwal Online Altora
+          <p className="text-xs text-[#746E66] mt-1 flex items-center gap-1.5 font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-[#B7792B]" /> Cek Poin Member & Reservasi Cukur Online
           </p>
         </div>
 
         {success ? (
           <div className="flex flex-col items-center text-center py-8 space-y-4 animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-[#56806A]/15 text-[#56806A] border border-[#56806A]/40 flex items-center justify-center">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h2 className="text-2xl font-bold text-zinc-100">Reservasi Berhasil!</h2>
-            <p className="text-xs text-zinc-400 max-w-md">
-              Jadwal cukur kamu pada tanggal <span className="font-bold text-amber-400">{bookingDate}</span> jam{' '}
-              <span className="font-bold text-amber-400">{selectedTime}</span> telah terdaftar di sistem ROMEBOIS Barbershop.
+            <h2 className="text-2xl font-bold text-[#26231F]">Reservasi Berhasil!</h2>
+            <p className="text-xs text-[#746E66] max-w-md">
+              Jadwal cukur kamu pada tanggal <span className="font-bold text-[#B7792B]">{bookingDate}</span> jam{' '}
+              <span className="font-bold text-[#B7792B]">{selectedTime}</span> telah terdaftar di ROME BOIS.
             </p>
-            <div className="w-full bg-zinc-950/80 border border-zinc-800 rounded-2xl p-4 text-left space-y-2 text-xs">
-              <div className="flex justify-between border-b border-zinc-800 pb-2">
-                <span className="text-zinc-500">Nama Pelanggan</span>
-                <span className="font-bold text-zinc-200">{customerName}</span>
+            <div className="w-full bg-[#F1ECE5] border border-[#DED7CE] rounded-2xl p-4 text-left space-y-2 text-xs">
+              <div className="flex justify-between border-b border-[#DED7CE] pb-2">
+                <span className="text-[#746E66]">Nama Pelanggan</span>
+                <span className="font-bold text-[#26231F]">{customerName}</span>
               </div>
-              <div className="flex justify-between border-b border-zinc-800 pb-2">
-                <span className="text-zinc-500">Nomor HP / Member</span>
-                <span className="font-mono text-zinc-200">{customerPhone}</span>
+              <div className="flex justify-between border-b border-[#DED7CE] pb-2">
+                <span className="text-[#746E66]">Nomor HP / Member</span>
+                <span className="font-mono text-[#26231F]">{customerPhone}</span>
               </div>
               <div className="flex justify-between pt-1 font-bold text-sm">
-                <span className="text-zinc-400">Total Biaya</span>
-                <span className="text-amber-500">Rp {totalPrice.toLocaleString('id-ID')}</span>
+                <span className="text-[#746E66]">Total Biaya</span>
+                <span className="text-[#B7792B]">{formatRupiah(totalPrice)}</span>
               </div>
             </div>
             <button
@@ -203,7 +236,7 @@ export default function PublicBookingForm() {
                 setSuccess(false)
                 setSelectedTime('')
               }}
-              className="mt-4 px-6 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs hover:bg-amber-600 transition-colors"
+              className="mt-4 px-6 py-2.5 rounded-xl bg-[#B7792B] text-white font-bold text-xs hover:bg-[#7A4B16] transition-colors"
             >
               Buat Reservasi Baru
             </button>
@@ -211,50 +244,95 @@ export default function PublicBookingForm() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-800/80 text-red-300 text-xs font-medium flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <div className="p-3.5 rounded-xl bg-[#B45C54]/10 border border-[#B45C54]/30 text-[#B45C54] text-xs font-medium flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Step 1: Data Pelanggan */}
+            {/* Step 1: Customer Point Checker & Identification */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <User className="w-4 h-4" /> 1. Data Member / Pelanggan
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#B7792B] flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><Award className="w-4 h-4" /> 1. Cek Poin Member & Identification</span>
               </h3>
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-medium text-zinc-400 mb-1">Nama Lengkap</label>
+                  <label className="block text-[11px] font-medium text-[#746E66] mb-1">Nomor WhatsApp / HP Member</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      onBlur={handleCheckMember}
+                      placeholder="081299887766"
+                      className="w-full h-11 px-3.5 bg-[#F1ECE5] border border-[#DED7CE] rounded-xl text-sm font-mono text-[#26231F] focus:outline-none focus:border-[#B7792B]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCheckMember}
+                      className="absolute right-2 top-2 h-7 px-3 rounded-lg bg-[#B7792B] text-white text-[10px] font-bold flex items-center gap-1"
+                    >
+                      {checkingMember ? <Loader2 className="w-3 h-3 animate-spin" /> : <Search className="w-3 h-3" />}
+                      <span>Cek Poin</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-medium text-[#746E66] mb-1">Nama Lengkap</label>
                   <input
                     type="text"
                     required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Alexander The Great"
-                    className="w-full h-11 px-3.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/60"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-zinc-400 mb-1">Nomor WhatsApp / HP</label>
-                  <input
-                    type="text"
-                    required
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="085200000000"
-                    className="w-full h-11 px-3.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm font-mono text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/60"
+                    placeholder="Budi Santoso"
+                    className="w-full h-11 px-3.5 bg-[#F1ECE5] border border-[#DED7CE] rounded-xl text-sm text-[#26231F] focus:outline-none focus:border-[#B7792B]"
                   />
                 </div>
               </div>
+
+              {/* Member Point Card Preview */}
+              {memberInfo && (
+                <div className="p-4 rounded-2xl bg-[#B7792B]/10 border border-[#B7792B]/30 space-y-2 text-xs animate-in fade-in">
+                  <div className="flex items-center justify-between border-b border-[#B7792B]/20 pb-2">
+                    <span className="font-bold text-[#7A4B16] flex items-center gap-1.5">
+                      <Award className="w-4 h-4 text-[#B7792B]" /> Member Found: {memberInfo.name_masked}
+                    </span>
+                    <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-[#B7792B] text-white">
+                      {memberInfo.tier_name}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center pt-1 font-mono">
+                    <div>
+                      <span className="block text-[10px] text-[#746E66]">Poin Anda</span>
+                      <strong className="text-sm text-[#B7792B]">{memberInfo.total_points} Pts</strong>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] text-[#746E66]">Kunjungan</span>
+                      <strong className="text-sm text-[#26231F]">{memberInfo.visit_count}x</strong>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] text-[#746E66]">Voucher Diskon</span>
+                      <strong className="text-xs text-[#56806A]">{formatRupiah(memberInfo.rewards_available)}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {memberMessage && (
+                <p className="text-[11px] text-[#746E66] italic">{memberMessage}</p>
+              )}
             </div>
 
-            {/* Step 2: Pilih Layanan */}
+            {/* Step 2: Choose Services */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#B7792B] flex items-center gap-1.5">
                 <Scissors className="w-4 h-4" /> 2. Pilih Layanan Cukur
               </h3>
               {loadingServices ? (
-                <div className="p-4 text-center text-xs text-zinc-500">Memuat paket cukur...</div>
+                <div className="p-4 text-center text-xs text-[#746E66]">Memuat paket cukur...</div>
               ) : (
                 <div className="grid grid-cols-1 gap-2">
                   {services.map((svc) => {
@@ -265,16 +343,16 @@ export default function PublicBookingForm() {
                         onClick={() => toggleService(svc.id)}
                         className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                           isSelected
-                            ? 'bg-amber-500/10 border-amber-500/60 text-zinc-100 shadow-md shadow-amber-500/5'
-                            : 'bg-zinc-950/50 border-zinc-800/80 text-zinc-400 hover:border-zinc-700'
+                            ? 'bg-[#B7792B]/10 border-[#B7792B] text-[#26231F]'
+                            : 'bg-[#F1ECE5] border-[#DED7CE] text-[#746E66] hover:border-[#B7792B]/50'
                         }`}
                       >
                         <div>
-                          <div className="font-bold text-sm text-zinc-200">{svc.name}</div>
-                          <div className="text-[11px] text-zinc-500">{svc.duration || 30} Menit</div>
+                          <div className="font-bold text-sm text-[#26231F]">{svc.name}</div>
+                          <div className="text-[11px] text-[#746E66]">{svc.duration || 30} Menit</div>
                         </div>
-                        <div className="font-extrabold text-sm text-amber-400 font-mono">
-                          Rp {svc.price.toLocaleString('id-ID')}
+                        <div className="font-extrabold text-sm text-[#B7792B] font-mono">
+                          {formatRupiah(svc.price)}
                         </div>
                       </div>
                     )
@@ -283,29 +361,27 @@ export default function PublicBookingForm() {
               )}
             </div>
 
-            {/* Step 3: Pilih Tanggal & Jam */}
+            {/* Step 3: Date & Slots */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" /> 3. Tanggal & Jam Potong (10:00 - 22:00)
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#B7792B] flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" /> 3. Tanggal & Jam Cukur (10:00 - 22:00)
               </h3>
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Pilih Tanggal</label>
                 <input
                   type="date"
                   required
                   value={bookingDate}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setBookingDate(e.target.value)}
-                  className="w-full h-11 px-3.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:border-amber-500/60"
+                  className="w-full h-11 px-3.5 bg-[#F1ECE5] border border-[#DED7CE] rounded-xl text-sm text-[#26231F] focus:outline-none focus:border-[#B7792B]"
                 />
               </div>
 
-              {/* Slot Jam Grid */}
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-2">Pilih Jam Cukur Tersedia</label>
+                <label className="block text-[11px] font-medium text-[#746E66] mb-2">Pilih Jam Cukur Tersedia</label>
                 {loadingSlots ? (
-                  <div className="p-6 text-center text-xs text-zinc-500 flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-500" /> Memeriksa slot jam...
+                  <div className="p-4 text-center text-xs text-[#746E66] flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#B7792B]" /> Memeriksa slot jam...
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -320,10 +396,10 @@ export default function PublicBookingForm() {
                           onClick={() => setSelectedTime(s.time)}
                           className={`py-2 px-3 rounded-xl border text-xs font-mono font-bold transition-all ${
                             isTaken
-                              ? 'bg-zinc-900 border-zinc-800 text-zinc-600 line-through cursor-not-allowed'
+                              ? 'bg-[#E5DFD5] border-[#DED7CE] text-[#A39C93] line-through cursor-not-allowed'
                               : isSelected
-                              ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-md shadow-amber-500/20 scale-105'
-                              : 'bg-zinc-950/80 border-zinc-800 text-zinc-300 hover:border-amber-500/50 hover:text-amber-400'
+                              ? 'bg-[#B7792B] text-white border-[#B7792B] shadow-md shadow-[#B7792B]/20 scale-105'
+                              : 'bg-[#F1ECE5] border-[#DED7CE] text-[#26231F] hover:border-[#B7792B] hover:text-[#B7792B]'
                           }`}
                         >
                           {s.time}
@@ -336,25 +412,25 @@ export default function PublicBookingForm() {
             </div>
 
             {/* Total & Submit */}
-            <div className="pt-4 border-t border-zinc-800/80 space-y-4">
+            <div className="pt-4 border-t border-[#DED7CE] space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-400">Total Estimasi Cukur</span>
-                <span className="text-xl font-black text-amber-500 font-mono">
-                  Rp {totalPrice.toLocaleString('id-ID')}
+                <span className="text-xs text-[#746E66]">Total Biaya Cukur</span>
+                <span className="text-xl font-black text-[#B7792B] font-mono">
+                  {formatRupiah(totalPrice)}
                 </span>
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/10 active:scale-[0.99] flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-2xl bg-[#B7792B] hover:bg-[#7A4B16] text-white font-bold text-sm transition-all shadow-lg shadow-[#B7792B]/20 flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
                     <Clock className="w-4 h-4" />
-                    <span>Konfirmasi Reservasi Sekarang</span>
+                    <span>Konfirmasi Reservasi ROME BOIS</span>
                   </>
                 )}
               </button>
@@ -362,8 +438,8 @@ export default function PublicBookingForm() {
           </form>
         )}
 
-        <p className="mt-6 text-center text-[10px] text-zinc-400">
-          &copy; {new Date().getFullYear()} ROMEBOIS Barbershop &middot; Online Reservation System
+        <p className="mt-6 text-center text-[10px] text-[#746E66]">
+          &copy; {new Date().getFullYear()} ROME BOIS Barbershop &middot; Technology by Altora
         </p>
       </div>
     </div>

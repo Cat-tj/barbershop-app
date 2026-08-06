@@ -38,7 +38,12 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
     { name: 'Jadwal & Kalender', href: '/calendar', icon: Calendar },
   ]
 
+  if (userRole === 'capster') {
+    navItems.push({ name: 'Portal Capster Saya', href: '/capster', icon: Scissors })
+  }
+
   if (userRole === 'admin') {
+    navItems.push({ name: 'Hak Akses & Permission', href: '/admin/access-control', icon: ShieldAlert })
     navItems.push({ name: 'Kelola User', href: '/admin', icon: ShieldAlert })
   }
 
@@ -57,18 +62,18 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
       {/* Header Branding */}
       <div className="p-5 border-b border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-xl shadow-lg shadow-amber-500/20">
-            R
+          <div className="w-10 h-10 rounded-xl bg-[#B7792B] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#B7792B]/20">
+            RB
           </div>
           <div>
-            <h1 className="font-extrabold tracking-wider text-sm text-zinc-100 flex items-center gap-1.5">
-              ROMEBOIS
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                ERP
+            <h1 className="font-extrabold tracking-wider text-sm text-[#26231F] flex items-center gap-1.5">
+              ROME BOIS
+              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#B7792B]/10 text-[#B7792B] border border-[#B7792B]/20">
+                BARBERSHOP
               </span>
             </h1>
-            <p className="text-[10px] text-zinc-400 flex items-center gap-1 font-medium">
-              <Sparkles className="w-2.5 h-2.5 text-amber-500" /> Powered by Altora
+            <p className="text-[10px] text-[#746E66] flex items-center gap-1 font-medium">
+              <Sparkles className="w-2.5 h-2.5 text-[#B7792B]" /> Technology by Altora
             </p>
           </div>
         </div>

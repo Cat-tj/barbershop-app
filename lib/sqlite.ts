@@ -114,17 +114,100 @@ db.exec(`
     value TEXT NOT NULL
   );
 
-  CREATE TABLE IF NOT EXISTS bookings (
+  CREATE TABLE IF NOT EXISTS roles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_name TEXT NOT NULL,
-    customer_phone TEXT,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL UNIQUE,
+    module TEXT NOT NULL,
+    description TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS role_permissions (
+    role_id INTEGER NOT NULL,
+    permission_id INTEGER NOT NULL,
+    allowed INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (role_id, permission_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS user_permissions (
+    user_id INTEGER NOT NULL,
+    permission_id INTEGER NOT NULL,
+    effect TEXT NOT NULL CHECK (effect IN ('allow', 'deny')),
+    PRIMARY KEY (user_id, permission_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS employees (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     capster_id INTEGER,
-    booking_date TEXT NOT NULL,
-    start_time TEXT NOT NULL,
-    end_time TEXT NOT NULL,
-    status TEXT DEFAULT 'confirmed',
-    booking_type TEXT DEFAULT 'potong_di_tempat',
-    notes TEXT,
+    full_name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    address TEXT,
+    position TEXT DEFAULT 'Capster',
+    join_date TEXT,
+    bank_account TEXT,
+    emergency_contact TEXT,
+    active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES user_accounts(id),
+    FOREIGN KEY(capster_id) REFERENCES capsters(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS attendance_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_id INTEGER NOT NULL,
+    shift_date TEXT NOT NULL,
+    clock_in DATETIME,
+    clock_out DATETIME,
+    break_start DATETIME,
+    break_end DATETIME,
+    late_minutes INTEGER DEFAULT 0,
+    overtime_minutes INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'present',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(employee_id) REFERENCES employees(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS leave_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_id INTEGER NOT NULL,
+    leave_type TEXT NOT NULL,
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL,
+    reason TEXT,
+    status TEXT DEFAULT 'pending',
+    approved_by INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(employee_id) REFERENCES employees(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS point_ledger (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('earn', 'redeem', 'expire', 'adjustment', 'reversal')),
+    points INTEGER NOT NULL,
+    order_id INTEGER,
+    reason TEXT,
+    created_by TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(member_id) REFERENCES members(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    actor TEXT NOT NULL,
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT,
+    before_value TEXT,
+    after_value TEXT,
+    reason TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `)
