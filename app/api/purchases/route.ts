@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from '@/lib/sqlite'
 
 interface PurchaseItem {
   item_name: string
@@ -26,54 +21,41 @@ export async function POST(request: NextRequest) {
     }
 
     let newProductsCount = 0
-    const purchaseRecords: Record<string, unknown>[] = []
+
+    const insertPurchase = db.prepare(`
+      INSERT INTO purchases (item_name, category, quantity, unit_price, total_price, place_of_purchase, is_new_item, created_product_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+
+    const insertProduct = db.prepare(`
+      INSERT INTO products (name, price, stock, category)
+      VALUES (?, ?, ?, ?)
+    `)
 
     for (const item of items) {
       let createdProductId: number | null = null
 
-      // If flagged to create a new product, insert it first
       if (item.create_product && item.is_new_item) {
-        const { data: product, error: productError } = await supabase
-          .from('products')
-          .insert({
-            name: item.item_name,
-            price: item.unit_price,
-            stock: item.quantity,
-            category: item.category,
-          })
-          .select('id')
-          .single()
-
-        if (productError) {
-          console.error('Failed to create product:', productError)
-          return Response.json({ error: `Failed to create product: ${item.item_name}` }, { status: 500 })
-        }
-
-        createdProductId = product.id
+        const prodResult = insertProduct.run(
+          item.item_name,
+          item.unit_price,
+          item.quantity,
+          item.category
+        )
+        createdProductId = Number(prodResult.lastInsertRowid)
         newProductsCount++
       }
 
-      // Insert purchase record
-      purchaseRecords.push({
-        item_name: item.item_name,
-        category: item.category,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total_price: item.quantity * item.unit_price,
-        place_of_purchase: item.place_of_purchase || null,
-        is_new_item: item.is_new_item,
-        created_product_id: createdProductId,
-        created_at: new Date().toISOString(),
-      })
-    }
-
-    const { error: insertError } = await supabase
-      .from('purchases')
-      .insert(purchaseRecords)
-
-    if (insertError) {
-      console.error('Failed to insert purchases:', insertError)
-      return Response.json({ error: 'Failed to record purchases.' }, { status: 500 })
+      insertPurchase.run(
+        item.item_name,
+        item.category,
+        item.quantity,
+        item.unit_price,
+        item.quantity * item.unit_price,
+        item.place_of_purchase || null,
+        item.is_new_item ? 1 : 0,
+        createdProductId
+      )
     }
 
     return Response.json({

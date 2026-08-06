@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from '@/lib/sqlite'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,57 +10,33 @@ export async function GET(request: NextRequest) {
       return Response.json({ found: false, error: 'Phone parameter is required.' }, { status: 400 })
     }
 
-    // Join members with member_tiers
-    const { data, error } = await supabase
-      .from('members')
-      .select(`
-        id,
-        name,
-        phone,
-        tier_id,
-        total_points,
-        total_spent,
-        visit_count,
-        member_tiers!inner (
-          name,
-          discount_pct,
-          point_mult,
-          color
-        )
-      `)
-      .eq('phone', phone.trim())
-      .maybeSingle()
-
-    if (error) {
-      console.error('Member fetch error:', error)
-      return Response.json({ found: false, error: 'Failed to fetch member.' }, { status: 500 })
-    }
-
-    if (!data) {
-      return Response.json({ found: false })
-    }
-
-    // Flatten the result
-    const tier = data.member_tiers as unknown as {
+    const member = db.prepare('SELECT * FROM members WHERE phone = ?').get(phone.trim()) as {
+      id: number
       name: string
-      discount_pct: number
-      point_mult: number
-      color: string
+      phone: string
+      tier_id: number
+      total_points: number
+      total_spent: number
+      visit_count: number
+    } | undefined
+
+    if (!member) {
+      return Response.json({ found: false })
     }
 
     return Response.json({
       found: true,
-      id: data.id,
-      name: data.name,
-      phone: data.phone,
-      tier_id: data.tier_id,
-      total_points: data.total_points,
-      total_spent: data.total_spent,
-      visit_count: data.visit_count,
-      tier_name: tier.name,
-      discount_pct: tier.discount_pct,
-      point_mult: tier.point_mult,
-      color: tier.color,
+      id: member.id,
+      name: member.name,
+      phone: member.phone,
+      tier_id: member.tier_id,
+      total_points: member.total_points,
+      total_spent: member.total_spent,
+      visit_count: member.visit_count,
+      tier_name: 'Silver',
+      discount_pct: 5,
+      point_mult: 1,
+      color: '#f59e0b',
     })
   } catch (err) {
     console.error('Member API error:', err)

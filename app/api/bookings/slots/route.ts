@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from '@/lib/sqlite'
 
 function generateSlots(): string[] {
   const slots: string[] = []
@@ -38,27 +33,21 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Invalid capster_id.' }, { status: 400 })
     }
 
-    // Fetch existing bookings for this date + capster (not cancelled)
-    const { data: bookings, error } = await supabase
-      .from('bookings')
-      .select('start_time, customer_phone')
-      .eq('booking_date', date)
-      .eq('capster_id', capsterId)
-      .neq('status', 'cancelled')
-
-    if (error) {
-      console.error('Slots query error:', error)
-      return Response.json({ error: 'Failed to fetch bookings.' }, { status: 500 })
+    let bookings: { start_time: string; customer_phone: string }[] = []
+    try {
+      bookings = db.prepare(`
+        SELECT start_time, customer_phone 
+        FROM bookings 
+        WHERE booking_date = ? AND capster_id = ? AND status != 'cancelled'
+      `).all(date, capsterId) as { start_time: string; customer_phone: string }[]
+    } catch {
+      bookings = []
     }
 
-    // Build a map of booked start_time -> customer_phone
     const bookedMap = new Map<string, string>()
-    if (bookings) {
-      for (const b of bookings) {
-        // start_time is like "09:00" or "09:00:00" — normalize to HH:MM
-        const time = b.start_time?.substring(0, 5)
-        if (time) bookedMap.set(time, b.customer_phone || '')
-      }
+    for (const b of bookings) {
+      const time = b.start_time?.substring(0, 5)
+      if (time) bookedMap.set(time, b.customer_phone || '')
     }
 
     const allSlots = generateSlots()

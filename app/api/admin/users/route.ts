@@ -1,12 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from '@/lib/sqlite'
 
 async function checkAuth(request: NextRequest): Promise<{ authorized: boolean; status: number; body?: Record<string, unknown> }> {
   const cookie = request.cookies.get('session')?.value
@@ -33,17 +28,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data, error } = await supabase
-      .from('user_accounts')
-      .select('id, username, role, active, created_at')
-      .order('username')
+    const users = db
+      .prepare('SELECT id, username, role, active, created_at FROM user_accounts ORDER BY username')
+      .all()
 
-    if (error) {
-      console.error('Failed to fetch users:', error)
-      return Response.json({ error: 'Failed to fetch users.' }, { status: 500 })
-    }
-
-    return Response.json({ users: data })
+    return Response.json({ users })
   } catch (err) {
     console.error('Admin users GET error:', err)
     return Response.json({ error: 'Internal server error.' }, { status: 500 })
@@ -68,12 +57,9 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Username and password are required.' }, { status: 400 })
     }
 
-    // Check for existing username
-    const { data: existing } = await supabase
-      .from('user_accounts')
-      .select('id')
-      .eq('username', username.trim())
-      .maybeSingle()
+    const existing = db
+      .prepare('SELECT id FROM user_accounts WHERE username = ?')
+      .get(username.trim())
 
     if (existing) {
       return Response.json({ error: 'Username already exists.' }, { status: 409 })
@@ -81,30 +67,22 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    const { data, error } = await supabase
-      .from('user_accounts')
-      .insert({
-        username: username.trim(),
-        password_hash: passwordHash,
-        role: role || 'user',
-        active: true,
-      })
-      .select('id, username, role, active, created_at')
-      .single()
+    const result = db.prepare(`
+      INSERT INTO user_accounts (username, password_hash, role, active)
+      VALUES (?, ?, ?, 1)
+    `).run(username.trim(), passwordHash, role || 'user')
 
-    if (error) {
-      console.error('Failed to create user:', error)
-      return Response.json({ error: 'Failed to create user.' }, { status: 500 })
-    }
+    const newUser = db
+      .prepare('SELECT id, username, role, active, created_at FROM user_accounts WHERE id = ?')
+      .get(result.lastInsertRowid)
 
-    return Response.json({ user: data }, { status: 201 })
+    return Response.json({ user: newUser }, { status: 201 })
   } catch (err) {
     console.error('Admin users POST error:', err)
     return Response.json({ error: 'Internal server error.' }, { status: 500 })
   }
 }
 
-// Also handle PATCH for role/active toggles (from the same route)
 export async function PATCH(request: NextRequest) {
   const auth = await checkAuth(request)
   if (!auth.authorized) {
@@ -125,31 +103,25 @@ export async function PATCH(request: NextRequest) {
       return Response.json({ error: 'User ID is required.' }, { status: 400 })
     }
 
-    const updates: Record<string, unknown> = {}
-    if (role !== undefined) updates.role = role
-    if (active !== undefined) updates.active = active
-    if (username?.trim()) updates.username = username.trim()
+    if (role !== undefined) {
+      db.prepare('UPDATE user_accounts SET role = ? WHERE id = ?').run(role, id)
+    }
+    if (active !== undefined) {
+      db.prepare('UPDATE user_accounts SET active = ? WHERE id = ?').run(active ? 1 : 0, id)
+    }
+    if (username?.trim()) {
+      db.prepare('UPDATE user_accounts SET username = ? WHERE id = ?').run(username.trim(), id)
+    }
     if (password?.trim()) {
-      updates.password_hash = await bcrypt.hash(password, 10)
+      const hash = await bcrypt.hash(password, 10)
+      db.prepare('UPDATE user_accounts SET password_hash = ? WHERE id = ?').run(hash, id)
     }
 
-    if (Object.keys(updates).length === 0) {
-      return Response.json({ error: 'No fields to update.' }, { status: 400 })
-    }
+    const updatedUser = db
+      .prepare('SELECT id, username, role, active, created_at FROM user_accounts WHERE id = ?')
+      .get(id)
 
-    const { data, error } = await supabase
-      .from('user_accounts')
-      .update(updates)
-      .eq('id', id)
-      .select('id, username, role, active, created_at')
-      .single()
-
-    if (error) {
-      console.error('Failed to update user:', error)
-      return Response.json({ error: 'Failed to update user.' }, { status: 500 })
-    }
-
-    return Response.json({ user: data })
+    return Response.json({ user: updatedUser })
   } catch (err) {
     console.error('Admin users PATCH error:', err)
     return Response.json({ error: 'Internal server error.' }, { status: 500 })

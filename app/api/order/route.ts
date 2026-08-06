@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import db from '@/lib/sqlite'
 
 interface OrderItemPayload {
   item_type: 'product' | 'service'
@@ -41,65 +36,51 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'At least one item is required.' }, { status: 400 })
     }
 
-    // Calculate subtotal
     const subtotal = items.reduce((sum, item) => sum + item.qty * item.price, 0)
     const total = Math.max(0, subtotal - discount)
 
-    // Step 1: Insert order as pending (triggers won't fire yet — no items to process)
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        customer_name: customer_name.trim(),
-        customer_phone: customer_phone?.trim() || null,
-        status: 'pending',
-        subtotal,
-        discount,
-        total,
-        payment_method: payment_method?.trim() || null,
-      })
-      .select('id')
-      .single()
+    const insertOrder = db.prepare(`
+      INSERT INTO orders (customer_name, customer_phone, status, subtotal, discount, total, payment_method)
+      VALUES (?, ?, 'completed', ?, ?, ?, ?)
+    `)
 
-    if (orderError) {
-      console.error('Order insert error:', orderError)
-      return Response.json({ error: 'Failed to create order.' }, { status: 500 })
-    }
+    const result = insertOrder.run(
+      customer_name.trim(),
+      customer_phone?.trim() || null,
+      subtotal,
+      discount,
+      total,
+      payment_method?.trim() || null
+    )
 
-    // Step 2: Insert order items
-    const orderItems = items.map(item => ({
-      order_id: order.id,
-      item_type: item.item_type,
-      product_id: item.product_id || null,
-      service_id: item.service_id || null,
-      capster_id: item.capster_id || null,
-      qty: item.qty,
-      price: item.price,
-      subtotal: item.qty * item.price,
-    }))
+    const orderId = result.lastInsertRowid
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems)
+    const insertItem = db.prepare(`
+      INSERT INTO order_items (order_id, item_type, product_id, service_id, capster_id, qty, price, subtotal)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
 
-    if (itemsError) {
-      console.error('Order items insert error:', itemsError)
-      return Response.json({ error: 'Failed to create order items.' }, { status: 500 })
-    }
+    for (const item of items) {
+      insertItem.run(
+        orderId,
+        item.item_type,
+        item.product_id || null,
+        item.service_id || null,
+        item.capster_id || null,
+        item.qty,
+        item.price,
+        item.qty * item.price
+      )
 
-    // Step 3: Update order to completed — triggers now have items to process
-    const { error: updateError } = await supabase
-      .from('orders')
-      .update({ status: 'completed' })
-      .eq('id', order.id)
-
-    if (updateError) {
-      console.error('Order status update error:', updateError)
-      return Response.json({ error: 'Failed to finalize order.' }, { status: 500 })
+      // Deduct stock for products
+      if (item.item_type === 'product' && item.product_id) {
+        db.prepare('UPDATE products SET stock = MAX(0, stock - ?) WHERE id = ?').run(item.qty, item.product_id)
+      }
     }
 
     return Response.json({
       success: true,
-      order_id: order.id,
+      order_id: orderId,
       subtotal,
       discount,
       total,
