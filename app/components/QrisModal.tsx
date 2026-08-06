@@ -36,21 +36,43 @@ export default function QrisModal({
     const generatedRefId = `QRIS-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`
     setRefId(generatedRefId)
 
-    // Generate Standard National QRIS String (NMID & Merchant Format)
-    const qrisPayload = `00020101021226670016ID.CO.QRIS.WWW01189360091430000000000215ID1020000000000030303936520458125303360540${amount}.005802ID5914ROMEBOIS POS6007JAKARTA610512110622207${generatedRefId}6304ABCD`
+    // Fetch static QRIS payload from settings & convert to dynamic QRIS via verssache/qris-dinamis logic
+    fetch('/api/admin/qris')
+      .then((res) => res.json())
+      .then((data) => {
+        const staticPayload = data.qris_static_payload || ''
+        // Construct dynamic QRIS payload
+        const amountStr = Math.round(amount).toString()
+        const tag54 = `54${amountStr.length.toString().padStart(2, '0')}${amountStr}`
+        
+        let qrisPayload = staticPayload
+        if (!qrisPayload || !qrisPayload.startsWith('000201')) {
+          qrisPayload = `00020101021226670016ID.CO.QRIS.WWW01189360091430000000000215ID102000000000003030393652045812${tag54}5802ID5914ROMEBOIS POS6007JAKARTA610512110622207${generatedRefId}6304ABCD`
+        } else {
+          // Replace tag 010211 with 010212 (Dynamic QRIS)
+          qrisPayload = qrisPayload.replace('010211', '010212')
+          if (qrisPayload.includes('5802ID')) {
+            const parts = qrisPayload.split('5802ID')
+            qrisPayload = `${parts[0]}${tag54}5802ID${parts[1]}`
+          }
+        }
 
-    QRCode.toDataURL(qrisPayload, {
-      width: 320,
-      margin: 2,
-      color: {
-        dark: '#09090b',
-        light: '#ffffff',
-      },
-    })
-      .then((url) => setQrUrl(url))
-      .catch((err) => console.error('Failed to generate QR code:', err))
+        QRCode.toDataURL(qrisPayload, {
+          width: 320,
+          margin: 2,
+          color: {
+            dark: '#09090b',
+            light: '#ffffff',
+          },
+        })
+          .then((url) => setQrUrl(url))
+          .catch((err) => console.error('Failed to generate QR code:', err))
+      })
+      .catch(() => {
+        const fallback = `00020101021226670016ID.CO.QRIS.WWW01189360091430000000000215ID10200000000000303039365204581254${amount.toString().length.toString().padStart(2, '0')}${amount}5802ID5914ROMEBOIS POS6007JAKARTA610512110622207${generatedRefId}6304ABCD`
+        QRCode.toDataURL(fallback, { width: 320, margin: 2 }).then(setQrUrl)
+      })
 
-    // Countdown Timer
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0))
     }, 1000)

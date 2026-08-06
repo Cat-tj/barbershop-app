@@ -93,7 +93,50 @@ db.exec(`
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT,
+    capster_id INTEGER,
+    booking_date TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
+    status TEXT DEFAULT 'confirmed',
+    booking_type TEXT DEFAULT 'potong_di_tempat',
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `)
+
+// Seed default settings (QRIS Static Payload)
+db.prepare(`
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('qris_static_payload', '00020101021226670016ID.CO.QRIS.WWW01189360091430000000000215ID10200000000000303039365204581253033605802ID5914ROMEBOIS POS6007JAKARTA610512110622207QRIS1234566304ABCD')
+`).run()
+
+// Seed default services
+const countServices = (db.prepare('SELECT COUNT(*) as count FROM services').get() as { count: number }).count
+if (countServices === 0) {
+  const insertService = db.prepare('INSERT INTO services (name, price, duration) VALUES (?, ?, ?)')
+  insertService.run('Potong Cukur Gentleman', 50000, 30)
+  insertService.run('Cukur + Keramas + Head Massage', 75000, 45)
+  insertService.run('Coloring / Semir Hair Trend', 120000, 60)
+  insertService.run('Cukur Anak / Kids Haircut', 40000, 30)
+}
+
+// Seed default capsters
+const countCapsters = (db.prepare('SELECT COUNT(*) as count FROM capsters').get() as { count: number }).count
+if (countCapsters === 0) {
+  const insertCapster = db.prepare('INSERT INTO capsters (name, phone, active) VALUES (?, ?, 1)')
+  insertCapster.run('Budi Barbershop', '081234567890')
+  insertCapster.run('Rian Hair Stylist', '081298765432')
+  insertCapster.run('Doni Fade Master', '081311223344')
+}
 
 // Seed default users
 const hash = bcrypt.hashSync('romebois123icat', 10)
