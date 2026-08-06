@@ -48,19 +48,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
   const isLoginPage = pathname === '/login'
+  const isFormsPage = pathname === '/forms'
 
   useEffect(() => {
     if (!mounted) return
-    if (isLoginPage) return
+    if (isLoginPage || isFormsPage) return
     const s = getSessionFromCookie()
     if (!s && !isPublic) {
       router.replace('/login')
     }
-  }, [mounted, pathname, isPublic, isLoginPage, router])
+  }, [mounted, pathname, isPublic, isLoginPage, isFormsPage, router])
 
   if (!mounted) return null
 
-  if (isLoginPage) {
+  if (isLoginPage || isFormsPage) {
     return <>{children}</>
   }
 
