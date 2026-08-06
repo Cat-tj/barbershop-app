@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import QrisModal from "./components/QrisModal";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -186,6 +187,7 @@ export default function POSPage() {
 
   /* ---- receipt state --------------------------------------------- */
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
+  const [qrisOpen, setQrisOpen] = useState(false);
 
   /* ---- inventory alerts ------------------------------------------ */
   const [lowStockItems, setLowStockItems] = useState<StockAlert[]>([]);
@@ -739,17 +741,20 @@ export default function POSPage() {
 
         {/* Submit */}
         <button
-          onClick={processOrder}
-          disabled={submitting || cart.length === 0}
-          className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold text-sm uppercase tracking-wider transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          onClick={() => {
+            if (paymentMethod === "qris") {
+              setQrisOpen(true);
+            } else {
+              processOrder();
+            }
+          }}
+          disabled={cart.length === 0 || submitting}
+          className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:hover:bg-amber-500 text-zinc-950 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10"
         >
           {submitting ? (
-            <>
-              <span className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-              Processing\u2026
-            </>
+            <div className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
           ) : (
-            "Process Order"
+            `Charge ${formatRp(total)} ${paymentMethod === "qris" ? "(QRIS)" : ""}`
           )}
         </button>
       </div>
@@ -1172,6 +1177,17 @@ export default function POSPage() {
           </div>
         </div>
       )}
+
+      {/* Altora QRIS Payment Modal */}
+      <QrisModal
+        isOpen={qrisOpen}
+        onClose={() => setQrisOpen(false)}
+        amount={total}
+        customerName={customerName || "Pelanggan"}
+        onSuccess={() => {
+          processOrder();
+        }}
+      />
     </div>
   );
 }
