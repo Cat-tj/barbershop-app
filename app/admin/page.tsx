@@ -359,13 +359,13 @@ export default function AdminPage() {
       {/* Header */}
       <div className="px-4 sm:px-6 py-4 border-b border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-md">
         <div>
-          <h1 className="text-base sm:text-lg font-black tracking-wider text-zinc-100 flex items-center gap-2">
-            ADMIN PANEL
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              ALTORA SYSTEM
+          <h1 className="text-base sm:text-lg font-black tracking-wider text-[#26231F] flex items-center gap-2">
+            ADMIN PANEL ROME BOIS
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#B7792B]/15 text-[#B7792B] border border-[#B7792B]/30">
+              ROME BOIS SYSTEM
             </span>
           </h1>
-          <p className="text-[11px] sm:text-xs text-zinc-400">Kelola Pengguna, Hak Akses Role, QRIS, dan Database</p>
+          <p className="text-[11px] sm:text-xs text-[#746E66]">Kelola Pengguna, Hak Akses Role, QRIS, HRIS Staff & Database</p>
         </div>
         {activeTab === 'users' && (
           <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto flex items-center gap-1.5">
@@ -444,8 +444,9 @@ export default function AdminPage() {
                         onChange={e => setFormRole(e.target.value as 'admin' | 'user')}
                         className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-amber-500/60"
                       >
-                        <option value="user">User / Operator Kasir (Hanya POS Kasir & Transaksi)</option>
-                        <option value="admin">Admin System (Akses Penuh Seluruh Menu ERP)</option>
+                        <option value="user">User / Operator Kasir (POS Kasir & Transaksi)</option>
+                        <option value="capster">Capster / Barber (Akses Portal Capster & Absensi)</option>
+                        <option value="admin">Admin System (Akses Penuh Rome Bois System)</option>
                       </select>
                     </div>
 
