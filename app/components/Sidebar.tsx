@@ -16,7 +16,8 @@ import {
   ShieldAlert,
   Sparkles,
   Menu,
-  X
+  X,
+  DollarSign
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -35,6 +36,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
     { name: 'Dashboard Omset', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Pelanggan & Member', href: '/members', icon: UserCheck },
     { name: 'Pembelian Stok', href: '/purchases', icon: Package },
+    { name: 'Gaji Capster', href: '/payroll', icon: DollarSign },
     { name: 'Jadwal & Kalender', href: '/calendar', icon: Calendar },
   ]
 
