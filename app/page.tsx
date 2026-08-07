@@ -311,17 +311,33 @@ export default function POSPage() {
       <div className="p-4 border-t border-zinc-800 space-y-3 bg-zinc-950/60">
         <input
           type="text"
-          placeholder="Nama Pelanggan"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
+          placeholder="No HP / WhatsApp (Auto-lookup Member)"
+          value={customerPhone}
+          onChange={async (e) => {
+            const val = e.target.value;
+            setCustomerPhone(val);
+            if (val.length >= 8) {
+              try {
+                const res = await fetch(`/api/member/lookup?phone=${encodeURIComponent(val)}`);
+                if (res.ok) {
+                  const data = await res.json();
+                  if (data && data.name) {
+                    setCustomerName(data.name);
+                  }
+                }
+              } catch (err) {
+                // silent lookup
+              }
+            }
+          }}
+          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
         />
         <input
           type="text"
-          placeholder="No HP / WhatsApp"
-          value={customerPhone}
-          onChange={(e) => setCustomerPhone(e.target.value)}
-          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
+          placeholder="Nama Pelanggan"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
         />
 
         <div className="flex gap-2">
