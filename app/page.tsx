@@ -387,9 +387,15 @@ export default function POSPage() {
         </div>
 
         {alert && (
-          <div className={`px-4 py-3 rounded-xl text-xs font-semibold flex justify-between ${alert.type === 'success' ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-300' : 'bg-red-950/80 border border-red-800 text-red-300'}`}>
+          <div
+            className="px-4 py-3 rounded-xl text-xs font-semibold flex justify-between items-center"
+            style={alert.type === 'success'
+              ? { background: '#e4f5ee', color: '#0e7a57', border: '1px solid rgba(14,122,87,.2)' }
+              : { background: '#fdeaec', color: '#ef4444', border: '1px solid rgba(239,68,68,.2)' }
+            }
+          >
             <span>{alert.message}</span>
-            <button onClick={() => setAlert(null)}>&times;</button>
+            <button onClick={() => setAlert(null)} className="ml-2 font-bold">&times;</button>
           </div>
         )}
 
@@ -405,15 +411,16 @@ export default function POSPage() {
                 <div
                   key={`svc-${s.id}`}
                   onClick={() => addToCart(s, "service")}
-                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] flex items-center justify-between group"
+                  className="p-4 rounded-2xl bg-white/90 border hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] group"
+                  style={{ borderColor: '#e9e6f2' }}
                 >
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-500">{s.name}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{s.duration || 30} Menit</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-extrabold text-purple-500 font-mono block">{formatRp(s.price)}</span>
-                    <span className="text-[10px] font-bold text-purple-500/80 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 inline-block mt-1">+ Tambah</span>
+                  <h3 className="text-sm font-bold truncate group-hover:text-purple-500" style={{ color: '#10224f' }}>{s.name}</h3>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs" style={{ color: '#6b7590' }}>{s.duration || 30} Menit</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-extrabold font-mono" style={{ color: '#7c5ce8' }}>{formatRp(s.price)}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ color: '#7c5ce8', background: 'rgba(124,92,232,.1)', border: '1px solid rgba(124,92,232,.2)' }}>+ Tambah</span>
+                    </div>
                   </div>
                 </div>
               ))}

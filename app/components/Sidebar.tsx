@@ -4,20 +4,9 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  Scissors,
-  LayoutDashboard,
-  ShoppingBag,
-  Users,
-  Calendar,
-  Package,
-  UserCheck,
-  LogOut,
-  ChevronRight,
-  ShieldAlert,
-  Sparkles,
-  Menu,
-  X,
-  DollarSign
+  Scissors, LayoutDashboard, ShoppingBag, Users, Calendar,
+  Package, UserCheck, LogOut, ChevronRight, ShieldAlert,
+  Sparkles, Menu, X, DollarSign, Settings
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -46,7 +35,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
   if (userRole === 'admin') {
     navItems.push({ name: 'Hak Akses & Permission', href: '/admin/access-control', icon: ShieldAlert })
-    navItems.push({ name: 'Kelola User', href: '/admin', icon: ShieldAlert })
+    navItems.push({ name: 'Pengaturan', href: '/admin', icon: Settings })
   }
 
   async function handleLogout() {
@@ -59,31 +48,33 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
     }
   }
 
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/'
+    return pathname === href
+  }
+
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#f8f7fc] border-r border-[#e9e6f2] w-64 text-[#10224f] select-none p-3 my-2 ml-2 rounded-3xl shadow-sm">
+    <div className="flex flex-col h-full bg-white/82 backdrop-blur-xl border-r w-64 text-[#10224f] select-none p-3 my-2 ml-2 rounded-3xl shadow-sm" style={{ borderColor: '#e9e6f2' }}>
       {/* Header Branding */}
-      <div className="p-4 border-b border-[#e9e6f2] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#7c5ce8] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#7c5ce8]/20">
+      <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: '#e9e6f2' }}>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-md shrink-0" style={{ background: 'linear-gradient(135deg, #6344c0, #7c5ce8)', boxShadow: '0 4px 12px rgba(124,92,232,.25)' }}>
             RB
           </div>
-          <div>
-            <h1 className="font-black tracking-wider text-xs text-[#10224f] flex items-center gap-1.5">
+          <div className="min-w-0">
+            <h1 className="font-black tracking-wider text-xs flex items-center gap-1.5 truncate" style={{ color: '#10224f' }}>
               ROME BOIS
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#7c5ce8]/15 text-[#7c5ce8] border border-[#7c5ce8]/30">
-                BARBERSHOP
-              </span>
             </h1>
-            <p className="text-[10px] text-[#6b7590] flex items-center gap-1 font-medium">
-              <Sparkles className="w-2.5 h-2.5 text-[#7c5ce8]" /> Technology by Altora
+            <p className="text-[10px] flex items-center gap-1 font-medium truncate" style={{ color: '#6b7590' }}>
+              <Sparkles className="w-2.5 h-2.5 shrink-0" style={{ color: '#7c5ce8' }} /> Technology by Altora
             </p>
           </div>
         </div>
 
-        {/* Mobile close */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="md:hidden p-1.5 text-[#6b7590] hover:text-[#10224f] rounded-lg"
+          className="md:hidden p-1.5 rounded-lg shrink-0"
+          style={{ color: '#6b7590' }}
         >
           <X className="w-5 h-5" />
         </button>
@@ -91,12 +82,12 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
       {/* Navigation Menu */}
       <div className="flex-1 py-4 px-1 space-y-1.5 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-[#8792a8]">
+        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider" style={{ color: '#8792a8' }}>
           Menu Operasional
         </div>
 
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+          const active = isActive(item.href)
           const Icon = item.icon
 
           return (
@@ -104,32 +95,36 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
               key={item.name}
               href={item.href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all group ${
-                isActive
-                  ? 'bg-[#7c5ce8]/15 text-[#7c5ce8] border border-[#7c5ce8]/30 shadow-sm'
-                  : 'text-[#6b7590] hover:text-[#10224f] hover:bg-white/80 border border-transparent'
-              }`}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all group border"
+              style={active ? {
+                background: 'rgba(124,92,232,.12)',
+                color: '#7c5ce8',
+                borderColor: 'rgba(124,92,232,.3)',
+              } : {
+                color: '#6b7590',
+                borderColor: 'transparent',
+              }}
             >
-              <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#7c5ce8]' : 'text-[#6b7590] group-hover:text-[#10224f]'}`} />
-                <span>{item.name}</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Icon className="w-4 h-4 shrink-0" style={active ? { color: '#7c5ce8' } : { color: '#6b7590' }} />
+                <span className="truncate">{item.name}</span>
               </div>
-              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#7c5ce8]" />}
+              {active && <ChevronRight className="w-3.5 h-3.5 shrink-0" style={{ color: '#7c5ce8' }} />}
             </Link>
           )
         })}
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-2 border-t border-[#e9e6f2] bg-white/60 rounded-2xl">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-[#e9e6f2] mb-2">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-[#7c5ce8]/15 text-[#7c5ce8] font-extrabold flex items-center justify-center text-xs">
+      <div className="p-2 border-t rounded-2xl" style={{ borderColor: '#e9e6f2', background: 'rgba(255,255,255,.6)' }}>
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white border mb-2" style={{ borderColor: '#e9e6f2' }}>
+          <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
+            <div className="w-8 h-8 rounded-xl font-extrabold flex items-center justify-center text-xs shrink-0" style={{ background: 'rgba(124,92,232,.12)', color: '#7c5ce8' }}>
               {username.charAt(0).toUpperCase()}
             </div>
-            <div className="truncate">
-              <span className="block text-xs font-bold text-[#10224f] truncate">{username}</span>
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-[#7c5ce8]">
+            <div className="truncate min-w-0">
+              <span className="block text-xs font-bold truncate" style={{ color: '#10224f' }}>{username}</span>
+              <span className="block text-[10px] uppercase font-bold tracking-wider" style={{ color: '#7c5ce8' }}>
                 {userRole}
               </span>
             </div>
@@ -138,7 +133,8 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
         <button
           onClick={handleLogout}
-          className="w-full py-2 px-3 rounded-xl bg-[#ef4444]/10 hover:bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+          style={{ background: 'rgba(239,68,68,.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,.2)' }}
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Keluar</span>
@@ -150,19 +146,20 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   return (
     <>
       {/* Top Navbar Header for Mobile */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#f8f7fc] border-b border-slate-200/80 shrink-0">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b shrink-0" style={{ background: '#f8f7fc', borderColor: '#e9e6f2' }}>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-xl bg-white border border-slate-200 text-purple-500"
+            className="p-2 rounded-xl bg-white border"
+            style={{ borderColor: '#e9e6f2', color: '#7c5ce8' }}
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm" style={{ background: 'linear-gradient(135deg, var(--color-primary-dark, #6344c0), var(--color-primary, #7c5ce8))', color: 'white' }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm text-white" style={{ background: 'linear-gradient(135deg, #6344c0, #7c5ce8)' }}>
               RB
             </div>
-            <span className="font-extrabold tracking-wider text-xs" style={{ color: '#1e293b' }}>ROMEBOIS ERP</span>
+            <span className="font-extrabold tracking-wider text-xs" style={{ color: '#10224f' }}>ROME BOIS</span>
           </div>
         </div>
       </div>
@@ -170,13 +167,10 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
       {/* Mobile Drawer Overlay */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm animate-in fade-in"
+          className="md:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-in fade-in"
           onClick={() => setMobileOpen(false)}
         >
-          <div
-            className="w-64 h-full"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="w-64 h-full" onClick={(e) => e.stopPropagation()}>
             {sidebarContent}
           </div>
         </div>
