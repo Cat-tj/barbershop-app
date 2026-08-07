@@ -144,12 +144,12 @@ export default function CalendarPage() {
           <p className="text-[11px] text-slate-400">Total nilai transaksi jasa + produk</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/15 via-zinc-900 to-zinc-900 border border-purple-500/40 space-y-1 shadow-lg">
-          <span className="text-[10px] uppercase font-bold text-purple-500 flex items-center gap-1.5">
-            <Award className="w-3.5 h-3.5 text-purple-500" /> Estimasi Total Komisi
+        <div className="p-4 rounded-2xl bg-white border space-y-1 shadow-sm" style={{ borderColor: '#e9e6f2' }}>
+          <span className="text-[10px] uppercase font-bold flex items-center gap-1.5" style={{ color: '#7c5ce8' }}>
+            <Award className="w-3.5 h-3.5" style={{ color: '#7c5ce8' }} /> Estimasi Total Komisi
           </span>
-          <p className="text-xl font-black text-purple-500 font-mono">{loading ? '...' : formatRp(totalCommission)}</p>
-          <p className="text-[11px] text-slate-500">Komisi belum termasuk gaji pokok</p>
+          <p className="text-xl font-black font-mono" style={{ color: '#7c5ce8' }}>{loading ? '...' : formatRp(totalCommission)}</p>
+          <p className="text-[11px]" style={{ color: '#6b7590' }}>Komisi belum termasuk gaji pokok</p>
         </div>
       </div>
 

@@ -411,16 +411,16 @@ export default function POSPage() {
                 <div
                   key={`svc-${s.id}`}
                   onClick={() => addToCart(s, "service")}
-                  className="p-4 rounded-2xl bg-white/90 border hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] group"
+                  className="p-3 rounded-xl bg-white border cursor-pointer transition-all active:scale-[0.98] group"
                   style={{ borderColor: '#e9e6f2' }}
                 >
-                  <h3 className="text-sm font-bold truncate group-hover:text-purple-500" style={{ color: '#10224f' }}>{s.name}</h3>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs" style={{ color: '#6b7590' }}>{s.duration || 30} Menit</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-extrabold font-mono" style={{ color: '#7c5ce8' }}>{formatRp(s.price)}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ color: '#7c5ce8', background: 'rgba(124,92,232,.1)', border: '1px solid rgba(124,92,232,.2)' }}>+ Tambah</span>
-                    </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-xs font-bold leading-tight group-hover:text-purple-500" style={{ color: '#10224f' }}>{s.name}</h3>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0" style={{ color: '#7c5ce8', background: 'rgba(124,92,232,.08)' }}>+ Tambah</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-xs font-extrabold font-mono" style={{ color: '#7c5ce8' }}>{formatRp(s.price)}</span>
+                    <span className="text-[10px]" style={{ color: '#8792a8' }}>{s.duration || 30} Menit</span>
                   </div>
                 </div>
               ))}
@@ -438,15 +438,16 @@ export default function POSPage() {
                 <div
                   key={`prod-${p.id}`}
                   onClick={() => addToCart(p, "product")}
-                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] flex flex-col justify-between group"
+                  className="p-3 rounded-xl bg-white border cursor-pointer transition-all active:scale-[0.98] group"
+                  style={{ borderColor: '#e9e6f2' }}
                 >
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-900 truncate group-hover:text-purple-500">{p.name}</h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Stok: <strong className="text-slate-700 font-mono">{p.stock} pcs</strong></p>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-xs font-bold leading-tight truncate group-hover:text-purple-500" style={{ color: '#10224f' }}>{p.name}</h3>
+                    <span className="w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: 'rgba(124,92,232,.1)', color: '#7c5ce8' }}>+</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs font-bold text-purple-500 font-mono">{formatRp(p.price)}</span>
-                    <span className="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-500 font-bold text-xs flex items-center justify-center">+</span>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-xs font-bold font-mono" style={{ color: '#7c5ce8' }}>{formatRp(p.price)}</span>
+                    <span className="text-[10px]" style={{ color: '#8792a8' }}>Stok: {p.stock}</span>
                   </div>
                 </div>
               ))}
