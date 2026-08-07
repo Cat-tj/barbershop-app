@@ -1,30 +1,39 @@
 @import "tailwindcss";
 
 @theme inline {
+  --color-altora-ink: #0f1b3d;
+  --color-altora-amber: #d97706;
+  --color-altora-amber-hover: #b45309;
+  --color-altora-gold: #fef3c7;
+  --color-altora-surface: #111827;
+  --color-altora-surface-hover: #1f2937;
+  --color-altora-border: #374151;
+  --color-altora-bg: #0b0f19;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-sidebar: #09090b;
-  --color-surface: #18181b;
-  --color-surface-hover: #27272a;
-  --color-border: #3f3f46;
-  --color-accent: #f59e0b;
-  --color-accent-hover: #d97706;
-  --color-accent-foreground: #0c0a09;
-  --color-muted: #a1a1aa;
-  --color-muted-foreground: #71717a;
-  --color-success: #22c55e;
-  --color-destructive: #ef4444;
+  --color-sidebar: #0f1b3d;
+  --color-surface: #111827;
+  --color-surface-hover: #1f2937;
+  --color-border: #374151;
+  --color-accent: #d97706;
+  --color-accent-hover: #b45309;
+  --color-accent-foreground: #ffffff;
+  --color-muted: #9ca3af;
+  --color-muted-foreground: #6b7280;
+  --color-success: #16a34a;
+  --color-destructive: #dc2626;
   --font-sans: var(--font-inter);
 }
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #0b0f19;
+  --foreground: #f9fafb;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
+  scrollbar-color: #374151 transparent;
 }
 
 body {
@@ -35,8 +44,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.04) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(15, 27, 61, 0.6) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.08) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
