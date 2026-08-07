@@ -157,10 +157,10 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-sm">
-              R
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm" style={{ background: 'linear-gradient(135deg, var(--color-primary-dark, #7e2582), var(--color-primary, #a730a8))', color: 'white' }}>
+              RB
             </div>
-            <span className="font-extrabold tracking-wider text-xs text-slate-900">ROMEBOIS ERP</span>
+            <span className="font-extrabold tracking-wider text-xs" style={{ color: '#1e293b' }}>ROMEBOIS ERP</span>
           </div>
         </div>
       </div>

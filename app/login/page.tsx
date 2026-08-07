@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles, ShieldCheck, ArrowRight, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { Sparkles, ArrowRight, Lock, User, Eye, EyeOff, Scissors } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,7 +25,7 @@ export default function LoginPage() {
       })
 
       if (!res.ok) {
-        setError('Invalid username or password')
+        setError('Username atau password salah. Silakan coba lagi.')
         setLoading(false)
         return
       }
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
       router.push('/')
     } catch {
-      setError('An error occurred. Please try again.')
+      setError('Terjadi kesalahan. Silakan coba lagi.')
       setLoading(false)
     }
   }
@@ -48,128 +48,184 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8f8fc] px-4 relative overflow-hidden">
-      {/* Background Altora Glowing Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-md bg-white/80 border border-slate-200/80 rounded-2xl p-8 shadow-2xl backdrop-blur-xl relative z-10">
-        {/* Header Logo */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-zinc-950 font-black text-2xl mb-4 shadow-lg shadow-amber-500/20">
-            R
-          </div>
-          <h1 className="text-xl font-black tracking-wider text-slate-900 flex items-center gap-2">
-            ROMEBOIS
-            <span className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              ERP
-            </span>
-          </h1>
-          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Powered by Altora Enterprise System
-          </p>
-        </div>
-
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-6 px-4 py-3 rounded-xl bg-red-950/60 border border-red-800/60 text-red-300 text-xs font-medium text-center animate-in fade-in">
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Username / Email
-            </label>
-            <div className="relative">
-              <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                autoComplete="username"
-                className="w-full h-10 pl-9 pr-3 bg-white/80 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/60 transition-colors"
-                placeholder="anang@gmail.com"
-              />
+    <div
+      className="flex min-h-screen flex-1 md:grid md:grid-cols-2"
+      style={{
+        '--color-primary': '#a730a8',
+        '--color-primary-dark': '#7e2582',
+      } as React.CSSProperties}
+    >
+      {/* Form side */}
+      <div
+        className="flex flex-1 items-center justify-center px-4 py-10"
+        style={{
+          backgroundImage:
+            'linear-gradient(135deg, rgba(47,59,163,.2) 0%, rgba(167,48,168,.16) 45%, rgba(242,138,78,.2) 100%), radial-gradient(1000px 620px at 8% -5%, rgba(47,59,163,.38) 0%, transparent 60%), radial-gradient(900px 560px at 100% 0%, rgba(242,138,78,.38) 0%, transparent 55%), radial-gradient(800px 700px at 50% 120%, rgba(167,48,168,.32) 0%, transparent 60%)',
+        }}
+      >
+        <div
+          className="w-full max-w-sm rounded-2xl p-6 shadow-xl sm:p-8"
+          style={{
+            background: 'rgba(255,255,255,0.75)',
+            backdropFilter: 'blur(18px) saturate(1.6)',
+            WebkitBackdropFilter: 'blur(18px) saturate(1.6)',
+            border: '1px solid rgba(255,255,255,0.45)',
+          }}
+        >
+          <div className="mb-6 flex flex-col items-center gap-3 text-center">
+            {/* Rome Bois Logo Mark */}
+            <div
+              className="flex h-28 w-28 items-center justify-center rounded-full"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)',
+              }}
+            >
+              <span className="text-5xl font-black text-white tracking-tighter">RB</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold tracking-tight" style={{ color: '#1e293b' }}>
+                Rome Bois Barbershop
+              </h1>
+              <p className="text-sm" style={{ color: '#64748b' }}>
+                Kelola kasir, antrian, dan jadwal barbershop-mu.
+              </p>
             </div>
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          {/* Error Alert */}
+          {error && (
+            <div
+              className="mb-4 rounded-lg px-4 py-3 text-sm text-center"
+              style={{
+                backgroundColor: '#fee2e2',
+                color: '#991b1b',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="username" className="text-sm font-medium" style={{ color: '#1e293b' }}>
+                Username
+              </label>
               <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="username"
+                type="text"
                 required
-                autoComplete="current-password"
-                className="w-full h-10 pl-9 pr-10 bg-white/80 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/60 transition-colors"
-                placeholder="••••••••••••"
+                autoComplete="username"
+                placeholder="admin"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="min-h-[48px] rounded-lg border bg-white/70 px-4 text-base outline-none transition-colors duration-150 focus:bg-white focus:ring-2"
+                style={{
+                  borderColor: '#e2e6ec',
+                  color: '#1e293b',
+                  // @ts-expect-error CSS custom property
+                  '--tw-ring-color': 'color-mix(in srgb, var(--color-primary) 20%, transparent)',
+                }}
               />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-sm font-medium" style={{ color: '#1e293b' }}>
+                Kata sandi
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  placeholder="Minimal 6 karakter"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="min-h-[48px] w-full rounded-lg border bg-white/70 px-4 pr-10 text-base outline-none transition-colors duration-150 focus:bg-white focus:ring-2"
+                  style={{
+                    borderColor: '#e2e6ec',
+                    color: '#1e293b',
+                    // @ts-expect-error CSS custom property
+                    '--tw-ring-color': 'color-mix(in srgb, var(--color-primary) 20%, transparent)',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 p-0.5 text-slate-400 hover:text-slate-700 transition-colors"
+                  title={showPassword ? 'Sembunyikan' : 'Lihat kata sandi'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="min-h-[48px] mt-1 rounded-lg text-white font-semibold text-base transition-opacity disabled:opacity-50 hover:opacity-90 active:scale-[0.99]"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)',
+              }}
+            >
+              {loading ? (
+                <div className="mx-auto w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Masuk
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              )}
+            </button>
+          </form>
+
+          {/* Quick Demo Accounts */}
+          <div className="mt-6 pt-5 border-t" style={{ borderColor: '#e2e6ec' }}>
+            <p className="text-xs font-medium mb-2 flex items-center gap-1.5" style={{ color: '#64748b' }}>
+              <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--color-primary)' }} />
+              Akun Cepat (Click to fill):
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 p-1 text-slate-400 hover:text-slate-700 transition-colors"
-                title={showPassword ? 'Sembunyikan Password' : 'Lihat Password'}
+                onClick={() => fillDemoAccount('admin', 'admin123')}
+                className="px-3 py-2 rounded-lg border transition-all hover:shadow-sm text-left"
+                style={{ borderColor: '#e2e6ec', background: 'rgba(255,255,255,0.7)' }}
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4 text-amber-500" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                <span className="block text-xs font-semibold" style={{ color: '#1e293b' }}>Anang (Admin)</span>
+                <span className="block text-[10px]" style={{ color: '#94a3b8' }}>anang@gmail.com</span>
+              </button>
+              <button
+                onClick={() => fillDemoAccount('kasir', 'admin123')}
+                className="px-3 py-2 rounded-lg border transition-all hover:shadow-sm text-left"
+                style={{ borderColor: '#e2e6ec', background: 'rgba(255,255,255,0.7)' }}
+              >
+                <span className="block text-xs font-semibold" style={{ color: '#1e293b' }}>Kasir (User)</span>
+                <span className="block text-[10px]" style={{ color: '#94a3b8' }}>kasir</span>
               </button>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-11 mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/10 active:scale-[0.99]"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>Masuk Ke Sistem</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Quick Demo Credentials Assistant */}
-        <div className="mt-6 pt-6 border-t border-slate-200/80">
-          <p className="text-[11px] font-semibold text-slate-500 mb-2 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" /> Akun Cepat (Click to fill):
+          <p className="mt-5 text-center text-[11px]" style={{ color: '#94a3b8' }}>
+            &copy; {new Date().getFullYear()} Rome Bois Barbershop &middot; Altora ERP Platform
           </p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <button
-              onClick={() => fillDemoAccount('anang@gmail.com', 'romebois123icat')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/80 border border-slate-200/80 hover:border-amber-500/40 text-left transition-all group"
-            >
-              <span className="block text-[11px] font-bold text-slate-800 group-hover:text-amber-400">Anang (Admin)</span>
-              <span className="block text-[9px] text-slate-400 truncate">anang@gmail.com</span>
-            </button>
-            <button
-              onClick={() => fillDemoAccount('kasir', 'romebois123icat')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/80 border border-slate-200/80 hover:border-amber-500/40 text-left transition-all group"
-            >
-              <span className="block text-[11px] font-bold text-slate-800 group-hover:text-amber-400">Kasir (User)</span>
-              <span className="block text-[9px] text-slate-400 truncate">kasir</span>
-            </button>
-          </div>
         </div>
+      </div>
 
-        <p className="mt-6 text-center text-[10px] text-slate-500">
-          &copy; {new Date().getFullYear()} ROMEBOIS Barbershop &middot; Altora ERP Platform
+      {/* Visual side — desktop only */}
+      <div className="relative hidden md:block">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(160deg, rgba(167,48,168,.10) 0%, rgba(167,48,168,.32) 100%), linear-gradient(135deg, #7e2582 0%, #a730a8 50%, #f28a4e 100%)',
+          }}
+        />
+        <p
+          className="absolute bottom-8 right-8 max-w-xs text-right text-lg italic text-white"
+          style={{ textShadow: '0 2px 14px rgba(0,0,0,.5)' }}
+        >
+          &ldquo;Bisnis secantik ini, pantas dikelola sepintar itu.&rdquo;
         </p>
       </div>
     </div>
