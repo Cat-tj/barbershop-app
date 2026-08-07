@@ -90,13 +90,15 @@ export async function POST(request: NextRequest) {
         db.prepare(`
           UPDATE members 
           SET total_points = total_points + ?, 
-              total_spent = total_spent + ?
+              total_spent = total_spent + ?,
+              visit_count = visit_count + 1,
+              last_visit_date = datetime('now')
           WHERE phone = ?
         `).run(earnedPoints, total, phone)
       } else {
         db.prepare(`
-          INSERT INTO members (name, phone, tier_id, total_points, total_spent, visit_count)
-          VALUES (?, ?, 1, ?, ?, 1)
+          INSERT INTO members (name, phone, tier_id, total_points, total_spent, visit_count, last_visit_date)
+          VALUES (?, ?, 1, ?, ?, 1, datetime('now'))
         `).run(customer_name.trim(), phone, earnedPoints, total)
       }
     }

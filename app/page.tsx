@@ -250,6 +250,18 @@ export default function POSPage() {
       });
 
       setAlert({ type: "success", message: "Transaksi berhasil diproses!" });
+
+      // Auto-register member if phone provided but wasn't found
+      if (customerPhone.trim() && customerPhone.trim().length >= 8) {
+        try {
+          await fetch('/api/member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: customerName.trim() || 'Member Baru', phone: customerPhone.trim() }),
+          })
+        } catch {}
+      }
+
       setCart([]);
       setCustomerName("");
       setCustomerPhone("");

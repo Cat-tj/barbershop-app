@@ -1,144 +1,284 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import {
+  LayoutDashboard, TrendingUp, Users, Scissors, ShoppingBag, Clock,
+  AlertTriangle, Bell, ArrowRight, CreditCard, Package, Calendar,
+  UserCheck, ChevronRight, Star
+} from 'lucide-react'
+import { formatRupiah } from '@/lib/currency'
 
 interface DashboardData {
-  today: { revenue: number; orders: number; bookings: number }
-  top_services: { name: string; count: number; revenue: number }[]
-  top_products: { name: string; qty: number; revenue: number }[]
-  top_capsters: { name: string; orders: number; commission: number }[]
-  low_stock: { name: string; stock: number; threshold: number }[]
-  recent_orders: { customer_name: string; total: number; time: string; capster_name: string }[]
-  revenue_last_7_days: { date: string; revenue: number }[]
-}
-
-import { formatRupiah as formatRp } from '@/lib/currency'
-
-function formatShortRp(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
-  return String(n)
+  dailySummary: { total_orders: number; total_revenue: number; avg_order: number }
+  topCapsters: Array<{ name: string; id: number; orders_handled: number; revenue_generated: number }>
+  topServices: Array<{ name: string; qty_sold: number; revenue: number }>
+  topProducts: Array<{ name: string; qty_sold: number; revenue: number }>
+  recentOrders: Array<{ id: number; customer_name: string; total: number; payment_method: string; created_at: string }>
+  membersOverdue: Array<{ id: number; name: string; phone: string; days_since_visit: number }>
+  membersLikely: Array<{ id: number; name: string; phone: string; days_since_visit: number }>
+  membersRecentHaircut: Array<{ id: number; name: string; last_visit_date: string }>
+  revenueTrend: Array<{ day: string; orders: number; revenue: number }>
+  paymentBreakdown: Array<{ payment_method: string; count: number; total: number }>
+  lowStock: Array<{ name: string; stock: number }>
+  totalMembers: number
 }
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await fetch('/api/dashboard')
-      if (!res.ok) throw new Error('Failed to fetch')
-      const json = await res.json()
-      setData(json)
-      setError(null)
-    } catch {
-      setError('Failed to load dashboard')
-    }
-  }, [])
+  const [loading, setLoading] = useState(true)
+  const [period, setPeriod] = useState('today')
 
   useEffect(() => {
-    fetchData()
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
-  }, [fetchData])
+    setLoading(true)
+    fetch(`/api/dashboard?period=${period}`)
+      .then(r => r.json())
+      .then(setData)
+      .finally(() => setLoading(false))
+  }, [period])
 
-  const today = new Date()
-  const dateStr = today.toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-
-  if (error && !data) {
+  if (loading || !data) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
-        <p className="text-slate-400 text-sm">{error}</p>
+      <div className="flex-1 flex items-center justify-center" style={{ background: '#f8f7fc' }}>
+        <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: '#7c5ce8', borderTopColor: 'transparent' }} />
       </div>
     )
   }
 
-  if (!data) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
-        <div className="w-7 h-7 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
-
-  const { today: todayData, top_services, top_products, top_capsters, low_stock, recent_orders, revenue_last_7_days } = data
-  const avgOrderValue = todayData.orders > 0 ? todayData.revenue / todayData.orders : 0
-  const maxRevenue = Math.max(...revenue_last_7_days.map(d => d.revenue), 1)
+  const { dailySummary: ds, topCapsters, topServices, topProducts, recentOrders, membersOverdue, membersLikely, membersRecentHaircut, revenueTrend, paymentBreakdown, lowStock, totalMembers } = data
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#f8f7fc] p-3 sm:p-4 space-y-4">
+    <div className="flex-1 flex flex-col min-h-full p-4 sm:p-6 space-y-5" style={{ background: '#f8f7fc' }}>
       {/* Header */}
-      <div>
-        <h1 className="text-base font-bold text-slate-900">Dashboard</h1>
-        <p className="text-xs text-slate-400 mt-0.5">{dateStr}</p>
-      </div>
-
-      {/* KPI Cards — 3 cols */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white rounded-xl p-3 border border-slate-200/80">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Revenue</p>
-          <p className="text-sm font-bold text-purple-500">{formatRp(todayData.revenue)}</p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold flex items-center gap-2" style={{ color: '#10224f' }}>
+            <LayoutDashboard className="w-6 h-6" style={{ color: '#7c5ce8' }} />
+            Dashboard CRM
+          </h1>
+          <p className="text-xs mt-1" style={{ color: '#6b7590' }}>Ringkasan operasional & insight pelanggan</p>
         </div>
-        <div className="bg-white rounded-xl p-3 border border-slate-200/80">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Orders</p>
-          <p className="text-sm font-bold text-slate-800">{todayData.orders}</p>
-        </div>
-        <div className="bg-white rounded-xl p-3 border border-slate-200/80">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Avg Order</p>
-          <p className="text-sm font-bold text-slate-800">{formatRp(avgOrderValue)}</p>
+        <div className="flex gap-2 text-xs">
+          {['today', 'week', 'month'].map(p => (
+            <button key={p} onClick={() => setPeriod(p)}
+              className="px-3 py-1.5 rounded-lg font-semibold transition-all"
+              style={period === p ? { background: 'rgba(124,92,232,.12)', color: '#7c5ce8' } : { background: 'white', color: '#6b7590', border: '1px solid #e9e6f2' }}>
+              {p === 'today' ? 'Hari Ini' : p === 'week' ? '7 Hari' : 'Bulan Ini'}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Revenue chart — CSS bar chart for last 7 days */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-3">
-        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Revenue (7 Days)</h2>
-        <div className="flex items-end gap-1 h-28">
-          {revenue_last_7_days.map((d) => {
-            const pct = (d.revenue / maxRevenue) * 100
-            const dayLabel = new Date(d.date).toLocaleDateString('id-ID', { weekday: 'short' })
-            return (
-              <div key={d.date} className="flex-1 flex flex-col items-center gap-1 min-w-0">
-                <span className="text-[10px] text-slate-400 flex-shrink-0">
-                  {d.revenue > 0 ? formatShortRp(d.revenue) : ''}
-                </span>
-                <div className="w-full flex-1 flex flex-col justify-end">
-                  <div
-                    className="w-full rounded-t-sm bg-purple-500/70 min-h-[4px] transition-all"
-                    style={{ height: `${Math.max(pct, 2)}%` }}
-                  />
-                </div>
-                <span className="text-[10px] text-slate-400 flex-shrink-0">{dayLabel}</span>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        {[
+          { icon: TrendingUp, label: 'Omset', value: formatRupiah(ds.total_revenue), color: '#7c5ce8' },
+          { icon: ShoppingBag, label: 'Transaksi', value: `${ds.total_orders}`, color: '#0e7a57' },
+          { icon: TrendingUp, label: 'Rata-rata', value: formatRupiah(ds.avg_order), color: '#3b82f6' },
+          { icon: Users, label: 'Total Member', value: `${totalMembers}`, color: '#d97706' },
+          { icon: AlertTriangle, label: 'Member Overdue', value: `${membersOverdue.length}`, color: '#ef4444' },
+        ].map((kpi, i) => (
+          <div key={i} className="bg-white rounded-2xl border p-4" style={{ borderColor: '#e9e6f2' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: `${kpi.color}15` }}>
+                <kpi.icon className="w-3.5 h-3.5" style={{ color: kpi.color }} />
               </div>
-            )
-          })}
+              <span className="text-[10px] font-semibold uppercase" style={{ color: '#6b7590' }}>{kpi.label}</span>
+            </div>
+            <p className="text-lg font-bold font-mono" style={{ color: '#10224f' }}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* REVENUE TREND */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4" style={{ color: '#10224f' }}>📈 Trend Omset 7 Hari</h3>
+          {revenueTrend.length === 0 ? (
+            <p className="text-xs text-center py-4" style={{ color: '#8792a8' }}>Belum ada data</p>
+          ) : (
+            <div className="space-y-2">
+              {revenueTrend.map(r => {
+                const maxRev = Math.max(...revenueTrend.map(x => x.revenue), 1)
+                return (
+                  <div key={r.day} className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono w-12 shrink-0" style={{ color: '#6b7590' }}>
+                      {new Date(r.day).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })}
+                    </span>
+                    <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: '#f1f5f9' }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${(r.revenue / maxRev) * 100}%`, background: 'linear-gradient(90deg, #7c5ce8, #a78bfa)' }} />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold w-20 text-right" style={{ color: '#10224f' }}>{formatRupiah(r.revenue)}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* PAYMENT BREAKDOWN */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4" style={{ color: '#10224f' }}>💳 Metode Pembayaran</h3>
+          {paymentBreakdown.length === 0 ? (
+            <p className="text-xs text-center py-4" style={{ color: '#8792a8' }}>Belum ada data</p>
+          ) : (
+            <div className="space-y-3">
+              {paymentBreakdown.map(p => {
+                const colors: Record<string, string> = { cash: '#0e7a57', qris: '#7c5ce8', debit: '#3b82f6' }
+                const c = colors[p.payment_method] || '#6b7590'
+                return (
+                  <div key={p.payment_method} className="flex items-center justify-between p-3 rounded-xl" style={{ background: `${c}08`, border: `1px solid ${c}20` }}>
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" style={{ color: c }} />
+                      <span className="text-xs font-bold uppercase" style={{ color: c }}>{p.payment_method}</span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-bold font-mono" style={{ color: '#10224f' }}>{formatRupiah(p.total)}</p>
+                      <p className="text-[10px]" style={{ color: '#8792a8' }}>{p.count} transaksi</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Top Services + Top Products — side by side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* Top 5 Services */}
-        <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-          <div className="px-3 py-2.5 border-b border-slate-200">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Top Services</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* TOP CAPSTERS */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4 flex items-center gap-2" style={{ color: '#10224f' }}>
+            <Scissors className="w-4 h-4" style={{ color: '#7c5ce8' }} /> Top Capster
+          </h3>
+          <div className="space-y-2">
+            {topCapsters.length === 0 ? (
+              <p className="text-xs text-center py-3" style={{ color: '#8792a8' }}>Belum ada data</p>
+            ) : topCapsters.map((c, i) => (
+              <div key={c.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                <span className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold" style={{ background: i === 0 ? 'rgba(217,119,6,.12)' : i === 1 ? 'rgba(100,116,139,.1)' : 'rgba(124,92,232,.08)', color: i === 0 ? '#d97706' : i === 1 ? '#64748b' : '#7c5ce8' }}>
+                  {i === 0 ? <Star className="w-3.5 h-3.5" /> : `#${i + 1}`}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold truncate" style={{ color: '#10224f' }}>{c.name}</p>
+                  <p className="text-[10px]" style={{ color: '#8792a8' }}>{c.orders_handled} transaksi</p>
+                </div>
+                <p className="text-xs font-bold font-mono" style={{ color: '#7c5ce8' }}>{formatRupiah(c.revenue_generated)}</p>
+              </div>
+            ))}
           </div>
-          {top_services.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-slate-400">No services today</p>
+        </div>
+
+        {/* LOW STOCK ALERTS */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4 flex items-center gap-2" style={{ color: '#10224f' }}>
+            <Package className="w-4 h-4" style={{ color: '#ef4444' }} /> Stok Menipis
+          </h3>
+          {lowStock.length === 0 ? (
+            <p className="text-xs text-center py-3" style={{ color: '#0e7a57' }}>Semua stok aman ✓</p>
           ) : (
-            <div className="divide-y divide-zinc-800/50">
-              {top_services.map((s, i) => (
-                <div key={i} className="px-3 py-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                    <span className="text-[10px] text-slate-400 w-4 text-right flex-shrink-0">{i + 1}</span>
-                    <span className="text-xs text-slate-700 truncate">{s.name}</span>
+            <div className="space-y-2">
+              {lowStock.map(p => (
+                <div key={p.name} className="flex items-center justify-between p-3 rounded-xl" style={{ background: '#fdeaec', border: '1px solid rgba(239,68,68,.15)' }}>
+                  <span className="text-xs font-semibold" style={{ color: '#10224f' }}>{p.name}</span>
+                  <span className="text-xs font-bold font-mono" style={{ color: '#ef4444' }}>{p.stock} left</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* CRM SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* MEMBERS OVERDUE — Warning */}
+        <div className="rounded-2xl border p-5" style={{ borderColor: 'rgba(239,68,68,.3)', background: 'linear-gradient(135deg, rgba(239,68,68,.04), rgba(239,68,68,.01))' }}>
+          <h3 className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: '#ef4444' }}>
+            <AlertTriangle className="w-4 h-4" /> ⚠️ Belum Potong &gt;30 Hari
+          </h3>
+          <p className="text-[10px] mb-3" style={{ color: '#6b7590' }}>Member ini perlu dihubungi (WA reminder)</p>
+          {membersOverdue.length === 0 ? (
+            <p className="text-xs py-2" style={{ color: '#0e7a57' }}>Tidak ada overdue ✓</p>
+          ) : (
+            <div className="space-y-2">
+              {membersOverdue.map(m => (
+                <Link key={m.id} href={`/members/${m.id}`} className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:shadow-sm transition-all">
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#10224f' }}>{m.name}</p>
+                    <p className="text-[10px]" style={{ color: '#8792a8' }}>{Math.round(m.days_since_visit)} hari lalu</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="text-[10px] text-slate-400">{s.count}x</span>
-                    <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(s.revenue)}</span>
+                  <ChevronRight className="w-3.5 h-3.5" style={{ color: '#8792a8' }} />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* MEMBERS LIKELY — Coming Soon */}
+        <div className="rounded-2xl border p-5" style={{ borderColor: 'rgba(124,92,232,.3)', background: 'linear-gradient(135deg, rgba(124,92,232,.04), rgba(124,92,232,.01))' }}>
+          <h3 className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: '#7c5ce8' }}>
+            <Clock className="w-4 h-4" /> 🕐 Estimasi Akan Potong (20-30 hari)
+          </h3>
+          <p className="text-[10px] mb-3" style={{ color: '#6b7590' }}>Kirim promo / reminder booking</p>
+          {membersLikely.length === 0 ? (
+            <p className="text-xs py-2" style={{ color: '#8792a8' }}>Tidak ada yang estimasi</p>
+          ) : (
+            <div className="space-y-2">
+              {membersLikely.map(m => (
+                <Link key={m.id} href={`/members/${m.id}`} className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:shadow-sm transition-all">
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#10224f' }}>{m.name}</p>
+                    <p className="text-[10px]" style={{ color: '#8792a8' }}>{Math.round(m.days_since_visit)} hari lalu</p>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5" style={{ color: '#8792a8' }} />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* MEMBERS RECENT — Baru Potong */}
+        <div className="rounded-2xl border p-5" style={{ borderColor: 'rgba(14,122,87,.3)', background: 'linear-gradient(135deg, rgba(14,122,87,.04), rgba(14,122,87,.01))' }}>
+          <h3 className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: '#0e7a57' }}>
+            <Scissors className="w-4 h-4" /> ✂️ Baru Potong Hari Ini
+          </h3>
+          <p className="text-[10px] mb-3" style={{ color: '#6b7590' }}>Member yang sudah datang hari ini</p>
+          {membersRecentHaircut.length === 0 ? (
+            <p className="text-xs py-2" style={{ color: '#8792a8' }}>Belum ada yang potong hari ini</p>
+          ) : (
+            <div className="space-y-2">
+              {membersRecentHaircut.map(m => (
+                <Link key={m.id} href={`/members/${m.id}`} className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:shadow-sm transition-all">
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#10224f' }}>{m.name}</p>
+                    <p className="text-[10px]" style={{ color: '#8792a8' }}>{new Date(m.last_visit_date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5" style={{ color: '#8792a8' }} />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* TOP SERVICES */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4 flex items-center gap-2" style={{ color: '#10224f' }}>
+            <Scissors className="w-4 h-4" style={{ color: '#7c5ce8' }} /> Layanan Terlaris
+          </h3>
+          {topServices.length === 0 ? (
+            <p className="text-xs text-center py-3" style={{ color: '#8792a8' }}>Belum ada data</p>
+          ) : (
+            <div className="space-y-2">
+              {topServices.map((s, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold w-5 text-center" style={{ color: '#7c5ce8' }}>#{i + 1}</span>
+                    <span className="text-xs font-semibold" style={{ color: '#10224f' }}>{s.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold font-mono" style={{ color: '#7c5ce8' }}>{s.qty_sold}x</p>
+                    <p className="text-[10px]" style={{ color: '#8792a8' }}>{formatRupiah(s.revenue)}</p>
                   </div>
                 </div>
               ))}
@@ -146,99 +286,30 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Top 5 Products */}
-        <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-          <div className="px-3 py-2.5 border-b border-slate-200">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Top Products</h2>
-          </div>
-          {top_products.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-slate-400">No products today</p>
+        {/* RECENT ORDERS */}
+        <div className="bg-white rounded-2xl border p-5" style={{ borderColor: '#e9e6f2' }}>
+          <h3 className="text-xs font-bold mb-4 flex items-center gap-2" style={{ color: '#10224f' }}>
+            <ShoppingBag className="w-4 h-4" style={{ color: '#7c5ce8' }} /> Transaksi Terbaru
+          </h3>
+          {recentOrders.length === 0 ? (
+            <p className="text-xs text-center py-3" style={{ color: '#8792a8' }}>Belum ada transaksi</p>
           ) : (
-            <div className="divide-y divide-zinc-800/50">
-              {top_products.map((p, i) => (
-                <div key={i} className="px-3 py-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                    <span className="text-[10px] text-slate-400 w-4 text-right flex-shrink-0">{i + 1}</span>
-                    <span className="text-xs text-slate-700 truncate">{p.name}</span>
+            <div className="space-y-2">
+              {recentOrders.map(o => (
+                <div key={o.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#10224f' }}>{o.customer_name}</p>
+                    <p className="text-[10px]" style={{ color: '#8792a8' }}>
+                      {new Date(o.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {o.payment_method}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="text-[10px] text-slate-400">{p.qty}x</span>
-                    <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(p.revenue)}</span>
-                  </div>
+                  <p className="text-xs font-bold font-mono" style={{ color: '#10224f' }}>{formatRupiah(o.total)}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
       </div>
-
-      {/* Top Capsters leaderboard */}
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-        <div className="px-3 py-2.5 border-b border-slate-200">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Top Capsters</h2>
-        </div>
-        {top_capsters.length === 0 ? (
-          <p className="px-3 py-4 text-xs text-slate-400">No capster data today</p>
-        ) : (
-          <div className="divide-y divide-zinc-800/50">
-            {top_capsters.map((c, i) => (
-              <div key={i} className="px-3 py-2 flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                  <span className={`text-[10px] font-bold w-4 text-right flex-shrink-0 ${i === 0 ? 'text-purple-500' : i === 1 ? 'text-slate-500' : i === 2 ? 'text-amber-700' : 'text-slate-400'}`}>
-                    {i + 1}
-                  </span>
-                  <span className="text-xs text-slate-700 truncate">{c.name}</span>
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className="text-[10px] text-slate-400">{c.orders} orders</span>
-                  <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(c.commission)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Recent Orders */}
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-        <div className="px-3 py-2.5 border-b border-slate-200">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Recent Orders</h2>
-        </div>
-        {recent_orders.length === 0 ? (
-          <p className="px-3 py-4 text-xs text-slate-400">No orders today</p>
-        ) : (
-          <div className="divide-y divide-zinc-800/50">
-            {recent_orders.map((o, i) => (
-              <div key={i} className="px-3 py-2 flex items-center justify-between">
-                <div className="min-w-0 flex-1 mr-2">
-                  <p className="text-xs text-slate-700 truncate">{o.customer_name}</p>
-                  <p className="text-[10px] text-slate-400">{o.time}{o.capster_name ? ` · ${o.capster_name}` : ''}</p>
-                </div>
-                <span className="text-xs text-purple-500 font-medium flex-shrink-0">{formatRp(o.total)}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Low Stock Alerts */}
-      {low_stock.length > 0 && (
-        <div className="bg-white rounded-xl border border-amber-800/40 overflow-hidden">
-          <div className="px-3 py-2.5 border-b border-amber-800/40 bg-purple-500/5">
-            <h2 className="text-xs font-semibold text-purple-500 uppercase tracking-wider">⚠ Low Stock</h2>
-          </div>
-          <div className="divide-y divide-zinc-800/50">
-            {low_stock.map((p, i) => (
-              <div key={i} className="px-3 py-2 flex items-center justify-between">
-                <span className="text-xs text-slate-700 truncate flex-1 mr-2">{p.name}</span>
-                <span className={`text-xs font-medium flex-shrink-0 ${p.stock === 0 ? 'text-red-400' : 'text-purple-500'}`}>
-                  {p.stock} / {p.threshold}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
