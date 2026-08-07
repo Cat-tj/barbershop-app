@@ -219,18 +219,18 @@ export default function BookingPage() {
     const isSelected = selectedTime === slot.time
     if (isSelected) return 'bg-emerald-600 border-emerald-500 text-white'
     if (slot.status === 'mine') return 'bg-green-600/30 border-green-500 text-green-300'
-    if (slot.status === 'taken') return 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-    return 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700'
+    if (slot.status === 'taken') return 'bg-slate-100 text-slate-400 cursor-not-allowed'
+    return 'bg-slate-100 hover:bg-slate-200 border-slate-200'
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-[#f8f8fc] text-slate-900 p-3 sm:p-4 md:p-6">
       <div className="max-w-lg mx-auto space-y-4">
 
         {/* HEADER */}
         <div>
           <h1 className="text-base font-bold tracking-tight">Booking</h1>
-          <p className="text-zinc-400 text-xs mt-0.5">Buat janji baru</p>
+          <p className="text-slate-500 text-xs mt-0.5">Buat janji baru</p>
         </div>
 
         {/* MESSAGE */}
@@ -247,8 +247,8 @@ export default function BookingPage() {
         )}
 
         {/* SECTION 1: Phone + Member lookup */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
-          <label className="block text-xs font-medium text-zinc-400">No. Telepon</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+          <label className="block text-xs font-medium text-slate-500">No. Telepon</label>
           <div className="flex gap-2">
             <input
               type="tel"
@@ -258,8 +258,8 @@ export default function BookingPage() {
                 lookupMember(e.target.value)
               }}
               placeholder="08123456789"
-              className="flex-1 h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
-                         placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+              className="flex-1 h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
+                         placeholder:text-slate-400 focus:outline-none focus:border-emerald-500/50"
             />
             <button
               type="button"
@@ -287,35 +287,35 @@ export default function BookingPage() {
           {/* Name input (shown when member not found or not yet checked) */}
           {member === undefined && (
             <div>
-              <label className="block text-xs text-zinc-500 mb-1">Nama *</label>
+              <label className="block text-xs text-slate-400 mb-1">Nama *</label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Nama pelanggan"
-                className="w-full h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
-                           placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+                className="w-full h-9 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
+                           placeholder:text-slate-400 focus:outline-none focus:border-emerald-500/50"
               />
             </div>
           )}
           {member === null && (
             <div>
-              <label className="block text-xs text-zinc-500 mb-1">Nama *</label>
+              <label className="block text-xs text-slate-400 mb-1">Nama *</label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Nama pelanggan"
-                className="w-full h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
-                           placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50"
+                className="w-full h-9 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
+                           placeholder:text-slate-400 focus:outline-none focus:border-emerald-500/50"
               />
             </div>
           )}
         </div>
 
         {/* SECTION 2: Capster selector */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
-          <label className="block text-xs font-medium text-zinc-400">Capster</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-slate-500">Capster</label>
           <div className="flex flex-wrap gap-2">
             {capsters.map(c => (
               <button
@@ -325,40 +325,40 @@ export default function BookingPage() {
                 className={`h-10 px-3 rounded-lg text-xs font-medium transition-colors focus:outline-none ${
                   selectedCapster === c.id
                     ? 'bg-emerald-600 text-white border border-emerald-500'
-                    : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:border-zinc-600'
+                    : 'bg-slate-100 text-slate-700 border border-slate-200 hover:border-zinc-600'
                 }`}
               >
                 {c.name}
               </button>
             ))}
             {capsters.length === 0 && (
-              <p className="text-zinc-500 text-xs py-2">Tidak ada capster</p>
+              <p className="text-slate-400 text-xs py-2">Tidak ada capster</p>
             )}
           </div>
         </div>
 
         {/* SECTION 3: Date picker */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
-          <label className="block text-xs font-medium text-zinc-400">Tanggal</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-slate-500">Tanggal</label>
           <input
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+            className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
                        focus:outline-none focus:border-emerald-500/50"
             style={{ colorScheme: 'dark' }}
           />
         </div>
 
         {/* SECTION 4: Time grid */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
-          <label className="block text-xs font-medium text-zinc-400">Jam</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-slate-500">Jam</label>
           {!selectedCapster ? (
-            <p className="text-xs text-zinc-600 py-4 text-center">Pilih capster dulu</p>
+            <p className="text-xs text-slate-400 py-4 text-center">Pilih capster dulu</p>
           ) : slotsLoading ? (
             <div className="grid grid-cols-4 gap-1.5">
               {Array.from({ length: 25 }).map((_, i) => (
-                <div key={i} className="h-9 bg-zinc-800 rounded-lg animate-pulse" />
+                <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : (
@@ -381,8 +381,8 @@ export default function BookingPage() {
         </div>
 
         {/* SECTION 5: Services */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2">
-          <label className="block text-xs font-medium text-zinc-400">Layanan</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+          <label className="block text-xs font-medium text-slate-500">Layanan</label>
           <div className="space-y-1.5">
             {services.map(s => {
               const selected = selectedServices.has(s.id)
@@ -392,7 +392,7 @@ export default function BookingPage() {
                   className={`flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-colors ${
                     selected
                       ? 'bg-emerald-900/30 border border-emerald-700'
-                      : 'bg-zinc-800 border border-zinc-700 hover:border-zinc-600'
+                      : 'bg-slate-100 border border-slate-200 hover:border-zinc-600'
                   }`}
                 >
                   <input
@@ -402,9 +402,9 @@ export default function BookingPage() {
                     className="w-4 h-4 accent-emerald-500 rounded"
                   />
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium text-zinc-200">{s.name}</span>
+                    <span className="text-xs font-medium text-slate-800">{s.name}</span>
                     {s.duration && (
-                      <span className="text-xs text-zinc-500 ml-1.5">{formatDuration(s.duration)}</span>
+                      <span className="text-xs text-slate-400 ml-1.5">{formatDuration(s.duration)}</span>
                     )}
                   </div>
                   <span className="text-xs font-semibold text-emerald-400 whitespace-nowrap">
@@ -414,14 +414,14 @@ export default function BookingPage() {
               )
             })}
             {services.length === 0 && (
-              <p className="text-zinc-500 text-xs py-2">Tidak ada layanan</p>
+              <p className="text-slate-400 text-xs py-2">Tidak ada layanan</p>
             )}
           </div>
 
           {/* Total */}
           {selectedServiceList.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center">
-              <div className="text-xs text-zinc-400">
+            <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
+              <div className="text-xs text-slate-500">
                 {selectedServiceList.length} layanan
                 {totalDuration > 0 && ` · ~${formatDuration(totalDuration)}`}
               </div>
@@ -433,8 +433,8 @@ export default function BookingPage() {
         </div>
 
         {/* SECTION 6: Booking type + notes */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
-          <label className="block text-xs font-medium text-zinc-400">Tipe Booking</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+          <label className="block text-xs font-medium text-slate-500">Tipe Booking</label>
           <div className="flex gap-2">
             <button
               type="button"
@@ -442,7 +442,7 @@ export default function BookingPage() {
               className={`flex-1 h-10 rounded-lg text-xs font-medium transition-colors border focus:outline-none ${
                 bookingType === 'potong_di_tempat'
                   ? 'bg-emerald-600 text-white border-emerald-500'
-                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-600'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:border-zinc-600'
               }`}
             >
               Potong di Tempat
@@ -453,7 +453,7 @@ export default function BookingPage() {
               className={`flex-1 h-10 rounded-lg text-xs font-medium transition-colors border focus:outline-none ${
                 bookingType === 'dipanggil'
                   ? 'bg-emerald-600 text-white border-emerald-500'
-                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-600'
+                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:border-zinc-600'
               }`}
             >
               Dipanggil
@@ -461,14 +461,14 @@ export default function BookingPage() {
           </div>
 
           <div>
-            <label className="block text-xs text-zinc-500 mb-1">Catatan</label>
+            <label className="block text-xs text-slate-400 mb-1">Catatan</label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder="Catatan tambahan..."
               rows={2}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100
-                         placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+              className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900
+                         placeholder:text-slate-400 focus:outline-none focus:border-emerald-500/50 resize-none"
             />
           </div>
         </div>
@@ -478,8 +478,8 @@ export default function BookingPage() {
           type="button"
           onClick={handleBook}
           disabled={loading}
-          className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700
-                     disabled:text-zinc-500 text-white font-semibold text-sm transition-colors
+          className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200
+                     disabled:text-slate-400 text-white font-semibold text-sm transition-colors
                      focus:outline-none focus:border-emerald-500/50"
         >
           {loading ? 'Booking...' : 'Book Now'}

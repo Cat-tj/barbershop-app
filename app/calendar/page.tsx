@@ -70,15 +70,15 @@ export default function CalendarPage() {
   const monthName = monthDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="flex-1 flex flex-col bg-zinc-950 p-4 sm:p-6 min-h-full space-y-6">
+    <div className="flex-1 flex flex-col bg-[#f8f8fc] p-4 sm:p-6 min-h-full space-y-6">
       {/* Header Controls */}
-      <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white/80 border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-black text-zinc-100 flex items-center gap-2">
+          <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-amber-400" />
             KALENDER HARI KERJA & KPI BARBER
           </h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Pantau kehadiran shift turun kerja, jumlah cukur, & estimasi komisi bulanan
           </p>
         </div>
@@ -89,7 +89,7 @@ export default function CalendarPage() {
           <select
             value={selectedCapsterId}
             onChange={(e) => setSelectedCapsterId(e.target.value)}
-            className="h-10 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-200 focus:outline-none focus:border-amber-500/60"
+            className="h-10 px-3 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500/60"
           >
             <option value="all">💈 Semua Capster / Barber</option>
             {kpiData.map((c) => (
@@ -100,17 +100,17 @@ export default function CalendarPage() {
           </select>
 
           {/* Month Navigator */}
-          <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl p-1 shrink-0">
+          <div className="flex items-center bg-[#f8f8fc] border border-slate-200 rounded-xl p-1 shrink-0">
             <button
               onClick={prevMonth}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="text-xs font-mono font-bold text-amber-400 px-3 capitalize">{monthName}</span>
             <button
               onClick={nextMonth}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -120,28 +120,28 @@ export default function CalendarPage() {
 
       {/* KPI Cards Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
-          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1.5">
             <Scissors className="w-3.5 h-3.5 text-amber-400" /> Total Potong Cukur
           </span>
-          <p className="text-2xl font-black text-zinc-100 font-mono">{loading ? '...' : `${totalHaircuts} Kepala`}</p>
-          <p className="text-[11px] text-zinc-500">Jumlah cukur selesai bulan ini</p>
+          <p className="text-2xl font-black text-slate-900 font-mono">{loading ? '...' : `${totalHaircuts} Kepala`}</p>
+          <p className="text-[11px] text-slate-400">Jumlah cukur selesai bulan ini</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
-          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-emerald-400" /> Total Shift Turun Kerja
           </span>
           <p className="text-2xl font-black text-emerald-400 font-mono">{loading ? '...' : `${totalShiftDays} Hari`}</p>
-          <p className="text-[11px] text-zinc-500">Jumlah hari buka toko / clock-in</p>
+          <p className="text-[11px] text-slate-400">Jumlah hari buka toko / clock-in</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-1 shadow-lg">
-          <span className="text-[10px] uppercase font-bold text-zinc-400 flex items-center gap-1.5">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1.5">
             <DollarSign className="w-3.5 h-3.5 text-blue-400" /> Total Omset Tercipta
           </span>
-          <p className="text-xl font-black text-zinc-100 font-mono">{loading ? '...' : formatRp(totalRevenue)}</p>
-          <p className="text-[11px] text-zinc-500">Total nilai transaksi jasa + produk</p>
+          <p className="text-xl font-black text-slate-900 font-mono">{loading ? '...' : formatRp(totalRevenue)}</p>
+          <p className="text-[11px] text-slate-400">Total nilai transaksi jasa + produk</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-zinc-900 to-zinc-900 border border-amber-500/40 space-y-1 shadow-lg">
@@ -149,14 +149,14 @@ export default function CalendarPage() {
             <Award className="w-3.5 h-3.5 text-amber-400" /> Estimasi Total Komisi
           </span>
           <p className="text-xl font-black text-amber-400 font-mono">{loading ? '...' : formatRp(totalCommission)}</p>
-          <p className="text-[11px] text-zinc-400">Komisi belum termasuk gaji pokok</p>
+          <p className="text-[11px] text-slate-500">Komisi belum termasuk gaji pokok</p>
         </div>
       </div>
 
       {/* Monthly Attendance & Haircuts Calendar Grid */}
-      <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+      <div className="bg-white/80 border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <span>KALENDER KEHADIRAN & DETAIL HARIAN ({monthName})</span>
           </h3>
           <div className="flex items-center gap-3 text-[10px]">
@@ -170,7 +170,7 @@ export default function CalendarPage() {
         </div>
 
         {/* Days Header */}
-        <div className="grid grid-cols-7 gap-1 text-center font-bold text-xs text-zinc-500 pb-1 border-b border-zinc-800/60">
+        <div className="grid grid-cols-7 gap-1 text-center font-bold text-xs text-slate-400 pb-1 border-b border-slate-200/60">
           <div>Sen</div>
           <div>Sel</div>
           <div>Rab</div>
@@ -182,14 +182,14 @@ export default function CalendarPage() {
 
         {/* Calendar Days */}
         {loading ? (
-          <div className="py-12 text-center text-xs text-zinc-500 flex justify-center">
+          <div className="py-12 text-center text-xs text-slate-400 flex justify-center">
             <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-7 gap-1.5">
             {/* Empty slots before first day */}
             {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[85px] bg-zinc-950/30 rounded-xl border border-zinc-900 opacity-30" />
+              <div key={`empty-${i}`} className="min-h-[85px] bg-[#f8f8fc]/30 rounded-xl border border-zinc-900 opacity-30" />
             ))}
 
             {/* Calendar Days */}
@@ -221,12 +221,12 @@ export default function CalendarPage() {
                     dayAttended
                       ? 'bg-gradient-to-b from-emerald-500/10 via-zinc-900 to-zinc-900 border-emerald-500/40 shadow-sm'
                       : dayHaircuts > 0
-                      ? 'bg-zinc-900 border-amber-500/30'
-                      : 'bg-zinc-950/80 border-zinc-800/80'
+                      ? 'bg-white border-amber-500/30'
+                      : 'bg-[#f8f8fc]/80 border-slate-200/80'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs font-mono font-bold ${dayAttended ? 'text-emerald-400' : 'text-zinc-400'}`}>
+                    <span className={`text-xs font-mono font-bold ${dayAttended ? 'text-emerald-400' : 'text-slate-500'}`}>
                       {dayNum}
                     </span>
                     {dayAttended && (
@@ -241,7 +241,7 @@ export default function CalendarPage() {
                       <p className="text-[11px] font-bold text-amber-400 flex items-center justify-between">
                         <span>✂️ {dayHaircuts} Cukur</span>
                       </p>
-                      <p className="text-[10px] font-mono text-zinc-300">
+                      <p className="text-[10px] font-mono text-slate-700">
                         {formatRp(dayRevenue)}
                       </p>
                       {dayCommission > 0 && (
@@ -251,7 +251,7 @@ export default function CalendarPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="text-[10px] text-zinc-600 italic">
+                    <div className="text-[10px] text-slate-400 italic">
                       {dayAttended ? 'Libur cukur' : 'Off'}
                     </div>
                   )}

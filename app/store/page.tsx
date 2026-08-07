@@ -225,7 +225,7 @@ export default function StorePage() {
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-zinc-500 text-sm">Loading store…</span>
+          <span className="text-slate-400 text-sm">Loading store…</span>
         </div>
       </div>
     )
@@ -242,20 +242,20 @@ export default function StorePage() {
             : 'bg-red-900/40 border border-red-700 text-red-300'
         }`}>
           <span>{alert.message}</span>
-          <button onClick={() => setAlert(null)} className="ml-3 text-zinc-400 hover:text-zinc-200 text-lg leading-none">&times;</button>
+          <button onClick={() => setAlert(null)} className="ml-3 text-slate-500 hover:text-slate-800 text-lg leading-none">&times;</button>
         </div>
       )}
 
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-5 w-80 space-y-4">
-            <p className="text-sm text-zinc-200">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 w-80 space-y-4">
+            <p className="text-sm text-slate-800">
               Delete <span className="font-semibold text-amber-400">{deleteTarget.name}</span>?
             </p>
-            <p className="text-xs text-zinc-500">This action cannot be undone.</p>
+            <p className="text-xs text-slate-400">This action cannot be undone.</p>
             <div className="flex gap-2">
-              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-700 transition-colors">Cancel</button>
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-9 rounded-lg bg-slate-100 border border-slate-200 text-sm text-slate-700 hover:bg-slate-200 transition-colors">Cancel</button>
               <button onClick={executeDelete} className="flex-1 h-9 rounded-lg bg-red-600 hover:bg-red-500 text-sm text-white font-medium transition-colors">Delete</button>
             </div>
           </div>
@@ -263,8 +263,8 @@ export default function StorePage() {
       )}
 
       {/* Header */}
-      <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
-        <h1 className="text-base font-bold tracking-tight text-zinc-100">Store</h1>
+      <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+        <h1 className="text-base font-bold tracking-tight text-slate-900">Store</h1>
         <button
           onClick={openAdd}
           className="h-9 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors"
@@ -274,15 +274,15 @@ export default function StorePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-zinc-800">
+      <div className="flex border-b border-slate-200">
         {(['products', 'services', 'capsters'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => { setActiveTab(tab); resetForm() }}
             className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
               activeTab === tab
-                ? 'text-amber-500 border-b-2 border-amber-500 bg-zinc-800/40'
-                : 'text-zinc-500 hover:text-zinc-300'
+                ? 'text-amber-500 border-b-2 border-amber-500 bg-slate-100/40'
+                : 'text-slate-400 hover:text-slate-700'
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -297,63 +297,63 @@ export default function StorePage() {
           <>
             {/* Inline form */}
             {showForm && (
-              <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
+              <div className="bg-slate-100/50 border border-slate-200 rounded-lg p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Name *</label>
-                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="Product name" />
+                    <label className="block text-xs text-slate-500 mb-1">Name *</label>
+                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Product name" />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Category</label>
-                    <select value={formCategory} onChange={e => setFormCategory(e.target.value as 'product' | 'consumable')} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50">
+                    <label className="block text-xs text-slate-500 mb-1">Category</label>
+                    <select value={formCategory} onChange={e => setFormCategory(e.target.value as 'product' | 'consumable')} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-amber-500/50">
                       <option value="product">Product</option>
                       <option value="consumable">Consumable</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Price *</label>
-                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <label className="block text-xs text-slate-500 mb-1">Price *</label>
+                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Stock *</label>
-                    <input type="number" value={formStock} onChange={e => setFormStock(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <label className="block text-xs text-slate-500 mb-1">Stock *</label>
+                    <input type="number" value={formStock} onChange={e => setFormStock(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={saveProduct} className="flex-1 h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
-                  <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs transition-colors">Cancel</button>
+                  <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-slate-200 hover:bg-zinc-600 text-slate-700 text-xs transition-colors">Cancel</button>
                 </div>
               </div>
             )}
 
             {/* Products table */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-800/40">
-                    <th className="text-left px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Name</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Price</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Stock</th>
-                    <th className="text-left px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Category</th>
-                    <th className="text-center px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Actions</th>
+                  <tr className="border-b border-slate-200 bg-slate-100/40">
+                    <th className="text-left px-3 py-2 text-xs font-medium text-slate-400 uppercase">Name</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium text-slate-400 uppercase">Price</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium text-slate-400 uppercase">Stock</th>
+                    <th className="text-left px-3 py-2 text-xs font-medium text-slate-400 uppercase">Category</th>
+                    <th className="text-center px-3 py-2 text-xs font-medium text-slate-400 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
                   {products.length === 0 && (
-                    <tr><td colSpan={5} className="px-3 py-6 text-center text-xs text-zinc-600">No products yet.</td></tr>
+                    <tr><td colSpan={5} className="px-3 py-6 text-center text-xs text-slate-400">No products yet.</td></tr>
                   )}
                   {products.map(p => (
-                    <tr key={p.id} className="hover:bg-zinc-800/30 transition-colors">
+                    <tr key={p.id} className="hover:bg-slate-100/30 transition-colors">
                       <td className="px-3 py-2.5">
-                        <button onClick={() => openEditProduct(p)} className="text-xs font-medium text-zinc-200 hover:text-amber-400 text-left transition-colors">{p.name}</button>
+                        <button onClick={() => openEditProduct(p)} className="text-xs font-medium text-slate-800 hover:text-amber-400 text-left transition-colors">{p.name}</button>
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-zinc-300 text-right tabular-nums">{formatRp(p.price)}</td>
-                      <td className="px-3 py-2.5 text-xs text-zinc-300 text-right tabular-nums">{p.stock}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{formatRp(p.price)}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{p.stock}</td>
                       <td className="px-3 py-2.5">
                         <span className={`text-[11px] px-1.5 py-0.5 rounded ${p.category === 'product' ? 'bg-blue-900/30 text-blue-400' : 'bg-purple-900/30 text-purple-400'}`}>{p.category}</span>
                       </td>
                       <td className="px-3 py-2.5 text-center">
-                        <button onClick={() => confirmDelete('product', p.id, p.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-zinc-500 hover:text-red-400 transition-colors text-sm">&times;</button>
+                        <button onClick={() => confirmDelete('product', p.id, p.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-slate-400 hover:text-red-400 transition-colors text-sm">&times;</button>
                       </td>
                     </tr>
                   ))}
@@ -367,51 +367,51 @@ export default function StorePage() {
         {activeTab === 'services' && (
           <>
             {showForm && (
-              <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
+              <div className="bg-slate-100/50 border border-slate-200 rounded-lg p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Name *</label>
-                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="Service name" />
+                    <label className="block text-xs text-slate-500 mb-1">Name *</label>
+                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Service name" />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Duration (min)</label>
-                    <input type="number" value={formDuration} onChange={e => setFormDuration(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="30" min="0" />
+                    <label className="block text-xs text-slate-500 mb-1">Duration (min)</label>
+                    <input type="number" value={formDuration} onChange={e => setFormDuration(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="30" min="0" />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Price *</label>
-                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <label className="block text-xs text-slate-500 mb-1">Price *</label>
+                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={saveService} className="flex-1 h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
-                  <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs transition-colors">Cancel</button>
+                  <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-slate-200 hover:bg-zinc-600 text-slate-700 text-xs transition-colors">Cancel</button>
                 </div>
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-800/40">
-                    <th className="text-left px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Name</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Price</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Duration</th>
-                    <th className="text-center px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Actions</th>
+                  <tr className="border-b border-slate-200 bg-slate-100/40">
+                    <th className="text-left px-3 py-2 text-xs font-medium text-slate-400 uppercase">Name</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium text-slate-400 uppercase">Price</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium text-slate-400 uppercase">Duration</th>
+                    <th className="text-center px-3 py-2 text-xs font-medium text-slate-400 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
                   {services.length === 0 && (
-                    <tr><td colSpan={4} className="px-3 py-6 text-center text-xs text-zinc-600">No services yet.</td></tr>
+                    <tr><td colSpan={4} className="px-3 py-6 text-center text-xs text-slate-400">No services yet.</td></tr>
                   )}
                   {services.map(s => (
-                    <tr key={s.id} className="hover:bg-zinc-800/30 transition-colors">
+                    <tr key={s.id} className="hover:bg-slate-100/30 transition-colors">
                       <td className="px-3 py-2.5">
-                        <button onClick={() => openEditService(s)} className="text-xs font-medium text-zinc-200 hover:text-amber-400 text-left transition-colors">{s.name}</button>
+                        <button onClick={() => openEditService(s)} className="text-xs font-medium text-slate-800 hover:text-amber-400 text-left transition-colors">{s.name}</button>
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-zinc-300 text-right tabular-nums">{formatRp(s.price)}</td>
-                      <td className="px-3 py-2.5 text-xs text-zinc-300 text-right tabular-nums">{s.duration ? `${s.duration} min` : '—'}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{formatRp(s.price)}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{s.duration ? `${s.duration} min` : '—'}</td>
                       <td className="px-3 py-2.5 text-center">
-                        <button onClick={() => confirmDelete('service', s.id, s.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-zinc-500 hover:text-red-400 transition-colors text-sm">&times;</button>
+                        <button onClick={() => confirmDelete('service', s.id, s.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-slate-400 hover:text-red-400 transition-colors text-sm">&times;</button>
                       </td>
                     </tr>
                   ))}
@@ -425,39 +425,39 @@ export default function StorePage() {
         {activeTab === 'capsters' && (
           <>
             {/* Add capster form */}
-            <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
+            <div className="bg-slate-100/50 border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Name *</label>
-                  <input value={formCapsterName} onChange={e => setFormCapsterName(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="Capster name" />
+                  <label className="block text-xs text-slate-500 mb-1">Name *</label>
+                  <input value={formCapsterName} onChange={e => setFormCapsterName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Capster name" />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Phone</label>
-                  <input value={formCapsterPhone} onChange={e => setFormCapsterPhone(e.target.value)} className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50" placeholder="08xxxxxxxxxx" />
+                  <label className="block text-xs text-slate-500 mb-1">Phone</label>
+                  <input value={formCapsterPhone} onChange={e => setFormCapsterPhone(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="08xxxxxxxxxx" />
                 </div>
               </div>
               <button onClick={saveCapster} className="w-full h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">Add Capster</button>
             </div>
 
             {/* Capsters list */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-800/40">
-                    <th className="text-left px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Name</th>
-                    <th className="text-left px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Phone</th>
-                    <th className="text-center px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Active</th>
-                    <th className="text-center px-3 py-2 text-xs font-medium text-zinc-500 uppercase">Actions</th>
+                  <tr className="border-b border-slate-200 bg-slate-100/40">
+                    <th className="text-left px-3 py-2 text-xs font-medium text-slate-400 uppercase">Name</th>
+                    <th className="text-left px-3 py-2 text-xs font-medium text-slate-400 uppercase">Phone</th>
+                    <th className="text-center px-3 py-2 text-xs font-medium text-slate-400 uppercase">Active</th>
+                    <th className="text-center px-3 py-2 text-xs font-medium text-slate-400 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
                   {capsters.length === 0 && (
-                    <tr><td colSpan={4} className="px-3 py-6 text-center text-xs text-zinc-600">No capsters yet.</td></tr>
+                    <tr><td colSpan={4} className="px-3 py-6 text-center text-xs text-slate-400">No capsters yet.</td></tr>
                   )}
                   {capsters.map(c => (
-                    <tr key={c.id} className="hover:bg-zinc-800/30 transition-colors">
-                      <td className="px-3 py-2.5 text-xs font-medium text-zinc-200">{c.name}</td>
-                      <td className="px-3 py-2.5 text-xs text-zinc-400">{c.phone || '—'}</td>
+                    <tr key={c.id} className="hover:bg-slate-100/30 transition-colors">
+                      <td className="px-3 py-2.5 text-xs font-medium text-slate-800">{c.name}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-500">{c.phone || '—'}</td>
                       <td className="px-3 py-2.5 text-center">
                         <button
                           onClick={() => toggleCapsterActive(c)}
@@ -471,7 +471,7 @@ export default function StorePage() {
                         </button>
                       </td>
                       <td className="px-3 py-2.5 text-center">
-                        <button onClick={() => confirmDelete('capster', c.id, c.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-zinc-500 hover:text-red-400 transition-colors text-sm">&times;</button>
+                        <button onClick={() => confirmDelete('capster', c.id, c.name)} className="h-7 w-7 inline-flex items-center justify-center rounded hover:bg-red-900/40 text-slate-400 hover:text-red-400 transition-colors text-sm">&times;</button>
                       </td>
                     </tr>
                   ))}

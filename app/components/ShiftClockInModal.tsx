@@ -78,20 +78,20 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl space-y-5">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-5">
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
+        <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
           <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
             <Store className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-black text-zinc-100 flex items-center gap-2">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
               OPEN STORE / SHIFT KASIR
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 DAILY CLOCK-IN
               </span>
             </h3>
-            <p className="text-xs text-zinc-400">Kasir: <strong className="text-amber-400 font-mono">{username}</strong></p>
+            <p className="text-xs text-slate-500">Kasir: <strong className="text-amber-400 font-mono">{username}</strong></p>
           </div>
         </div>
 
@@ -103,7 +103,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Step 1: Input Uang Laci Awal */}
-            <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
               <DollarSign className="w-4 h-4 text-amber-400" /> 1. Input Nominal Uang Modal Laci Awal
             </label>
             <div className="relative">
@@ -113,21 +113,21 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
                 value={openingCash}
                 onChange={(e) => setOpeningCash(e.target.value)}
                 placeholder="200000"
-                className="w-full h-11 px-3.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500/60"
+                className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-sm font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500/60"
               />
               <div className="mt-1 text-right text-xs font-mono font-bold text-emerald-400">
                 Format: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(openingCash) || 0)}
               </div>
             </div>
-            <p className="text-[11px] text-zinc-500 mt-1">Uang pecahan kembalian awal di laci meja kasir pagi ini.</p>
+            <p className="text-[11px] text-slate-400 mt-1">Uang pecahan kembalian awal di laci meja kasir pagi ini.</p>
 
           {/* Step 2: Pilih Capster Shift Hari Ini */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 mb-2 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
               <Users className="w-4 h-4 text-amber-400" /> 2. Pilih Barber / Capster Bertugas Shift Hari Ini
             </label>
             {loading ? (
-              <div className="p-4 text-center text-xs text-zinc-500">Memuat daftar barber...</div>
+              <div className="p-4 text-center text-xs text-slate-400">Memuat daftar barber...</div>
             ) : (
               <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
                 {capsters.map((c) => {
@@ -138,8 +138,8 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
                       onClick={() => toggleCapster(c.id)}
                       className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between text-xs ${
                         isSelected
-                          ? 'bg-amber-500/15 border-amber-500/60 text-zinc-100 font-bold'
-                          : 'bg-zinc-950 border-zinc-800/80 text-zinc-400 hover:border-zinc-700'
+                          ? 'bg-amber-500/15 border-amber-500/60 text-slate-900 font-bold'
+                          : 'bg-[#f8f8fc] border-slate-200/80 text-slate-500 hover:border-slate-200'
                       }`}
                     >
                       <span className="text-sm">{c.name}</span>

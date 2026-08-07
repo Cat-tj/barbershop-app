@@ -198,7 +198,7 @@ export default function PurchasesPage() {
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-zinc-500 text-sm">Loading purchases…</span>
+          <span className="text-slate-400 text-sm">Loading purchases…</span>
         </div>
       </div>
     )
@@ -215,46 +215,46 @@ export default function PurchasesPage() {
             : 'bg-red-900/40 border border-red-700 text-red-300'
         }`}>
           <span>{alert.message}</span>
-          <button onClick={() => setAlert(null)} className="ml-3 text-zinc-400 hover:text-zinc-200 text-lg leading-none">&times;</button>
+          <button onClick={() => setAlert(null)} className="ml-3 text-slate-500 hover:text-slate-800 text-lg leading-none">&times;</button>
         </div>
       )}
 
       {/* Header */}
-      <div className="px-4 py-3 border-b border-zinc-800">
-        <h1 className="text-base font-bold tracking-tight text-zinc-100">Purchases</h1>
-        <p className="text-xs text-zinc-500 mt-0.5">Record inventory purchases</p>
+      <div className="px-4 py-3 border-b border-slate-200">
+        <h1 className="text-base font-bold tracking-tight text-slate-900">Purchases</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Record inventory purchases</p>
       </div>
 
       {/* Content: scrollable */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4 max-w-2xl mx-auto">
           {/* Form card */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">New Purchase</h2>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">New Purchase</h2>
 
             {/* Rows */}
             {rows.map((r, idx) => {
               const matched = matchProduct(r.item_name)
               const total = rowTotals[idx] || 0
               return (
-                <div key={r.id} className="bg-zinc-800/40 border border-zinc-700 rounded-lg p-3 space-y-3">
+                <div key={r.id} className="bg-slate-100/40 border border-slate-200 rounded-lg p-3 space-y-3">
                   {/* Row header */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-zinc-500 font-medium">Item #{idx + 1}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Item #{idx + 1}</span>
                     {rows.length > 1 && (
-                      <button onClick={() => removeRow(r.id)} className="text-xs text-zinc-500 hover:text-red-400 transition-colors">Hapus</button>
+                      <button onClick={() => removeRow(r.id)} className="text-xs text-slate-400 hover:text-red-400 transition-colors">Hapus</button>
                     )}
                   </div>
 
                   {/* Nama Barang */}
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1">Nama Barang</label>
+                    <label className="block text-xs text-slate-500 mb-1">Nama Barang</label>
                     <input
                       type="text"
                       value={r.item_name}
                       onChange={e => updateRow(r.id, 'item_name', e.target.value)}
                       list="product-list"
-                      className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
                       placeholder="Search or type new item..."
                     />
                     {/* Product match indicator */}
@@ -281,23 +281,23 @@ export default function PurchasesPage() {
                   {/* Kategori + Jumlah */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Kategori</label>
+                      <label className="block text-xs text-slate-500 mb-1">Kategori</label>
                       <select
                         value={r.category}
                         onChange={e => updateRow(r.id, 'category', e.target.value)}
-                        className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-amber-500/50"
                       >
                         <option value="product">Product</option>
                         <option value="consumable">Consumable</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Jumlah</label>
+                      <label className="block text-xs text-slate-500 mb-1">Jumlah</label>
                       <input
                         type="number"
                         value={r.quantity}
                         onChange={e => updateRow(r.id, 'quantity', e.target.value)}
-                        className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
                         placeholder="0"
                         min="1"
                       />
@@ -307,23 +307,23 @@ export default function PurchasesPage() {
                   {/* Harga Satuan + Tempat Beli */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Harga Satuan</label>
+                      <label className="block text-xs text-slate-500 mb-1">Harga Satuan</label>
                       <input
                         type="number"
                         value={r.unit_price}
                         onChange={e => updateRow(r.id, 'unit_price', e.target.value)}
-                        className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
                         placeholder="0"
                         min="0"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Tempat Beli</label>
+                      <label className="block text-xs text-slate-500 mb-1">Tempat Beli</label>
                       <input
                         type="text"
                         value={r.place_of_purchase}
                         onChange={e => updateRow(r.id, 'place_of_purchase', e.target.value)}
-                        className="w-full h-9 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
                         placeholder="Toko..."
                       />
                     </div>
@@ -331,7 +331,7 @@ export default function PurchasesPage() {
 
                   {/* Row total */}
                   <div className="text-right">
-                    <span className="text-xs text-zinc-500">Total: </span>
+                    <span className="text-xs text-slate-400">Total: </span>
                     <span className="text-sm font-semibold text-amber-400 tabular-nums">{formatRp(total)}</span>
                   </div>
                 </div>
@@ -342,15 +342,15 @@ export default function PurchasesPage() {
             <button
               type="button"
               onClick={addRow}
-              className="w-full h-9 rounded-lg border border-dashed border-zinc-600 hover:border-zinc-500 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="w-full h-9 rounded-lg border border-dashed border-zinc-600 hover:border-zinc-500 text-xs text-slate-400 hover:text-slate-700 transition-colors"
             >
               + Tambah Barang
             </button>
 
             {/* Grand total + submit */}
-            <div className="flex items-center justify-between pt-3 border-t border-zinc-800">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-200">
               <div>
-                <span className="text-xs text-zinc-500">{rows.length} item{rows.length !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-slate-400">{rows.length} item{rows.length !== 1 ? 's' : ''}</span>
                 <span className="ml-3 text-sm font-bold text-amber-400 tabular-nums">{formatRp(grandTotal)}</span>
               </div>
               <button
@@ -365,39 +365,39 @@ export default function PurchasesPage() {
           </div>
 
           {/* History */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-zinc-800">
-              <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Riwayat Pembelian</h2>
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Riwayat Pembelian</h2>
             </div>
             {history.length === 0 ? (
-              <p className="px-4 py-6 text-xs text-zinc-600 text-center">No purchase history.</p>
+              <p className="px-4 py-6 text-xs text-slate-400 text-center">No purchase history.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-zinc-800 bg-zinc-800/40">
-                      <th className="text-left px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Item</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Cat</th>
-                      <th className="text-right px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Qty</th>
-                      <th className="text-right px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Price</th>
-                      <th className="text-right px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Total</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Place</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-medium text-zinc-500 uppercase">Date</th>
+                    <tr className="border-b border-slate-200 bg-slate-100/40">
+                      <th className="text-left px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Item</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Cat</th>
+                      <th className="text-right px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Qty</th>
+                      <th className="text-right px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Price</th>
+                      <th className="text-right px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Total</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Place</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-medium text-slate-400 uppercase">Date</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/60">
                     {history.map(h => (
-                      <tr key={h.id} className="hover:bg-zinc-800/20 transition-colors">
-                        <td className="px-3 py-2 text-xs text-zinc-200">
+                      <tr key={h.id} className="hover:bg-slate-100/20 transition-colors">
+                        <td className="px-3 py-2 text-xs text-slate-800">
                           {h.is_new_item && <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 align-middle" />}
                           {h.item_name}
                         </td>
-                        <td className="px-3 py-2 text-[11px] text-zinc-500">{h.category}</td>
-                        <td className="px-3 py-2 text-xs text-zinc-300 text-right tabular-nums">{h.quantity}</td>
-                        <td className="px-3 py-2 text-xs text-zinc-300 text-right tabular-nums">{formatRp(h.unit_price)}</td>
+                        <td className="px-3 py-2 text-[11px] text-slate-400">{h.category}</td>
+                        <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{h.quantity}</td>
+                        <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{formatRp(h.unit_price)}</td>
                         <td className="px-3 py-2 text-xs text-amber-400 text-right tabular-nums font-medium">{formatRp(h.total_price)}</td>
-                        <td className="px-3 py-2 text-[11px] text-zinc-500">{h.place_of_purchase || '—'}</td>
-                        <td className="px-3 py-2 text-[11px] text-zinc-500 whitespace-nowrap">{new Date(h.created_at).toLocaleDateString('id-ID')}</td>
+                        <td className="px-3 py-2 text-[11px] text-slate-400">{h.place_of_purchase || '—'}</td>
+                        <td className="px-3 py-2 text-[11px] text-slate-400 whitespace-nowrap">{new Date(h.created_at).toLocaleDateString('id-ID')}</td>
                       </tr>
                     ))}
                   </tbody>

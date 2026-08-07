@@ -98,13 +98,13 @@ export default function MembersPage() {
   const getTierBadge = (tier: MemberInfo['color'], name: string) => {
     const colorMap: Record<string, string> = {
       bronze: 'bg-amber-700/30 text-amber-400 border-amber-700',
-      silver: 'bg-zinc-400/20 text-zinc-300 border-zinc-500',
+      silver: 'bg-zinc-400/20 text-slate-700 border-zinc-500',
       gold: 'bg-yellow-500/20 text-yellow-400 border-yellow-600',
       platinum: 'bg-cyan-600/20 text-cyan-400 border-cyan-600',
       diamond: 'bg-blue-500/20 text-blue-400 border-blue-600',
     }
 
-    const classes = colorMap[tier.toLowerCase()] || 'bg-zinc-700 text-zinc-300 border-zinc-600'
+    const classes = colorMap[tier.toLowerCase()] || 'bg-slate-200 text-slate-700 border-zinc-600'
 
     return (
       <span
@@ -116,17 +116,17 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8">
+    <div className="min-h-screen bg-[#f8f8fc] text-slate-900 p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* HEADER */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Members</h1>
-          <p className="text-zinc-400 text-sm mt-1">Look up member info and redeem rewards</p>
+          <p className="text-slate-500 text-sm mt-1">Look up member info and redeem rewards</p>
         </div>
 
         {/* SEARCH */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-          <label className="block text-sm font-medium text-zinc-300">Search by Phone</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+          <label className="block text-sm font-medium text-slate-700">Search by Phone</label>
           <div className="flex gap-3">
             <input
               type="tel"
@@ -134,14 +134,14 @@ export default function MembersPage() {
               onChange={e => setPhone(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && searchMember()}
               placeholder="08xxxxxxxxxx"
-              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-zinc-100
-                         placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="flex-1 bg-slate-100 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900
+                         placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <button
               type="button"
               onClick={searchMember}
               disabled={loading}
-              className="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700
+              className="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200
                          text-white font-medium text-sm transition-colors"
             >
               {loading ? 'Searching...' : 'Search'}
@@ -165,50 +165,50 @@ export default function MembersPage() {
         {/* MEMBER INFO */}
         {member && (
           <>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-zinc-100">{member.name}</h2>
-                  <p className="text-sm text-zinc-500">{member.phone}</p>
+                  <h2 className="text-xl font-bold text-slate-900">{member.name}</h2>
+                  <p className="text-sm text-slate-400">{member.phone}</p>
                 </div>
                 {getTierBadge(member.color, member.tier_name)}
               </div>
 
               {/* STATS */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-zinc-800 rounded-lg p-3 text-center">
-                  <div className="text-xs text-zinc-500 mb-0.5">Points</div>
+                <div className="bg-slate-100 rounded-lg p-3 text-center">
+                  <div className="text-xs text-slate-400 mb-0.5">Points</div>
                   <div className="text-lg font-bold text-emerald-400">
                     {member.total_points.toLocaleString()}
                   </div>
                 </div>
-                <div className="bg-zinc-800 rounded-lg p-3 text-center">
-                  <div className="text-xs text-zinc-500 mb-0.5">Spent</div>
-                  <div className="text-lg font-bold text-zinc-200">
+                <div className="bg-slate-100 rounded-lg p-3 text-center">
+                  <div className="text-xs text-slate-400 mb-0.5">Spent</div>
+                  <div className="text-lg font-bold text-slate-800">
                     Rp {member.total_spent.toLocaleString()}
                   </div>
                 </div>
-                <div className="bg-zinc-800 rounded-lg p-3 text-center">
-                  <div className="text-xs text-zinc-500 mb-0.5">Visits</div>
-                  <div className="text-lg font-bold text-zinc-200">{member.visit_count}</div>
+                <div className="bg-slate-100 rounded-lg p-3 text-center">
+                  <div className="text-xs text-slate-400 mb-0.5">Visits</div>
+                  <div className="text-lg font-bold text-slate-800">{member.visit_count}</div>
                 </div>
-                <div className="bg-zinc-800 rounded-lg p-3 text-center">
-                  <div className="text-xs text-zinc-500 mb-0.5">Discount</div>
+                <div className="bg-slate-100 rounded-lg p-3 text-center">
+                  <div className="text-xs text-slate-400 mb-0.5">Discount</div>
                   <div className="text-lg font-bold text-amber-400">{member.discount_pct}%</div>
                 </div>
               </div>
 
               {/* TIER DETAILS */}
-              <div className="flex gap-3 text-xs text-zinc-500">
+              <div className="flex gap-3 text-xs text-slate-400">
                 <span>Point multiplier: {member.point_mult}x</span>
               </div>
             </div>
 
             {/* REWARDS */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-              <h3 className="text-base font-semibold text-zinc-200">Available Rewards</h3>
+            <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+              <h3 className="text-base font-semibold text-slate-800">Available Rewards</h3>
               {rewards.length === 0 ? (
-                <p className="text-zinc-500 text-sm py-2">No rewards available</p>
+                <p className="text-slate-400 text-sm py-2">No rewards available</p>
               ) : (
                 <div className="space-y-2">
                   {rewards.map(r => {
@@ -216,14 +216,14 @@ export default function MembersPage() {
                     return (
                       <div
                         key={r.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-zinc-800 border border-zinc-700"
+                        className="flex items-center justify-between p-3 rounded-lg bg-slate-100 border border-slate-200"
                       >
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-zinc-200">{r.name}</div>
+                          <div className="text-sm font-medium text-slate-800">{r.name}</div>
                           {r.description && (
-                            <div className="text-xs text-zinc-500 mt-0.5">{r.description}</div>
+                            <div className="text-xs text-slate-400 mt-0.5">{r.description}</div>
                           )}
-                          <div className="text-xs text-zinc-500 mt-0.5">
+                          <div className="text-xs text-slate-400 mt-0.5">
                             {r.points_cost.toLocaleString()} pts
                             {r.value ? ` · Rp ${r.value.toLocaleString()} value` : ''}
                           </div>
@@ -235,7 +235,7 @@ export default function MembersPage() {
                           className={`ml-3 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                             canAfford
                               ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                              : 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
+                              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                           }`}
                         >
                           {redeemingId === r.id ? '...' : 'Redeem'}
@@ -248,11 +248,11 @@ export default function MembersPage() {
             </div>
 
             {/* RECENT ACTIVITY (placeholder — stats are shown above) */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-              <h3 className="text-base font-semibold text-zinc-200">Activity Summary</h3>
-              <div className="text-sm text-zinc-500">
-                <p>Total spent: <span className="text-zinc-300 font-medium">Rp {member.total_spent.toLocaleString()}</span></p>
-                <p>Total visits: <span className="text-zinc-300 font-medium">{member.visit_count}</span></p>
+            <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+              <h3 className="text-base font-semibold text-slate-800">Activity Summary</h3>
+              <div className="text-sm text-slate-400">
+                <p>Total spent: <span className="text-slate-700 font-medium">Rp {member.total_spent.toLocaleString()}</span></p>
+                <p>Total visits: <span className="text-slate-700 font-medium">{member.visit_count}</span></p>
                 <p>Points earned: <span className="text-emerald-400 font-medium">{member.total_points.toLocaleString()}</span></p>
                 <p>Tier discount: <span className="text-amber-400 font-medium">{member.discount_pct}%</span></p>
               </div>

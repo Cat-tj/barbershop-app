@@ -47,7 +47,7 @@ import { formatRupiah as formatRp } from '@/lib/currency'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: 'bg-amber-700/30 text-amber-400 border-amber-700',
-  silver: 'bg-zinc-400/20 text-zinc-300 border-zinc-500',
+  silver: 'bg-zinc-400/20 text-slate-700 border-zinc-500',
   gold: 'bg-yellow-500/20 text-yellow-400 border-yellow-600',
   platinum: 'bg-cyan-600/20 text-cyan-400 border-cyan-600',
   diamond: 'bg-blue-500/20 text-blue-400 border-blue-600',
@@ -296,11 +296,11 @@ export default function MemberDetailPage() {
     ? Math.min(100, Math.round((member?.total_spent || 0) / nextTier.min_spending * 100))
     : 100
 
-  const tierClass = TIER_COLORS[member?.tier_color?.toLowerCase() || ''] || 'bg-zinc-700 text-zinc-300 border-zinc-600'
+  const tierClass = TIER_COLORS[member?.tier_color?.toLowerCase() || ''] || 'bg-slate-200 text-slate-700 border-zinc-600'
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-zinc-950">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
         <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -308,19 +308,19 @@ export default function MemberDetailPage() {
 
   if (error || !member) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-zinc-950 p-4">
-        <p className="text-zinc-500 text-sm">{error || 'Member not found'}</p>
+      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc] p-4">
+        <p className="text-slate-400 text-sm">{error || 'Member not found'}</p>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-zinc-950 p-3 sm:p-4 space-y-3">
+    <div className="flex-1 overflow-y-auto bg-[#f8f8fc] p-3 sm:p-4 space-y-3">
       {/* Header: Name + Tier */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-base font-bold text-zinc-100">{member.name}</h1>
-          <p className="text-xs text-zinc-500">{member.phone}</p>
+          <h1 className="text-base font-bold text-slate-900">{member.name}</h1>
+          <p className="text-xs text-slate-400">{member.phone}</p>
         </div>
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${tierClass}`}>
           {member.tier_name}
@@ -329,34 +329,34 @@ export default function MemberDetailPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <div className="bg-zinc-900 rounded-lg p-2.5 text-center border border-zinc-800">
-          <p className="text-[10px] text-zinc-500 uppercase">Points</p>
+        <div className="bg-white rounded-lg p-2.5 text-center border border-slate-200">
+          <p className="text-[10px] text-slate-400 uppercase">Points</p>
           <p className="text-sm font-bold text-emerald-400">{member.total_points.toLocaleString()}</p>
         </div>
-        <div className="bg-zinc-900 rounded-lg p-2.5 text-center border border-zinc-800">
-          <p className="text-[10px] text-zinc-500 uppercase">Spent</p>
-          <p className="text-sm font-bold text-zinc-200">{formatRp(member.total_spent)}</p>
+        <div className="bg-white rounded-lg p-2.5 text-center border border-slate-200">
+          <p className="text-[10px] text-slate-400 uppercase">Spent</p>
+          <p className="text-sm font-bold text-slate-800">{formatRp(member.total_spent)}</p>
         </div>
-        <div className="bg-zinc-900 rounded-lg p-2.5 text-center border border-zinc-800">
-          <p className="text-[10px] text-zinc-500 uppercase">Visits</p>
-          <p className="text-sm font-bold text-zinc-200">{member.visit_count}</p>
+        <div className="bg-white rounded-lg p-2.5 text-center border border-slate-200">
+          <p className="text-[10px] text-slate-400 uppercase">Visits</p>
+          <p className="text-sm font-bold text-slate-800">{member.visit_count}</p>
         </div>
-        <div className="bg-zinc-900 rounded-lg p-2.5 text-center border border-zinc-800">
-          <p className="text-[10px] text-zinc-500 uppercase">Discount</p>
+        <div className="bg-white rounded-lg p-2.5 text-center border border-slate-200">
+          <p className="text-[10px] text-slate-400 uppercase">Discount</p>
           <p className="text-sm font-bold text-amber-400">{member.discount_pct}%</p>
         </div>
       </div>
 
       {/* Tier Progress Bar */}
       {nextTier && (
-        <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-3 space-y-1.5">
+        <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-1.5">
           <div className="flex justify-between text-[10px]">
-            <span className="text-zinc-500">Progress tier</span>
-            <span className="text-zinc-400">
+            <span className="text-slate-400">Progress tier</span>
+            <span className="text-slate-500">
               {formatRp(member.total_spent)} / {formatRp(nextTier.min_spending)} → {nextTier.name}
             </span>
           </div>
-          <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-amber-500 rounded-full transition-all"
               style={{ width: `${tierProgress}%` }}
@@ -367,32 +367,32 @@ export default function MemberDetailPage() {
 
       {/* Favorites */}
       {favoriteCapster && (
-        <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-3">
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Capster Favorit</p>
-          <p className="text-sm text-zinc-200 font-medium mt-0.5">{favoriteCapster}</p>
+        <div className="bg-white rounded-lg border border-slate-200 p-3">
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider">Capster Favorit</p>
+          <p className="text-sm text-slate-800 font-medium mt-0.5">{favoriteCapster}</p>
         </div>
       )}
 
       {/* Booking History */}
-      <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
-        <div className="px-3 py-2 border-b border-zinc-800">
-          <h2 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Riwayat Booking</h2>
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="px-3 py-2 border-b border-slate-200">
+          <h2 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Riwayat Booking</h2>
         </div>
         {bookings.length === 0 ? (
-          <p className="px-3 py-3 text-xs text-zinc-600">Belum ada booking</p>
+          <p className="px-3 py-3 text-xs text-slate-400">Belum ada booking</p>
         ) : (
           <div className="divide-y divide-zinc-800/60">
             {bookings.map(b => (
               <div key={b.id} className="px-3 py-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-zinc-300 font-medium">{b.services || 'Booking'}</p>
+                  <p className="text-xs text-slate-700 font-medium">{b.services || 'Booking'}</p>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                     b.status === 'confirmed' ? 'bg-green-900/40 text-green-400' :
                     b.status === 'completed' ? 'bg-emerald-900/40 text-emerald-400' :
-                    'bg-zinc-800 text-zinc-500'
+                    'bg-slate-100 text-slate-400'
                   }`}>{b.status}</span>
                 </div>
-                <p className="text-[10px] text-zinc-600 mt-0.5">
+                <p className="text-[10px] text-slate-400 mt-0.5">
                   {b.booking_date} · {b.start_time}{b.capster_name ? ` · ${b.capster_name}` : ''}
                 </p>
               </div>
@@ -402,19 +402,19 @@ export default function MemberDetailPage() {
       </div>
 
       {/* Order History */}
-      <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
-        <div className="px-3 py-2 border-b border-zinc-800">
-          <h2 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Riwayat Transaksi</h2>
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="px-3 py-2 border-b border-slate-200">
+          <h2 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Riwayat Transaksi</h2>
         </div>
         {orders.length === 0 ? (
-          <p className="px-3 py-3 text-xs text-zinc-600">Belum ada transaksi</p>
+          <p className="px-3 py-3 text-xs text-slate-400">Belum ada transaksi</p>
         ) : (
           <div className="divide-y divide-zinc-800/60">
             {orders.map(o => (
               <div key={o.id} className="px-3 py-2 flex items-center justify-between">
                 <div className="flex-1 min-w-0 mr-2">
-                  <p className="text-xs text-zinc-300 truncate">{o.items || 'Order'}</p>
-                  <p className="text-[10px] text-zinc-600">
+                  <p className="text-xs text-slate-700 truncate">{o.items || 'Order'}</p>
+                  <p className="text-[10px] text-slate-400">
                     {o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID') : ''}
                     {o.capster_name ? ` · ${o.capster_name}` : ''}
                   </p>
@@ -427,21 +427,21 @@ export default function MemberDetailPage() {
       </div>
 
       {/* Notes */}
-      <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-3 space-y-2">
-        <h2 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Catatan</h2>
+      <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-2">
+        <h2 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Catatan</h2>
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
           placeholder="Tambahkan catatan..."
           rows={3}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100
-                     placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 resize-none"
+          className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900
+                     placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 resize-none"
         />
         <button
           onClick={saveNotes}
           disabled={savingNotes}
-          className="h-9 px-4 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-700
-                     disabled:text-zinc-500 text-white text-xs font-semibold transition-colors"
+          className="h-9 px-4 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:bg-slate-200
+                     disabled:text-slate-400 text-white text-xs font-semibold transition-colors"
         >
           {savingNotes ? 'Menyimpan...' : 'Simpan'}
         </button>

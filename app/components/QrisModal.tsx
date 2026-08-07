@@ -91,7 +91,7 @@ export default function QrisModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl overflow-hidden">
         {/* Decorative Glow */}
         <div className="absolute -top-16 -right-16 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl" />
@@ -99,24 +99,24 @@ export default function QrisModal({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-5 border-b border-zinc-800 pb-4">
+        <div className="flex items-center gap-3 mb-5 border-b border-slate-200 pb-4">
           <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
             <QrCode className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               Pembayaran QRIS Altora
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
                 Instant
               </span>
             </h3>
-            <p className="text-xs text-zinc-400">Scan QRIS pakai GoPay, OVO, Dana, BCA, Mandiri, dll.</p>
+            <p className="text-xs text-slate-500">Scan QRIS pakai GoPay, OVO, Dana, BCA, Mandiri, dll.</p>
           </div>
         </div>
 
@@ -124,8 +124,8 @@ export default function QrisModal({
         {status !== 'success' ? (
           <div className="flex flex-col items-center">
             {/* Amount Banner */}
-            <div className="w-full bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-3 mb-5 text-center">
-              <span className="text-xs text-zinc-400 block mb-0.5">Total Tagihan ({customerName})</span>
+            <div className="w-full bg-[#f8f8fc]/80 border border-slate-200/80 rounded-xl p-3 mb-5 text-center">
+              <span className="text-xs text-slate-500 block mb-0.5">Total Tagihan ({customerName})</span>
               <span className="text-2xl font-extrabold text-amber-500">
                 Rp {amount.toLocaleString('id-ID')}
               </span>
@@ -136,17 +136,17 @@ export default function QrisModal({
               {qrUrl ? (
                 <img src={qrUrl} alt="QRIS Code" className="w-60 h-60 rounded-lg" />
               ) : (
-                <div className="w-60 h-60 flex items-center justify-center text-zinc-600">
+                <div className="w-60 h-60 flex items-center justify-center text-slate-400">
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
               )}
             </div>
 
             {/* Timer & Info */}
-            <div className="flex items-center justify-between w-full text-xs text-zinc-400 mb-5 px-1">
+            <div className="flex items-center justify-between w-full text-xs text-slate-500 mb-5 px-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                Ref: <strong className="text-zinc-200 font-mono">{refId}</strong>
+                Ref: <strong className="text-slate-800 font-mono">{refId}</strong>
               </span>
               <span className="font-mono font-medium text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/50">
                 Batas: {formatTime(timeLeft)}
@@ -178,9 +178,9 @@ export default function QrisModal({
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mb-4">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h4 className="text-xl font-bold text-zinc-100 mb-1">Pembayaran QRIS Berhasil!</h4>
-            <p className="text-xs text-zinc-400 mb-4">
-              Transaksi ID: <span className="font-mono text-zinc-200">{refId}</span>
+            <h4 className="text-xl font-bold text-slate-900 mb-1">Pembayaran QRIS Berhasil!</h4>
+            <p className="text-xs text-slate-500 mb-4">
+              Transaksi ID: <span className="font-mono text-slate-800">{refId}</span>
             </p>
             <span className="text-2xl font-extrabold text-emerald-400">
               Rp {amount.toLocaleString('id-ID')}

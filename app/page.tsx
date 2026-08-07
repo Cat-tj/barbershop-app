@@ -264,19 +264,19 @@ export default function POSPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-zinc-950">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-zinc-500 text-sm font-medium">Memuat POS Kasir Altora...</span>
+          <span className="text-slate-400 text-sm font-medium">Memuat POS Kasir Altora...</span>
         </div>
       </div>
     );
   }
 
   const renderCartInner = () => (
-    <div className="flex flex-col h-full bg-zinc-900">
-      <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+    <div className="flex flex-col h-full bg-white">
+      <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
           <span>Keranjang Kasir ({cart.length})</span>
         </h2>
         {cart.length > 0 && (
@@ -288,27 +288,27 @@ export default function POSPage() {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-zinc-800/60">
         {cart.length === 0 ? (
-          <div className="text-center py-10 text-zinc-500 text-xs">
+          <div className="text-center py-10 text-slate-400 text-xs">
             Keranjang masih kosong.<br />Klik (+) pada Layanan/Produk untuk menambahkan.
           </div>
         ) : (
           cart.map((item) => (
             <div key={item.id} className="pt-2 flex items-center justify-between text-xs">
               <div>
-                <div className="font-bold text-zinc-200">{item.name}</div>
-                <div className="text-[10px] text-zinc-500">{formatRp(item.price)} x {item.qty}</div>
+                <div className="font-bold text-slate-800">{item.name}</div>
+                <div className="text-[10px] text-slate-400">{formatRp(item.price)} x {item.qty}</div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => updateQty(item.id, -1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">&minus;</button>
+                <button onClick={() => updateQty(item.id, -1)} className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold">&minus;</button>
                 <span className="font-bold font-mono">{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-bold">+</button>
+                <button onClick={() => updateQty(item.id, 1)} className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold">+</button>
               </div>
             </div>
           ))
         )}
       </div>
 
-      <div className="p-4 border-t border-zinc-800 space-y-3 bg-zinc-950/60">
+      <div className="p-4 border-t border-slate-200 space-y-3 bg-white/80">
         <input
           type="text"
           placeholder="No HP / WhatsApp (Auto-lookup Member)"
@@ -330,14 +330,14 @@ export default function POSPage() {
               }
             }
           }}
-          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
         />
         <input
           type="text"
           placeholder="Nama Pelanggan"
           value={customerName}
           onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
         />
 
         <div className="flex gap-2">
@@ -345,15 +345,15 @@ export default function POSPage() {
             <button
               key={m}
               onClick={() => setPaymentMethod(m)}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-amber-500 text-zinc-950 shadow-md' : 'bg-zinc-800 text-zinc-400'}`}
+              className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-amber-500 text-zinc-950 shadow-md' : 'bg-slate-100 text-slate-500'}`}
             >
               {m}
             </button>
           ))}
         </div>
 
-        <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-zinc-800">
-          <span className="text-zinc-400">Total Tagihan</span>
+        <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-slate-200">
+          <span className="text-slate-500">Total Tagihan</span>
           <span className="text-amber-400 font-mono text-base">{formatRp(total)}</span>
         </div>
 
@@ -372,7 +372,7 @@ export default function POSPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-zinc-950 relative">
+    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-[#f8f8fc] relative">
       {/* LEFT AREA: SERVICES & PRODUCTS ALL-IN-ONE SINGLE PAGE */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden p-4 sm:p-6 space-y-4 sm:space-y-6 pb-20 md:pb-6">
         {/* Top Search Bar */}
@@ -382,7 +382,7 @@ export default function POSPage() {
             placeholder="Cari Layanan atau Produk Kasir..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 px-4 bg-zinc-900 border border-zinc-800 rounded-2xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/60"
+            className="w-full h-11 px-4 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60"
           />
         </div>
 
@@ -398,18 +398,18 @@ export default function POSPage() {
           <div className="space-y-3">
             <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
               <span>✂️ LAYANAN CUKUR (SERVICES)</span>
-              <span className="text-[10px] text-zinc-500 font-mono">({filteredServices.length} Item)</span>
+              <span className="text-[10px] text-slate-400 font-mono">({filteredServices.length} Item)</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredServices.map((s) => (
                 <div
                   key={`svc-${s.id}`}
                   onClick={() => addToCart(s, "service")}
-                  className="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex items-center justify-between group"
+                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex items-center justify-between group"
                 >
                   <div>
-                    <h3 className="text-sm font-bold text-zinc-100 group-hover:text-amber-400">{s.name}</h3>
-                    <p className="text-xs text-zinc-500 mt-0.5">{s.duration || 30} Menit</p>
+                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-400">{s.name}</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">{s.duration || 30} Menit</p>
                   </div>
                   <div className="text-right">
                     <span className="text-sm font-extrabold text-amber-400 font-mono block">{formatRp(s.price)}</span>
@@ -421,21 +421,21 @@ export default function POSPage() {
           </div>
 
           {/* SECTION 2: PRODUK RETAIL & STOK (BAWAH) */}
-          <div className="space-y-3 pt-4 border-t border-zinc-800/80">
+          <div className="space-y-3 pt-4 border-t border-slate-200/80">
             <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
               <span>🧴 PRODUK RETAIL & STOK (PRODUCTS)</span>
-              <span className="text-[10px] text-zinc-500 font-mono">({filteredProducts.length} Item)</span>
+              <span className="text-[10px] text-slate-400 font-mono">({filteredProducts.length} Item)</span>
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {filteredProducts.map((p) => (
                 <div
                   key={`prod-${p.id}`}
                   onClick={() => addToCart(p, "product")}
-                  className="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex flex-col justify-between group"
+                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex flex-col justify-between group"
                 >
                   <div>
-                    <h3 className="text-xs font-bold text-zinc-100 truncate group-hover:text-amber-400">{p.name}</h3>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">Stok: <strong className="text-zinc-300 font-mono">{p.stock} pcs</strong></p>
+                    <h3 className="text-xs font-bold text-slate-900 truncate group-hover:text-amber-400">{p.name}</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Stok: <strong className="text-slate-700 font-mono">{p.stock} pcs</strong></p>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-xs font-bold text-amber-400 font-mono">{formatRp(p.price)}</span>
@@ -449,12 +449,12 @@ export default function POSPage() {
       </div>
 
       {/* DESKTOP RIGHT SIDEBAR */}
-      <div className="hidden md:flex md:w-96 md:flex-col md:h-full border-l border-zinc-800">
+      <div className="hidden md:flex md:w-96 md:flex-col md:h-full border-l border-slate-200">
         {renderCartInner()}
       </div>
 
       {/* MOBILE FLOATING BOTTOM CART BAR */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 p-3 z-30 flex items-center justify-between">
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-30 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 relative">
             <ShoppingCart className="w-5 h-5" />
@@ -465,7 +465,7 @@ export default function POSPage() {
             )}
           </div>
           <div>
-            <span className="text-[10px] text-zinc-400 uppercase font-bold block">Total Kasir</span>
+            <span className="text-[10px] text-slate-500 uppercase font-bold block">Total Kasir</span>
             <span className="text-sm font-extrabold text-amber-400 font-mono">{formatRp(total)}</span>
           </div>
         </div>
@@ -480,10 +480,10 @@ export default function POSPage() {
       {/* MOBILE CART OVERLAY SLIDE-UP */}
       {cartOpenMobile && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border-t border-zinc-800 rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
+          <div className="bg-white border-t border-slate-200 rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
             <button
               onClick={() => setCartOpenMobile(false)}
-              className="absolute top-3 right-3 p-2 text-zinc-400 hover:text-zinc-100 rounded-full z-10"
+              className="absolute top-3 right-3 p-2 text-slate-500 hover:text-slate-900 rounded-full z-10"
             >
               <X className="w-5 h-5" />
             </button>

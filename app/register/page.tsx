@@ -126,13 +126,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-[#f8f8fc] text-slate-900">
       <div className="max-w-lg mx-auto px-4 py-8 sm:py-12">
 
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-widest text-amber-500">ROMEBOIS</h1>
-          <p className="text-sm text-zinc-400 mt-1">Book your appointment</p>
+          <p className="text-sm text-slate-500 mt-1">Book your appointment</p>
         </div>
 
         {/* Message */}
@@ -157,86 +157,86 @@ export default function RegisterPage() {
         )}
 
         {/* Form Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 sm:p-6 space-y-5">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5">
 
           {/* Name */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Name</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Your full name"
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
-                         placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
+                         placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Phone</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Phone</label>
             <input
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="08123456789"
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
-                         placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
+                         placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
           </div>
 
           {/* Service */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Service</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Service</label>
             <select
               value={selectedService ?? ''}
               onChange={e => setSelectedService(e.target.value ? Number(e.target.value) : null)}
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
                          focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
-              <option value="" className="bg-zinc-900 text-zinc-500">Select a service</option>
+              <option value="" className="bg-white text-slate-400">Select a service</option>
               {services.map(s => (
-                <option key={s.id} value={s.id} className="bg-zinc-900 text-zinc-100">
+                <option key={s.id} value={s.id} className="bg-white text-slate-900">
                   {s.name} — Rp {s.price.toLocaleString()}
                 </option>
               ))}
             </select>
             {services.length === 0 && (
-              <p className="text-xs text-zinc-600 mt-1">Loading services...</p>
+              <p className="text-xs text-slate-400 mt-1">Loading services...</p>
             )}
           </div>
 
           {/* Capster */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Capster</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Capster</label>
             <select
               value={selectedCapster ?? ''}
               onChange={e => setSelectedCapster(e.target.value ? Number(e.target.value) : null)}
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
                          focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
-              <option value="" className="bg-zinc-900 text-zinc-500">Select a capster</option>
+              <option value="" className="bg-white text-slate-400">Select a capster</option>
               {capsters.map(c => (
-                <option key={c.id} value={c.id} className="bg-zinc-900 text-zinc-100">
+                <option key={c.id} value={c.id} className="bg-white text-slate-900">
                   {c.name}
                 </option>
               ))}
             </select>
             {capsters.length === 0 && (
-              <p className="text-xs text-zinc-600 mt-1">Loading capsters...</p>
+              <p className="text-xs text-slate-400 mt-1">Loading capsters...</p>
             )}
           </div>
 
           {/* Date */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Preferred Date</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Preferred Date</label>
             <input
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
                          focus:outline-none focus:border-amber-500/50 transition-colors"
               style={{ colorScheme: 'dark' }}
             />
@@ -244,17 +244,17 @@ export default function RegisterPage() {
 
           {/* Time */}
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Preferred Time</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Preferred Time</label>
             <select
               value={time}
               onChange={e => setTime(e.target.value)}
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-zinc-100
+              className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
                          focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
-              <option value="" className="bg-zinc-900 text-zinc-500">Select a time</option>
+              <option value="" className="bg-white text-slate-400">Select a time</option>
               {TIME_SLOTS.map(slot => (
-                <option key={slot} value={slot} className="bg-zinc-900 text-zinc-100">
+                <option key={slot} value={slot} className="bg-white text-slate-900">
                   {slot}
                 </option>
               ))}
@@ -266,8 +266,8 @@ export default function RegisterPage() {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700
-                       disabled:text-zinc-500 text-zinc-950 font-semibold text-sm transition-colors
+            className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-slate-200
+                       disabled:text-slate-400 text-zinc-950 font-semibold text-sm transition-colors
                        focus:outline-none focus:ring-2 focus:ring-amber-500/50 mt-2"
           >
             {loading ? 'Booking...' : 'Book Appointment'}
@@ -276,7 +276,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-zinc-600 mt-8">
+        <p className="text-center text-xs text-slate-400 mt-8">
           ROMEBOIS Barbershop
         </p>
 

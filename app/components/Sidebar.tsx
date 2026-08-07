@@ -148,11 +148,11 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   return (
     <>
       {/* Top Navbar Header for Mobile */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950 border-b border-zinc-800/80 shrink-0">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#f8f8fc] border-b border-slate-200/80 shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400"
+            className="p-2 rounded-xl bg-white border border-slate-200 text-amber-400"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -160,7 +160,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-sm">
               R
             </div>
-            <span className="font-extrabold tracking-wider text-xs text-zinc-100">ROMEBOIS ERP</span>
+            <span className="font-extrabold tracking-wider text-xs text-slate-900">ROMEBOIS ERP</span>
           </div>
         </div>
       </div>
