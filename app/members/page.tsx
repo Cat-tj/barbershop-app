@@ -97,7 +97,7 @@ export default function MembersPage() {
 
   const getTierBadge = (tier: MemberInfo['color'], name: string) => {
     const colorMap: Record<string, string> = {
-      bronze: 'bg-amber-700/30 text-amber-400 border-amber-700',
+      bronze: 'bg-amber-700/30 text-purple-500 border-amber-700',
       silver: 'bg-zinc-400/20 text-slate-700 border-zinc-500',
       gold: 'bg-yellow-500/20 text-yellow-400 border-yellow-600',
       platinum: 'bg-cyan-600/20 text-cyan-400 border-cyan-600',
@@ -116,7 +116,7 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8fc] text-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-[#f8f7fc] text-slate-900 p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* HEADER */}
         <div>
@@ -194,7 +194,7 @@ export default function MembersPage() {
                 </div>
                 <div className="bg-slate-100 rounded-lg p-3 text-center">
                   <div className="text-xs text-slate-400 mb-0.5">Discount</div>
-                  <div className="text-lg font-bold text-amber-400">{member.discount_pct}%</div>
+                  <div className="text-lg font-bold text-purple-500">{member.discount_pct}%</div>
                 </div>
               </div>
 
@@ -234,7 +234,7 @@ export default function MembersPage() {
                           disabled={!canAfford || redeemingId === r.id}
                           className={`ml-3 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                             canAfford
-                              ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                              ? 'bg-purple-600 hover:bg-purple-500 text-white'
                               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                           }`}
                         >
@@ -254,7 +254,7 @@ export default function MembersPage() {
                 <p>Total spent: <span className="text-slate-700 font-medium">Rp {member.total_spent.toLocaleString()}</span></p>
                 <p>Total visits: <span className="text-slate-700 font-medium">{member.visit_count}</span></p>
                 <p>Points earned: <span className="text-emerald-400 font-medium">{member.total_points.toLocaleString()}</span></p>
-                <p>Tier discount: <span className="text-amber-400 font-medium">{member.discount_pct}%</span></p>
+                <p>Tier discount: <span className="text-purple-500 font-medium">{member.discount_pct}%</span></p>
               </div>
             </div>
           </>

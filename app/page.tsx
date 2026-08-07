@@ -264,9 +264,9 @@ export default function POSPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-slate-400 text-sm font-medium">Memuat POS Kasir Altora...</span>
         </div>
       </div>
@@ -330,14 +330,14 @@ export default function POSPage() {
               }
             }
           }}
-          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
         />
         <input
           type="text"
           placeholder="Nama Pelanggan"
           value={customerName}
           onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
         />
 
         <div className="flex gap-2">
@@ -345,7 +345,7 @@ export default function POSPage() {
             <button
               key={m}
               onClick={() => setPaymentMethod(m)}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-amber-500 text-zinc-950 shadow-md' : 'bg-slate-100 text-slate-500'}`}
+              className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all ${paymentMethod === m ? 'bg-purple-500 text-zinc-950 shadow-md' : 'bg-slate-100 text-slate-500'}`}
             >
               {m}
             </button>
@@ -354,7 +354,7 @@ export default function POSPage() {
 
         <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-slate-200">
           <span className="text-slate-500">Total Tagihan</span>
-          <span className="text-amber-400 font-mono text-base">{formatRp(total)}</span>
+          <span className="text-purple-500 font-mono text-base">{formatRp(total)}</span>
         </div>
 
         <button
@@ -363,7 +363,7 @@ export default function POSPage() {
             else processOrder()
           }}
           disabled={cart.length === 0 || submitting}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 font-bold text-sm shadow-lg shadow-amber-500/10 active:scale-[0.98] disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-zinc-950 font-bold text-sm shadow-lg shadow-purple-500/10 active:scale-[0.98] disabled:opacity-50"
         >
           Bayar / Charge {formatRp(total)}
         </button>
@@ -372,7 +372,7 @@ export default function POSPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-[#f8f8fc] relative">
+    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-[#f8f7fc] relative">
       {/* LEFT AREA: SERVICES & PRODUCTS ALL-IN-ONE SINGLE PAGE */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden p-4 sm:p-6 space-y-4 sm:space-y-6 pb-20 md:pb-6">
         {/* Top Search Bar */}
@@ -382,7 +382,7 @@ export default function POSPage() {
             placeholder="Cari Layanan atau Produk Kasir..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 px-4 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60"
+            className="w-full h-11 px-4 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500/60"
           />
         </div>
 
@@ -396,7 +396,7 @@ export default function POSPage() {
         <div className="flex-1 overflow-y-auto space-y-6 pr-1">
           {/* SECTION 1: LAYANAN / SERVICES (ATAS) */}
           <div className="space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-purple-500 flex items-center gap-2">
               <span>✂️ LAYANAN CUKUR (SERVICES)</span>
               <span className="text-[10px] text-slate-400 font-mono">({filteredServices.length} Item)</span>
             </h2>
@@ -405,15 +405,15 @@ export default function POSPage() {
                 <div
                   key={`svc-${s.id}`}
                   onClick={() => addToCart(s, "service")}
-                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex items-center justify-between group"
+                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] flex items-center justify-between group"
                 >
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-400">{s.name}</h3>
+                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-500">{s.name}</h3>
                     <p className="text-xs text-slate-400 mt-0.5">{s.duration || 30} Menit</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm font-extrabold text-amber-400 font-mono block">{formatRp(s.price)}</span>
-                    <span className="text-[10px] font-bold text-amber-500/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block mt-1">+ Tambah</span>
+                    <span className="text-sm font-extrabold text-purple-500 font-mono block">{formatRp(s.price)}</span>
+                    <span className="text-[10px] font-bold text-purple-500/80 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 inline-block mt-1">+ Tambah</span>
                   </div>
                 </div>
               ))}
@@ -422,7 +422,7 @@ export default function POSPage() {
 
           {/* SECTION 2: PRODUK RETAIL & STOK (BAWAH) */}
           <div className="space-y-3 pt-4 border-t border-slate-200/80">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-purple-500 flex items-center gap-2">
               <span>🧴 PRODUK RETAIL & STOK (PRODUCTS)</span>
               <span className="text-[10px] text-slate-400 font-mono">({filteredProducts.length} Item)</span>
             </h2>
@@ -431,15 +431,15 @@ export default function POSPage() {
                 <div
                   key={`prod-${p.id}`}
                   onClick={() => addToCart(p, "product")}
-                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-[0.98] flex flex-col justify-between group"
+                  className="p-4 rounded-2xl bg-white/90 border border-slate-200 hover:border-purple-500/50 cursor-pointer transition-all active:scale-[0.98] flex flex-col justify-between group"
                 >
                   <div>
-                    <h3 className="text-xs font-bold text-slate-900 truncate group-hover:text-amber-400">{p.name}</h3>
+                    <h3 className="text-xs font-bold text-slate-900 truncate group-hover:text-purple-500">{p.name}</h3>
                     <p className="text-[10px] text-slate-400 mt-0.5">Stok: <strong className="text-slate-700 font-mono">{p.stock} pcs</strong></p>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-400 font-mono">{formatRp(p.price)}</span>
-                    <span className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 font-bold text-xs flex items-center justify-center">+</span>
+                    <span className="text-xs font-bold text-purple-500 font-mono">{formatRp(p.price)}</span>
+                    <span className="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-500 font-bold text-xs flex items-center justify-center">+</span>
                   </div>
                 </div>
               ))}
@@ -456,22 +456,22 @@ export default function POSPage() {
       {/* MOBILE FLOATING BOTTOM CART BAR */}
       <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-30 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 relative">
+          <div className="p-2 rounded-xl bg-purple-500/20 text-purple-500 relative">
             <ShoppingCart className="w-5 h-5" />
             {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-zinc-950 font-bold text-[10px] flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-purple-500 text-zinc-950 font-bold text-[10px] flex items-center justify-center">
                 {cart.length}
               </span>
             )}
           </div>
           <div>
             <span className="text-[10px] text-slate-500 uppercase font-bold block">Total Kasir</span>
-            <span className="text-sm font-extrabold text-amber-400 font-mono">{formatRp(total)}</span>
+            <span className="text-sm font-extrabold text-purple-500 font-mono">{formatRp(total)}</span>
           </div>
         </div>
         <button
           onClick={() => setCartOpenMobile(true)}
-          className="px-5 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20 active:scale-95"
+          className="px-5 py-2.5 rounded-xl bg-purple-500 text-zinc-950 font-bold text-xs shadow-lg shadow-purple-500/20 active:scale-95"
         >
           Lihat Keranjang ({cart.length})
         </button>

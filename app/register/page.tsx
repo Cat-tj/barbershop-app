@@ -126,12 +126,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8fc] text-slate-900">
+    <div className="min-h-screen bg-[#f8f7fc] text-slate-900">
       <div className="max-w-lg mx-auto px-4 py-8 sm:py-12">
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-widest text-amber-500">ROMEBOIS</h1>
+          <h1 className="text-2xl font-bold tracking-widest text-purple-500">ROMEBOIS</h1>
           <p className="text-sm text-slate-500 mt-1">Book your appointment</p>
         </div>
 
@@ -168,7 +168,7 @@ export default function RegisterPage() {
               onChange={e => setName(e.target.value)}
               placeholder="Your full name"
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 transition-colors"
+                         placeholder:text-slate-400 focus:outline-none focus:border-purple-500/50 transition-colors"
             />
           </div>
 
@@ -181,7 +181,7 @@ export default function RegisterPage() {
               onChange={e => setPhone(e.target.value)}
               placeholder="08123456789"
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 transition-colors"
+                         placeholder:text-slate-400 focus:outline-none focus:border-purple-500/50 transition-colors"
             />
           </div>
 
@@ -192,7 +192,7 @@ export default function RegisterPage() {
               value={selectedService ?? ''}
               onChange={e => setSelectedService(e.target.value ? Number(e.target.value) : null)}
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
+                         focus:outline-none focus:border-purple-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
               <option value="" className="bg-white text-slate-400">Select a service</option>
@@ -214,7 +214,7 @@ export default function RegisterPage() {
               value={selectedCapster ?? ''}
               onChange={e => setSelectedCapster(e.target.value ? Number(e.target.value) : null)}
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
+                         focus:outline-none focus:border-purple-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
               <option value="" className="bg-white text-slate-400">Select a capster</option>
@@ -237,7 +237,7 @@ export default function RegisterPage() {
               value={date}
               onChange={e => setDate(e.target.value)}
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         focus:outline-none focus:border-amber-500/50 transition-colors"
+                         focus:outline-none focus:border-purple-500/50 transition-colors"
               style={{ colorScheme: 'dark' }}
             />
           </div>
@@ -249,7 +249,7 @@ export default function RegisterPage() {
               value={time}
               onChange={e => setTime(e.target.value)}
               className="w-full h-10 bg-slate-100 border border-slate-200 rounded-lg px-3 text-sm text-slate-900
-                         focus:outline-none focus:border-amber-500/50 transition-colors appearance-none"
+                         focus:outline-none focus:border-purple-500/50 transition-colors appearance-none"
               style={{ colorScheme: 'dark' }}
             >
               <option value="" className="bg-white text-slate-400">Select a time</option>
@@ -266,7 +266,7 @@ export default function RegisterPage() {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-slate-200
+            className="w-full h-12 rounded-xl bg-purple-500 hover:bg-amber-400 disabled:bg-slate-200
                        disabled:text-slate-400 text-zinc-950 font-semibold text-sm transition-colors
                        focus:outline-none focus:ring-2 focus:ring-amber-500/50 mt-2"
           >

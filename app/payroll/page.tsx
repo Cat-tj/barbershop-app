@@ -57,12 +57,12 @@ export default function PayrollPage() {
   const monthLabel = new Date(month + '-01').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="flex-1 flex flex-col min-h-full p-4 sm:p-6 space-y-6" style={{ background: '#f8f8fc' }}>
+    <div className="flex-1 flex flex-col min-h-full p-4 sm:p-6 space-y-6" style={{ background: '#f8f7fc' }}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2" style={{ color: '#1e293b' }}>
-            <DollarSign className="w-6 h-6" style={{ color: '#a730a8' }} />
+            <DollarSign className="w-6 h-6" style={{ color: '#7c5ce8' }} />
             Perhitungan Gaji Capster
           </h1>
           <p className="text-sm mt-1" style={{ color: '#64748b' }}>
@@ -88,7 +88,7 @@ export default function PayrollPage() {
           <div className="bg-white rounded-2xl border p-4" style={{ borderColor: '#e2e6ec' }}>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#f3e8ff' }}>
-                <Scissors className="w-4 h-4" style={{ color: '#a730a8' }} />
+                <Scissors className="w-4 h-4" style={{ color: '#7c5ce8' }} />
               </div>
               <span className="text-[11px] font-semibold uppercase" style={{ color: '#64748b' }}>Gaji Pokok</span>
             </div>
@@ -125,14 +125,14 @@ export default function PayrollPage() {
             <p className="text-lg font-bold" style={{ color: '#1e293b' }}>{formatRupiah(totals.total_attendance_bonus)}</p>
           </div>
 
-          <div className="rounded-2xl border p-4" style={{ borderColor: '#a730a8', background: 'linear-gradient(135deg, rgba(167,48,168,.08), rgba(126,37,130,.04))' }}>
+          <div className="rounded-2xl border p-4" style={{ borderColor: '#7c5ce8', background: 'linear-gradient(135deg, rgba(124,92,232,.08), rgba(126,37,130,.04))' }}>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(167,48,168,.15)' }}>
-                <Award className="w-4 h-4" style={{ color: '#a730a8' }} />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(124,92,232,.15)' }}>
+                <Award className="w-4 h-4" style={{ color: '#7c5ce8' }} />
               </div>
-              <span className="text-[11px] font-semibold uppercase" style={{ color: '#a730a8' }}>TOTAL GAJI</span>
+              <span className="text-[11px] font-semibold uppercase" style={{ color: '#7c5ce8' }}>TOTAL GAJI</span>
             </div>
-            <p className="text-lg font-black" style={{ color: '#7e2582' }}>{formatRupiah(totals.total_gaji)}</p>
+            <p className="text-lg font-black" style={{ color: '#6344c0' }}>{formatRupiah(totals.total_gaji)}</p>
           </div>
         </div>
       )}
@@ -141,7 +141,7 @@ export default function PayrollPage() {
       <div className="space-y-4">
         {loading ? (
           <div className="bg-white rounded-2xl border p-8 text-center" style={{ borderColor: '#e2e6ec' }}>
-            <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3" style={{ borderColor: '#a730a8', borderTopColor: 'transparent' }} />
+            <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3" style={{ borderColor: '#7c5ce8', borderTopColor: 'transparent' }} />
             <p className="text-sm" style={{ color: '#64748b' }}>Menghitung gaji capster...</p>
           </div>
         ) : capsters.length === 0 ? (
@@ -157,7 +157,7 @@ export default function PayrollPage() {
                 className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white text-lg" style={{ background: 'linear-gradient(135deg, #a730a8, #7e2582)' }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white text-lg" style={{ background: 'linear-gradient(135deg, #7c5ce8, #6344c0)' }}>
                     {p.capster_name.charAt(0)}
                   </div>
                   <div className="text-left">
@@ -168,7 +168,7 @@ export default function PayrollPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black" style={{ color: '#a730a8' }}>{formatRupiah(p.total_gaji)}</p>
+                  <p className="text-lg font-black" style={{ color: '#7c5ce8' }}>{formatRupiah(p.total_gaji)}</p>
                   <p className="text-[10px] font-semibold uppercase" style={{ color: '#64748b' }}>Total Gaji</p>
                 </div>
               </button>
@@ -197,9 +197,9 @@ export default function PayrollPage() {
                       <p className="text-sm font-bold" style={{ color: '#1e293b' }}>{formatRupiah(p.attendance_bonus)}</p>
                       <p className="text-[10px]" style={{ color: '#94a3b8' }}>{p.shift_days} hari</p>
                     </div>
-                    <div className="p-3 rounded-xl" style={{ background: 'rgba(167,48,168,.06)', border: '1px solid rgba(167,48,168,.15)' }}>
-                      <p className="text-[10px] font-semibold uppercase" style={{ color: '#a730a8' }}>TOTAL</p>
-                      <p className="text-sm font-black" style={{ color: '#7e2582' }}>{formatRupiah(p.total_gaji)}</p>
+                    <div className="p-3 rounded-xl" style={{ background: 'rgba(124,92,232,.06)', border: '1px solid rgba(124,92,232,.15)' }}>
+                      <p className="text-[10px] font-semibold uppercase" style={{ color: '#7c5ce8' }}>TOTAL</p>
+                      <p className="text-sm font-black" style={{ color: '#6344c0' }}>{formatRupiah(p.total_gaji)}</p>
                     </div>
                   </div>
 
@@ -229,7 +229,7 @@ export default function PayrollPage() {
                                 <td className="p-2 text-right" style={{ color: '#1e293b' }}>{d.haircuts}</td>
                                 <td className="p-2 text-right" style={{ color: '#1e293b' }}>{d.products}</td>
                                 <td className="p-2 text-right" style={{ color: '#64748b' }}>{formatRupiah(d.service_rev)}</td>
-                                <td className="p-2 text-right font-semibold" style={{ color: '#a730a8' }}>{formatRupiah(d.service_comm)}</td>
+                                <td className="p-2 text-right font-semibold" style={{ color: '#7c5ce8' }}>{formatRupiah(d.service_comm)}</td>
                                 <td className="p-2 text-right" style={{ color: '#64748b' }}>{formatRupiah(d.product_rev)}</td>
                                 <td className="p-2 text-right font-semibold" style={{ color: '#d97706' }}>{formatRupiah(d.product_comm)}</td>
                               </tr>

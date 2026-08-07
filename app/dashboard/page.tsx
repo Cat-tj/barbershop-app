@@ -52,7 +52,7 @@ export default function DashboardPage() {
 
   if (error && !data) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
         <p className="text-slate-400 text-sm">{error}</p>
       </div>
     )
@@ -60,8 +60,8 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
-        <div className="w-7 h-7 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
+        <div className="w-7 h-7 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -71,7 +71,7 @@ export default function DashboardPage() {
   const maxRevenue = Math.max(...revenue_last_7_days.map(d => d.revenue), 1)
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#f8f8fc] p-3 sm:p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto bg-[#f8f7fc] p-3 sm:p-4 space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-base font-bold text-slate-900">Dashboard</h1>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-white rounded-xl p-3 border border-slate-200/80">
           <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Revenue</p>
-          <p className="text-sm font-bold text-amber-400">{formatRp(todayData.revenue)}</p>
+          <p className="text-sm font-bold text-purple-500">{formatRp(todayData.revenue)}</p>
         </div>
         <div className="bg-white rounded-xl p-3 border border-slate-200/80">
           <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Orders</p>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
                 </span>
                 <div className="w-full flex-1 flex flex-col justify-end">
                   <div
-                    className="w-full rounded-t-sm bg-amber-500/70 min-h-[4px] transition-all"
+                    className="w-full rounded-t-sm bg-purple-500/70 min-h-[4px] transition-all"
                     style={{ height: `${Math.max(pct, 2)}%` }}
                   />
                 </div>
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <span className="text-[10px] text-slate-400">{s.count}x</span>
-                    <span className="text-xs text-amber-400 font-medium w-20 text-right">{formatRp(s.revenue)}</span>
+                    <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(s.revenue)}</span>
                   </div>
                 </div>
               ))}
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <span className="text-[10px] text-slate-400">{p.qty}x</span>
-                    <span className="text-xs text-amber-400 font-medium w-20 text-right">{formatRp(p.revenue)}</span>
+                    <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(p.revenue)}</span>
                   </div>
                 </div>
               ))}
@@ -184,14 +184,14 @@ export default function DashboardPage() {
             {top_capsters.map((c, i) => (
               <div key={i} className="px-3 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                  <span className={`text-[10px] font-bold w-4 text-right flex-shrink-0 ${i === 0 ? 'text-amber-400' : i === 1 ? 'text-slate-500' : i === 2 ? 'text-amber-700' : 'text-slate-400'}`}>
+                  <span className={`text-[10px] font-bold w-4 text-right flex-shrink-0 ${i === 0 ? 'text-purple-500' : i === 1 ? 'text-slate-500' : i === 2 ? 'text-amber-700' : 'text-slate-400'}`}>
                     {i + 1}
                   </span>
                   <span className="text-xs text-slate-700 truncate">{c.name}</span>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span className="text-[10px] text-slate-400">{c.orders} orders</span>
-                  <span className="text-xs text-amber-400 font-medium w-20 text-right">{formatRp(c.commission)}</span>
+                  <span className="text-xs text-purple-500 font-medium w-20 text-right">{formatRp(c.commission)}</span>
                 </div>
               </div>
             ))}
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-slate-700 truncate">{o.customer_name}</p>
                   <p className="text-[10px] text-slate-400">{o.time}{o.capster_name ? ` · ${o.capster_name}` : ''}</p>
                 </div>
-                <span className="text-xs text-amber-400 font-medium flex-shrink-0">{formatRp(o.total)}</span>
+                <span className="text-xs text-purple-500 font-medium flex-shrink-0">{formatRp(o.total)}</span>
               </div>
             ))}
           </div>
@@ -224,14 +224,14 @@ export default function DashboardPage() {
       {/* Low Stock Alerts */}
       {low_stock.length > 0 && (
         <div className="bg-white rounded-xl border border-amber-800/40 overflow-hidden">
-          <div className="px-3 py-2.5 border-b border-amber-800/40 bg-amber-500/5">
-            <h2 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">⚠ Low Stock</h2>
+          <div className="px-3 py-2.5 border-b border-amber-800/40 bg-purple-500/5">
+            <h2 className="text-xs font-semibold text-purple-500 uppercase tracking-wider">⚠ Low Stock</h2>
           </div>
           <div className="divide-y divide-zinc-800/50">
             {low_stock.map((p, i) => (
               <div key={i} className="px-3 py-2 flex items-center justify-between">
                 <span className="text-xs text-slate-700 truncate flex-1 mr-2">{p.name}</span>
-                <span className={`text-xs font-medium flex-shrink-0 ${p.stock === 0 ? 'text-red-400' : 'text-amber-400'}`}>
+                <span className={`text-xs font-medium flex-shrink-0 ${p.stock === 0 ? 'text-red-400' : 'text-purple-500'}`}>
                   {p.stock} / {p.threshold}
                 </span>
               </div>

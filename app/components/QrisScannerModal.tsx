@@ -142,7 +142,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 border-b border-slate-200 pb-3">
-          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-500">
             <Camera className="w-5 h-5" />
           </div>
           <div>
@@ -164,12 +164,12 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h4 className="text-sm font-bold text-slate-900">QRIS Berhasil Terbaca!</h4>
-            <p className="text-xs font-mono text-amber-400 bg-[#f8f8fc] p-3 rounded-xl border border-slate-200 break-all max-h-28 overflow-y-auto w-full">
+            <p className="text-xs font-mono text-purple-500 bg-[#f8f7fc] p-3 rounded-xl border border-slate-200 break-all max-h-28 overflow-y-auto w-full">
               {scanResult}
             </p>
             <button
               onClick={onClose}
-              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/20"
+              className="w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 font-bold text-xs shadow-lg shadow-purple-500/20"
             >
               Gunakan Payload QRIS Ini
             </button>
@@ -178,14 +178,14 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
           <div className="space-y-4">
             {/* Camera Switcher Selector if multiple cameras exist */}
             {cameras.length > 1 && (
-              <div className="flex items-center justify-between bg-[#f8f8fc] p-2.5 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between bg-[#f8f7fc] p-2.5 rounded-xl border border-slate-200">
                 <span className="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium">
-                  <SwitchCamera className="w-3.5 h-3.5 text-amber-400" /> Pilih Kamera HP:
+                  <SwitchCamera className="w-3.5 h-3.5 text-purple-500" /> Pilih Kamera HP:
                 </span>
                 <select
                   value={selectedCameraId}
                   onChange={(e) => handleSwitchCamera(e.target.value)}
-                  className="bg-white text-xs text-amber-400 font-bold border border-slate-200 rounded-lg px-2 py-1 focus:outline-none"
+                  className="bg-white text-xs text-purple-500 font-bold border border-slate-200 rounded-lg px-2 py-1 focus:outline-none"
                 >
                   {cameras.map((cam) => (
                     <option key={cam.id} value={cam.id}>
@@ -197,7 +197,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
             )}
 
             {/* Video Container */}
-            <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-[#f8f8fc] min-h-[260px] flex items-center justify-center">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-purple-500/40 bg-[#f8f7fc] min-h-[260px] flex items-center justify-center">
               <div id="qr-reader-container" className="w-full" />
             </div>
 
@@ -217,7 +217,7 @@ export default function QrisScannerModal({ isOpen, onClose, onScanSuccess }: Qri
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 border border-slate-200 transition-all shadow-md"
               >
-                <Upload className="w-4 h-4 text-amber-400" />
+                <Upload className="w-4 h-4 text-purple-500" />
                 <span>Upload Foto / Screenshot QRIS</span>
               </button>
             </div>

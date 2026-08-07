@@ -60,22 +60,22 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#F1ECE5] border-r border-[#DED7CE] w-64 text-[#27231F] select-none p-3 my-2 ml-2 rounded-3xl shadow-sm">
+    <div className="flex flex-col h-full bg-[#f8f7fc] border-r border-[#e9e6f2] w-64 text-[#10224f] select-none p-3 my-2 ml-2 rounded-3xl shadow-sm">
       {/* Header Branding */}
-      <div className="p-4 border-b border-[#DED7CE] flex items-center justify-between">
+      <div className="p-4 border-b border-[#e9e6f2] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#B6782B] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#B6782B]/20">
+          <div className="w-10 h-10 rounded-2xl bg-[#7c5ce8] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#7c5ce8]/20">
             RB
           </div>
           <div>
-            <h1 className="font-black tracking-wider text-xs text-[#27231F] flex items-center gap-1.5">
+            <h1 className="font-black tracking-wider text-xs text-[#10224f] flex items-center gap-1.5">
               ROME BOIS
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#B6782B]/15 text-[#B6782B] border border-[#B6782B]/30">
+              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#7c5ce8]/15 text-[#7c5ce8] border border-[#7c5ce8]/30">
                 BARBERSHOP
               </span>
             </h1>
-            <p className="text-[10px] text-[#6F675F] flex items-center gap-1 font-medium">
-              <Sparkles className="w-2.5 h-2.5 text-[#B6782B]" /> Technology by Altora
+            <p className="text-[10px] text-[#6b7590] flex items-center gap-1 font-medium">
+              <Sparkles className="w-2.5 h-2.5 text-[#7c5ce8]" /> Technology by Altora
             </p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
         {/* Mobile close */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="md:hidden p-1.5 text-[#6F675F] hover:text-[#27231F] rounded-lg"
+          className="md:hidden p-1.5 text-[#6b7590] hover:text-[#10224f] rounded-lg"
         >
           <X className="w-5 h-5" />
         </button>
@@ -91,7 +91,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
       {/* Navigation Menu */}
       <div className="flex-1 py-4 px-1 space-y-1.5 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-[#91887F]">
+        <div className="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-[#8792a8]">
           Menu Operasional
         </div>
 
@@ -106,30 +106,30 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
               onClick={() => setMobileOpen(false)}
               className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all group ${
                 isActive
-                  ? 'bg-[#B6782B]/15 text-[#B6782B] border border-[#B6782B]/30 shadow-sm'
-                  : 'text-[#6F675F] hover:text-[#27231F] hover:bg-white/80 border border-transparent'
+                  ? 'bg-[#7c5ce8]/15 text-[#7c5ce8] border border-[#7c5ce8]/30 shadow-sm'
+                  : 'text-[#6b7590] hover:text-[#10224f] hover:bg-white/80 border border-transparent'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#B6782B]' : 'text-[#6F675F] group-hover:text-[#27231F]'}`} />
+                <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#7c5ce8]' : 'text-[#6b7590] group-hover:text-[#10224f]'}`} />
                 <span>{item.name}</span>
               </div>
-              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#B6782B]" />}
+              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#7c5ce8]" />}
             </Link>
           )
         })}
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-2 border-t border-[#DED7CE] bg-white/60 rounded-2xl">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-[#DED7CE] mb-2">
+      <div className="p-2 border-t border-[#e9e6f2] bg-white/60 rounded-2xl">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-[#e9e6f2] mb-2">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-[#B6782B]/15 text-[#B6782B] font-extrabold flex items-center justify-center text-xs">
+            <div className="w-8 h-8 rounded-xl bg-[#7c5ce8]/15 text-[#7c5ce8] font-extrabold flex items-center justify-center text-xs">
               {username.charAt(0).toUpperCase()}
             </div>
             <div className="truncate">
-              <span className="block text-xs font-bold text-[#27231F] truncate">{username}</span>
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-[#B6782B]">
+              <span className="block text-xs font-bold text-[#10224f] truncate">{username}</span>
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-[#7c5ce8]">
                 {userRole}
               </span>
             </div>
@@ -138,7 +138,7 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
 
         <button
           onClick={handleLogout}
-          className="w-full py-2 px-3 rounded-xl bg-[#B35E57]/10 hover:bg-[#B35E57]/20 text-[#B35E57] border border-[#B35E57]/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2 px-3 rounded-xl bg-[#ef4444]/10 hover:bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Keluar</span>
@@ -150,16 +150,16 @@ export default function Sidebar({ userRole = 'admin', username = 'Kasir' }: Side
   return (
     <>
       {/* Top Navbar Header for Mobile */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#f8f8fc] border-b border-slate-200/80 shrink-0">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#f8f7fc] border-b border-slate-200/80 shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-xl bg-white border border-slate-200 text-amber-400"
+            className="p-2 rounded-xl bg-white border border-slate-200 text-purple-500"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm" style={{ background: 'linear-gradient(135deg, var(--color-primary-dark, #7e2582), var(--color-primary, #a730a8))', color: 'white' }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm" style={{ background: 'linear-gradient(135deg, var(--color-primary-dark, #6344c0), var(--color-primary, #7c5ce8))', color: 'white' }}>
               RB
             </div>
             <span className="font-extrabold tracking-wider text-xs" style={{ color: '#1e293b' }}>ROMEBOIS ERP</span>

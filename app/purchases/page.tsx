@@ -197,7 +197,7 @@ export default function PurchasesPage() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-slate-400 text-sm">Loading purchases…</span>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function PurchasesPage() {
                       value={r.item_name}
                       onChange={e => updateRow(r.id, 'item_name', e.target.value)}
                       list="product-list"
-                      className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
                       placeholder="Search or type new item..."
                     />
                     {/* Product match indicator */}
@@ -266,8 +266,8 @@ export default function PurchasesPage() {
                     )}
                     {r.item_name.trim() && !matched && (
                       <div className="mt-1.5 flex items-center gap-1.5">
-                        <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
-                        <span className="text-[11px] text-amber-400">Tambah sebagai produk baru</span>
+                        <span className="inline-block w-2 h-2 rounded-full bg-purple-500" />
+                        <span className="text-[11px] text-purple-500">Tambah sebagai produk baru</span>
                       </div>
                     )}
                   </div>
@@ -285,7 +285,7 @@ export default function PurchasesPage() {
                       <select
                         value={r.category}
                         onChange={e => updateRow(r.id, 'category', e.target.value)}
-                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-purple-500/50"
                       >
                         <option value="product">Product</option>
                         <option value="consumable">Consumable</option>
@@ -297,7 +297,7 @@ export default function PurchasesPage() {
                         type="number"
                         value={r.quantity}
                         onChange={e => updateRow(r.id, 'quantity', e.target.value)}
-                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
                         placeholder="0"
                         min="1"
                       />
@@ -312,7 +312,7 @@ export default function PurchasesPage() {
                         type="number"
                         value={r.unit_price}
                         onChange={e => updateRow(r.id, 'unit_price', e.target.value)}
-                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
                         placeholder="0"
                         min="0"
                       />
@@ -323,7 +323,7 @@ export default function PurchasesPage() {
                         type="text"
                         value={r.place_of_purchase}
                         onChange={e => updateRow(r.id, 'place_of_purchase', e.target.value)}
-                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+                        className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50"
                         placeholder="Toko..."
                       />
                     </div>
@@ -332,7 +332,7 @@ export default function PurchasesPage() {
                   {/* Row total */}
                   <div className="text-right">
                     <span className="text-xs text-slate-400">Total: </span>
-                    <span className="text-sm font-semibold text-amber-400 tabular-nums">{formatRp(total)}</span>
+                    <span className="text-sm font-semibold text-purple-500 tabular-nums">{formatRp(total)}</span>
                   </div>
                 </div>
               )
@@ -351,13 +351,13 @@ export default function PurchasesPage() {
             <div className="flex items-center justify-between pt-3 border-t border-slate-200">
               <div>
                 <span className="text-xs text-slate-400">{rows.length} item{rows.length !== 1 ? 's' : ''}</span>
-                <span className="ml-3 text-sm font-bold text-amber-400 tabular-nums">{formatRp(grandTotal)}</span>
+                <span className="ml-3 text-sm font-bold text-purple-500 tabular-nums">{formatRp(grandTotal)}</span>
               </div>
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="h-10 px-6 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 text-sm font-semibold transition-colors"
+                className="h-10 px-6 rounded-lg bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 text-sm font-semibold transition-colors"
               >
                 {submitting ? 'Saving...' : 'Submit'}
               </button>
@@ -389,13 +389,13 @@ export default function PurchasesPage() {
                     {history.map(h => (
                       <tr key={h.id} className="hover:bg-slate-100/20 transition-colors">
                         <td className="px-3 py-2 text-xs text-slate-800">
-                          {h.is_new_item && <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 align-middle" />}
+                          {h.is_new_item && <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5 align-middle" />}
                           {h.item_name}
                         </td>
                         <td className="px-3 py-2 text-[11px] text-slate-400">{h.category}</td>
                         <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{h.quantity}</td>
                         <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{formatRp(h.unit_price)}</td>
-                        <td className="px-3 py-2 text-xs text-amber-400 text-right tabular-nums font-medium">{formatRp(h.total_price)}</td>
+                        <td className="px-3 py-2 text-xs text-purple-500 text-right tabular-nums font-medium">{formatRp(h.total_price)}</td>
                         <td className="px-3 py-2 text-[11px] text-slate-400">{h.place_of_purchase || '—'}</td>
                         <td className="px-3 py-2 text-[11px] text-slate-400 whitespace-nowrap">{new Date(h.created_at).toLocaleDateString('id-ID')}</td>
                       </tr>

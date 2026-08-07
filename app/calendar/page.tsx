@@ -70,12 +70,12 @@ export default function CalendarPage() {
   const monthName = monthDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f8f8fc] p-4 sm:p-6 min-h-full space-y-6">
+    <div className="flex-1 flex flex-col bg-[#f8f7fc] p-4 sm:p-6 min-h-full space-y-6">
       {/* Header Controls */}
       <div className="bg-white/80 border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-amber-400" />
+            <CalendarIcon className="w-5 h-5 text-purple-500" />
             KALENDER HARI KERJA & KPI BARBER
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -89,7 +89,7 @@ export default function CalendarPage() {
           <select
             value={selectedCapsterId}
             onChange={(e) => setSelectedCapsterId(e.target.value)}
-            className="h-10 px-3 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500/60"
+            className="h-10 px-3 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500/60"
           >
             <option value="all">💈 Semua Capster / Barber</option>
             {kpiData.map((c) => (
@@ -100,14 +100,14 @@ export default function CalendarPage() {
           </select>
 
           {/* Month Navigator */}
-          <div className="flex items-center bg-[#f8f8fc] border border-slate-200 rounded-xl p-1 shrink-0">
+          <div className="flex items-center bg-[#f8f7fc] border border-slate-200 rounded-xl p-1 shrink-0">
             <button
               onClick={prevMonth}
               className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-mono font-bold text-amber-400 px-3 capitalize">{monthName}</span>
+            <span className="text-xs font-mono font-bold text-purple-500 px-3 capitalize">{monthName}</span>
             <button
               onClick={nextMonth}
               className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
@@ -122,7 +122,7 @@ export default function CalendarPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1 shadow-lg">
           <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1.5">
-            <Scissors className="w-3.5 h-3.5 text-amber-400" /> Total Potong Cukur
+            <Scissors className="w-3.5 h-3.5 text-purple-500" /> Total Potong Cukur
           </span>
           <p className="text-2xl font-black text-slate-900 font-mono">{loading ? '...' : `${totalHaircuts} Kepala`}</p>
           <p className="text-[11px] text-slate-400">Jumlah cukur selesai bulan ini</p>
@@ -144,11 +144,11 @@ export default function CalendarPage() {
           <p className="text-[11px] text-slate-400">Total nilai transaksi jasa + produk</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-zinc-900 to-zinc-900 border border-amber-500/40 space-y-1 shadow-lg">
-          <span className="text-[10px] uppercase font-bold text-amber-400 flex items-center gap-1.5">
-            <Award className="w-3.5 h-3.5 text-amber-400" /> Estimasi Total Komisi
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/15 via-zinc-900 to-zinc-900 border border-purple-500/40 space-y-1 shadow-lg">
+          <span className="text-[10px] uppercase font-bold text-purple-500 flex items-center gap-1.5">
+            <Award className="w-3.5 h-3.5 text-purple-500" /> Estimasi Total Komisi
           </span>
-          <p className="text-xl font-black text-amber-400 font-mono">{loading ? '...' : formatRp(totalCommission)}</p>
+          <p className="text-xl font-black text-purple-500 font-mono">{loading ? '...' : formatRp(totalCommission)}</p>
           <p className="text-[11px] text-slate-500">Komisi belum termasuk gaji pokok</p>
         </div>
       </div>
@@ -163,8 +163,8 @@ export default function CalendarPage() {
             <span className="flex items-center gap-1 text-emerald-400 font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Shift Turun Kerja
             </span>
-            <span className="flex items-center gap-1 text-amber-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span> Ada Cukur
+            <span className="flex items-center gap-1 text-purple-500 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-purple-500"></span> Ada Cukur
             </span>
           </div>
         </div>
@@ -183,13 +183,13 @@ export default function CalendarPage() {
         {/* Calendar Days */}
         {loading ? (
           <div className="py-12 text-center text-xs text-slate-400 flex justify-center">
-            <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-7 gap-1.5">
             {/* Empty slots before first day */}
             {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[85px] bg-[#f8f8fc]/30 rounded-xl border border-zinc-900 opacity-30" />
+              <div key={`empty-${i}`} className="min-h-[85px] bg-[#f8f7fc]/30 rounded-xl border border-zinc-900 opacity-30" />
             ))}
 
             {/* Calendar Days */}
@@ -221,8 +221,8 @@ export default function CalendarPage() {
                     dayAttended
                       ? 'bg-gradient-to-b from-emerald-500/10 via-zinc-900 to-zinc-900 border-emerald-500/40 shadow-sm'
                       : dayHaircuts > 0
-                      ? 'bg-white border-amber-500/30'
-                      : 'bg-[#f8f8fc]/80 border-slate-200/80'
+                      ? 'bg-white border-purple-500/30'
+                      : 'bg-[#f8f7fc]/80 border-slate-200/80'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -238,7 +238,7 @@ export default function CalendarPage() {
 
                   {dayHaircuts > 0 || dayRevenue > 0 ? (
                     <div className="space-y-0.5 mt-1">
-                      <p className="text-[11px] font-bold text-amber-400 flex items-center justify-between">
+                      <p className="text-[11px] font-bold text-purple-500 flex items-center justify-between">
                         <span>✂️ {dayHaircuts} Cukur</span>
                       </p>
                       <p className="text-[10px] font-mono text-slate-700">

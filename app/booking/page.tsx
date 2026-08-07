@@ -224,7 +224,7 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8fc] text-slate-900 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-[#f8f7fc] text-slate-900 p-3 sm:p-4 md:p-6">
       <div className="max-w-lg mx-auto space-y-4">
 
         {/* HEADER */}

@@ -224,7 +224,7 @@ export default function StorePage() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-slate-400 text-sm">Loading store…</span>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default function StorePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white border border-slate-200 rounded-xl p-5 w-80 space-y-4">
             <p className="text-sm text-slate-800">
-              Delete <span className="font-semibold text-amber-400">{deleteTarget.name}</span>?
+              Delete <span className="font-semibold text-purple-500">{deleteTarget.name}</span>?
             </p>
             <p className="text-xs text-slate-400">This action cannot be undone.</p>
             <div className="flex gap-2">
@@ -267,7 +267,7 @@ export default function StorePage() {
         <h1 className="text-base font-bold tracking-tight text-slate-900">Store</h1>
         <button
           onClick={openAdd}
-          className="h-9 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors"
+          className="h-9 px-4 rounded-lg bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-semibold transition-colors"
         >
           + Add
         </button>
@@ -281,7 +281,7 @@ export default function StorePage() {
             onClick={() => { setActiveTab(tab); resetForm() }}
             className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
               activeTab === tab
-                ? 'text-amber-500 border-b-2 border-amber-500 bg-slate-100/40'
+                ? 'text-purple-500 border-b-2 border-purple-500 bg-slate-100/40'
                 : 'text-slate-400 hover:text-slate-700'
             }`}
           >
@@ -301,26 +301,26 @@ export default function StorePage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Name *</label>
-                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Product name" />
+                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="Product name" />
                   </div>
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Category</label>
-                    <select value={formCategory} onChange={e => setFormCategory(e.target.value as 'product' | 'consumable')} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-amber-500/50">
+                    <select value={formCategory} onChange={e => setFormCategory(e.target.value as 'product' | 'consumable')} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-purple-500/50">
                       <option value="product">Product</option>
                       <option value="consumable">Consumable</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Price *</label>
-                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="0" min="0" />
                   </div>
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Stock *</label>
-                    <input type="number" value={formStock} onChange={e => setFormStock(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <input type="number" value={formStock} onChange={e => setFormStock(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="0" min="0" />
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={saveProduct} className="flex-1 h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
+                  <button onClick={saveProduct} className="flex-1 h-9 rounded-lg bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
                   <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-slate-200 hover:bg-zinc-600 text-slate-700 text-xs transition-colors">Cancel</button>
                 </div>
               </div>
@@ -345,7 +345,7 @@ export default function StorePage() {
                   {products.map(p => (
                     <tr key={p.id} className="hover:bg-slate-100/30 transition-colors">
                       <td className="px-3 py-2.5">
-                        <button onClick={() => openEditProduct(p)} className="text-xs font-medium text-slate-800 hover:text-amber-400 text-left transition-colors">{p.name}</button>
+                        <button onClick={() => openEditProduct(p)} className="text-xs font-medium text-slate-800 hover:text-purple-500 text-left transition-colors">{p.name}</button>
                       </td>
                       <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{formatRp(p.price)}</td>
                       <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{p.stock}</td>
@@ -371,19 +371,19 @@ export default function StorePage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Name *</label>
-                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Service name" />
+                    <input value={formName} onChange={e => setFormName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="Service name" />
                   </div>
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Duration (min)</label>
-                    <input type="number" value={formDuration} onChange={e => setFormDuration(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="30" min="0" />
+                    <input type="number" value={formDuration} onChange={e => setFormDuration(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="30" min="0" />
                   </div>
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">Price *</label>
-                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="0" min="0" />
+                    <input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="0" min="0" />
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={saveService} className="flex-1 h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
+                  <button onClick={saveService} className="flex-1 h-9 rounded-lg bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-semibold transition-colors">{editingId ? 'Update' : 'Save'}</button>
                   <button onClick={resetForm} className="h-9 px-4 rounded-lg bg-slate-200 hover:bg-zinc-600 text-slate-700 text-xs transition-colors">Cancel</button>
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default function StorePage() {
                   {services.map(s => (
                     <tr key={s.id} className="hover:bg-slate-100/30 transition-colors">
                       <td className="px-3 py-2.5">
-                        <button onClick={() => openEditService(s)} className="text-xs font-medium text-slate-800 hover:text-amber-400 text-left transition-colors">{s.name}</button>
+                        <button onClick={() => openEditService(s)} className="text-xs font-medium text-slate-800 hover:text-purple-500 text-left transition-colors">{s.name}</button>
                       </td>
                       <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{formatRp(s.price)}</td>
                       <td className="px-3 py-2.5 text-xs text-slate-700 text-right tabular-nums">{s.duration ? `${s.duration} min` : '—'}</td>
@@ -429,14 +429,14 @@ export default function StorePage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">Name *</label>
-                  <input value={formCapsterName} onChange={e => setFormCapsterName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="Capster name" />
+                  <input value={formCapsterName} onChange={e => setFormCapsterName(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="Capster name" />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">Phone</label>
-                  <input value={formCapsterPhone} onChange={e => setFormCapsterPhone(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500/50" placeholder="08xxxxxxxxxx" />
+                  <input value={formCapsterPhone} onChange={e => setFormCapsterPhone(e.target.value)} className="w-full h-9 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500/50" placeholder="08xxxxxxxxxx" />
                 </div>
               </div>
-              <button onClick={saveCapster} className="w-full h-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-semibold transition-colors">Add Capster</button>
+              <button onClick={saveCapster} className="w-full h-9 rounded-lg bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-semibold transition-colors">Add Capster</button>
             </div>
 
             {/* Capsters list */}

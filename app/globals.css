@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f8fc;
+  --background: #f8f7fc;
   --foreground: #0f172a;
 }
 
 [data-theme="market"] {
-  --background: #f8f8fc;
+  --background: #f8f7fc;
   --foreground: #0f172a;
 }
 
@@ -16,7 +16,7 @@ body {
     radial-gradient(circle at 91% 8%, rgba(96, 165, 250, 0.08), transparent 30%),
     radial-gradient(circle at 88% 90%, rgba(236, 72, 153, 0.055), transparent 34%),
     radial-gradient(circle at 15% 92%, rgba(129, 140, 248, 0.05), transparent 30%),
-    #f8f8fc;
+    #f8f7fc;
   color: #0f172a;
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;

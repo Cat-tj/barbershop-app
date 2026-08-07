@@ -93,8 +93,8 @@ export default function QrisModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl overflow-hidden">
         {/* Decorative Glow */}
-        <div className="absolute -top-16 -right-16 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="absolute -top-16 -right-16 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" />
 
         {/* Close Button */}
         <button
@@ -106,13 +106,13 @@ export default function QrisModal({
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-5 border-b border-slate-200 pb-4">
-          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-500">
             <QrCode className="w-6 h-6" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               Pembayaran QRIS Altora
-              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-500 border border-purple-500/30">
                 Instant
               </span>
             </h3>
@@ -124,15 +124,15 @@ export default function QrisModal({
         {status !== 'success' ? (
           <div className="flex flex-col items-center">
             {/* Amount Banner */}
-            <div className="w-full bg-[#f8f8fc]/80 border border-slate-200/80 rounded-xl p-3 mb-5 text-center">
+            <div className="w-full bg-[#f8f7fc]/80 border border-slate-200/80 rounded-xl p-3 mb-5 text-center">
               <span className="text-xs text-slate-500 block mb-0.5">Total Tagihan ({customerName})</span>
-              <span className="text-2xl font-extrabold text-amber-500">
+              <span className="text-2xl font-extrabold text-purple-500">
                 Rp {amount.toLocaleString('id-ID')}
               </span>
             </div>
 
             {/* QR Container */}
-            <div className="p-3 bg-white rounded-2xl shadow-inner border-4 border-amber-500/30 mb-4 flex items-center justify-center">
+            <div className="p-3 bg-white rounded-2xl shadow-inner border-4 border-purple-500/30 mb-4 flex items-center justify-center">
               {qrUrl ? (
                 <img src={qrUrl} alt="QRIS Code" className="w-60 h-60 rounded-lg" />
               ) : (
@@ -145,10 +145,10 @@ export default function QrisModal({
             {/* Timer & Info */}
             <div className="flex items-center justify-between w-full text-xs text-slate-500 mb-5 px-1">
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
                 Ref: <strong className="text-slate-800 font-mono">{refId}</strong>
               </span>
-              <span className="font-mono font-medium text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/50">
+              <span className="font-mono font-medium text-purple-500 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/50">
                 Batas: {formatTime(timeLeft)}
               </span>
             </div>
@@ -157,7 +157,7 @@ export default function QrisModal({
             <button
               onClick={handleCheckPayment}
               disabled={status === 'checking'}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-zinc-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 transition-all active:scale-[0.98]"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 text-zinc-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10 transition-all active:scale-[0.98]"
             >
               {status === 'checking' ? (
                 <>

@@ -81,7 +81,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-5">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-          <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+          <div className="p-3 rounded-2xl bg-purple-500/20 text-purple-500 border border-purple-500/30">
             <Store className="w-6 h-6" />
           </div>
           <div>
@@ -91,7 +91,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
                 DAILY CLOCK-IN
               </span>
             </h3>
-            <p className="text-xs text-slate-500">Kasir: <strong className="text-amber-400 font-mono">{username}</strong></p>
+            <p className="text-xs text-slate-500">Kasir: <strong className="text-purple-500 font-mono">{username}</strong></p>
           </div>
         </div>
 
@@ -104,7 +104,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Step 1: Input Uang Laci Awal */}
             <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-              <DollarSign className="w-4 h-4 text-amber-400" /> 1. Input Nominal Uang Modal Laci Awal
+              <DollarSign className="w-4 h-4 text-purple-500" /> 1. Input Nominal Uang Modal Laci Awal
             </label>
             <div className="relative">
               <input
@@ -113,7 +113,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
                 value={openingCash}
                 onChange={(e) => setOpeningCash(e.target.value)}
                 placeholder="200000"
-                className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-sm font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500/60"
+                className="w-full h-11 px-3.5 bg-[#f8f7fc] border border-slate-200 rounded-xl text-sm font-mono text-purple-500 font-bold focus:outline-none focus:border-purple-500/60"
               />
               <div className="mt-1 text-right text-xs font-mono font-bold text-emerald-400">
                 Format: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(openingCash) || 0)}
@@ -124,7 +124,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
           {/* Step 2: Pilih Capster Shift Hari Ini */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-amber-400" /> 2. Pilih Barber / Capster Bertugas Shift Hari Ini
+              <Users className="w-4 h-4 text-purple-500" /> 2. Pilih Barber / Capster Bertugas Shift Hari Ini
             </label>
             {loading ? (
               <div className="p-4 text-center text-xs text-slate-400">Memuat daftar barber...</div>
@@ -138,12 +138,12 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
                       onClick={() => toggleCapster(c.id)}
                       className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between text-xs ${
                         isSelected
-                          ? 'bg-amber-500/15 border-amber-500/60 text-slate-900 font-bold'
-                          : 'bg-[#f8f8fc] border-slate-200/80 text-slate-500 hover:border-slate-200'
+                          ? 'bg-purple-500/15 border-purple-500/60 text-slate-900 font-bold'
+                          : 'bg-[#f8f7fc] border-slate-200/80 text-slate-500 hover:border-slate-200'
                       }`}
                     >
                       <span className="text-sm">{c.name}</span>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-400" />}
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-purple-500" />}
                     </div>
                   )
                 })}
@@ -154,7 +154,7 @@ export default function ShiftClockInModal({ isOpen, username, onClockInSuccess }
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 mt-2"
+            className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 mt-2"
           >
             {submitting ? (
               <Loader2 className="w-5 h-5 animate-spin" />

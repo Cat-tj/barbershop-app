@@ -310,9 +310,9 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-slate-400 text-sm font-medium">Memuat Admin Panel Altora ERP...</span>
         </div>
       </div>
@@ -333,7 +333,7 @@ export default function AdminPage() {
   )
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-x-hidden bg-[#f8f8fc] max-w-full">
+    <div className="flex-1 flex flex-col h-full overflow-x-hidden bg-[#f8f7fc] max-w-full">
       {/* QRIS Camera Scanner Modal */}
       <QrisScannerModal
         isOpen={scannerOpen}
@@ -359,21 +359,21 @@ export default function AdminPage() {
       {/* Header */}
       <div className="px-4 sm:px-6 py-4 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/80 backdrop-blur-md">
         <div>
-          <h1 className="text-base sm:text-lg font-black tracking-wider text-[#26231F] flex items-center gap-2">
+          <h1 className="text-base sm:text-lg font-black tracking-wider text-[#10224f] flex items-center gap-2">
             ADMIN PANEL ROME BOIS
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#B7792B]/15 text-[#B7792B] border border-[#B7792B]/30">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#7c5ce8]/15 text-[#7c5ce8] border border-[#7c5ce8]/30">
               ROME BOIS SYSTEM
             </span>
           </h1>
-          <p className="text-[11px] sm:text-xs text-[#746E66]">Kelola Pengguna, Hak Akses Role, QRIS, HRIS Staff & Database</p>
+          <p className="text-[11px] sm:text-xs text-[#6b7590]">Kelola Pengguna, Hak Akses Role, QRIS, HRIS Staff & Database</p>
         </div>
         {activeTab === 'users' && (
-          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto flex items-center gap-1.5">
+          <button onClick={openAddUser} className="h-9 px-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-purple-500/10 self-start sm:self-auto flex items-center gap-1.5">
             <span>+ Tambah User Baru</span>
           </button>
         )}
         {activeTab === 'services' && (
-          <button onClick={openAddService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-amber-500/10 self-start sm:self-auto">
+          <button onClick={openAddService} className="h-9 px-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-purple-500/10 self-start sm:self-auto">
             + Tambah Service Baru
           </button>
         )}
@@ -387,7 +387,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex-shrink-0 px-3.5 py-3 text-xs font-bold transition-all ${
               activeTab === tab.key
-                ? 'text-amber-400 border-b-2 border-amber-500 bg-amber-500/5'
+                ? 'text-purple-500 border-b-2 border-purple-500 bg-purple-500/5'
                 : 'text-slate-400 hover:text-slate-700'
             }`}
           >
@@ -407,7 +407,7 @@ export default function AdminPage() {
                 <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-amber-400" />
+                      <Shield className="w-4 h-4 text-purple-500" />
                       <span>{editingUser ? `Edit User: ${editingUser.username}` : 'Tambah User Account Baru'}</span>
                     </h3>
                     <button onClick={() => setShowUserForm(false)} className="text-slate-500 hover:text-slate-900">&times;</button>
@@ -419,7 +419,7 @@ export default function AdminPage() {
                       <input
                         value={formUsername}
                         onChange={e => setFormUsername(e.target.value)}
-                        className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60 font-mono"
+                        className="w-full h-11 px-3.5 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500/60 font-mono"
                         placeholder="contoh: kasir1 / kasir@gmail.com"
                       />
                     </div>
@@ -432,7 +432,7 @@ export default function AdminPage() {
                         type="password"
                         value={formPassword}
                         onChange={e => setFormPassword(e.target.value)}
-                        className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500/60 font-mono"
+                        className="w-full h-11 px-3.5 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500/60 font-mono"
                         placeholder="••••••••"
                       />
                     </div>
@@ -442,7 +442,7 @@ export default function AdminPage() {
                       <select
                         value={formRole}
                         onChange={e => setFormRole(e.target.value as 'admin' | 'user')}
-                        className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-amber-500/60"
+                        className="w-full h-11 px-3.5 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-purple-500/60"
                       >
                         <option value="user">User / Operator Kasir (POS Kasir & Transaksi)</option>
                         <option value="capster">Capster / Barber (Akses Portal Capster & Absensi)</option>
@@ -456,7 +456,7 @@ export default function AdminPage() {
                         <select
                           value={formActive ? 'active' : 'inactive'}
                           onChange={e => setFormActive(e.target.value === 'active')}
-                          className="w-full h-11 px-3.5 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-amber-500/60"
+                          className="w-full h-11 px-3.5 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-purple-500/60"
                         >
                           <option value="active">● Aktif (Bisa Login)</option>
                           <option value="inactive">○ Non-Aktif (Di-Blokir)</option>
@@ -465,8 +465,8 @@ export default function AdminPage() {
                     )}
 
                     {/* Informasi Hak Akses Role */}
-                    <div className="p-3.5 rounded-2xl bg-[#f8f8fc] border border-slate-200 space-y-1 text-[11px] text-slate-500">
-                      <div className="font-bold text-amber-400 flex items-center gap-1.5">
+                    <div className="p-3.5 rounded-2xl bg-[#f8f7fc] border border-slate-200 space-y-1 text-[11px] text-slate-500">
+                      <div className="font-bold text-purple-500 flex items-center gap-1.5">
                         <UserCheck className="w-3.5 h-3.5" />
                         <span>Penjelasan Hak Akses Role:</span>
                       </div>
@@ -484,7 +484,7 @@ export default function AdminPage() {
 
                   <div className="flex gap-2 pt-2">
                     <button onClick={() => setShowUserForm(false)} className="flex-1 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">Batal</button>
-                    <button onClick={saveUser} className="flex-1 h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold shadow-lg shadow-amber-500/20">Simpan User</button>
+                    <button onClick={saveUser} className="flex-1 h-11 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-bold shadow-lg shadow-purple-500/20">Simpan User</button>
                   </div>
                 </div>
               </div>
@@ -509,7 +509,7 @@ export default function AdminPage() {
                       <td className="p-3.5">
                         <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-extrabold ${
                           u.role === 'admin' 
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                            ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30' 
                             : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                         }`}>
                           {u.role}
@@ -529,7 +529,7 @@ export default function AdminPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openEditUser(u)}
-                            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-amber-400 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-purple-500 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                             <span>Edit</span>
@@ -562,9 +562,9 @@ export default function AdminPage() {
             </div>
 
             {/* Scan via Camera Button */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
+                <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-500 shrink-0">
                   <Camera className="w-5 h-5" />
                 </div>
                 <div>
@@ -574,7 +574,7 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => setScannerOpen(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 shrink-0"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 font-bold text-xs transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-1.5 shrink-0"
               >
                 <Camera className="w-4 h-4" />
                 <span>Buka Kamera</span>
@@ -587,14 +587,14 @@ export default function AdminPage() {
                 value={qrisStaticPayload}
                 onChange={(e) => setQrisStaticPayload(e.target.value)}
                 rows={4}
-                className="w-full p-3.5 bg-[#f8f8fc]/80 border border-slate-200 rounded-xl text-xs font-mono text-amber-400 placeholder-slate-400 focus:outline-none focus:border-amber-500/60 resize-none"
+                className="w-full p-3.5 bg-[#f8f7fc]/80 border border-slate-200 rounded-xl text-xs font-mono text-purple-500 placeholder-slate-400 focus:outline-none focus:border-purple-500/60 resize-none"
                 placeholder="00020101021126670016ID.CO.QRIS.WWW..."
               />
             </div>
 
             <button
               onClick={() => saveQrisSetting()}
-              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/10"
+              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-purple-500/10"
             >
               Simpan Configuration QRIS
             </button>
@@ -606,7 +606,7 @@ export default function AdminPage() {
           <div className="space-y-4">
             {showServiceForm && (
               <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                <h3 className="text-sm font-bold text-amber-400">
+                <h3 className="text-sm font-bold text-purple-500">
                   {editingServiceId ? 'Edit Layanan Cukur' : 'Tambah Service / Layanan Cukur Baru'}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -616,7 +616,7 @@ export default function AdminPage() {
                       value={serviceName}
                       onChange={(e) => setServiceName(e.target.value)}
                       placeholder="e.g. Smoothing Hair Treatment"
-                      className="w-full h-10 px-3 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
                   <div>
@@ -626,7 +626,7 @@ export default function AdminPage() {
                       value={servicePrice}
                       onChange={(e) => setServicePrice(e.target.value)}
                       placeholder="60000"
-                      className="w-full h-10 px-3 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
                   <div>
@@ -636,13 +636,13 @@ export default function AdminPage() {
                       value={serviceDuration}
                       onChange={(e) => setServiceDuration(e.target.value)}
                       placeholder="30"
-                      className="w-full h-10 px-3 bg-[#f8f8fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-amber-500/50"
+                      className="w-full h-10 px-3 bg-[#f8f7fc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2 justify-end pt-2">
                   <button onClick={() => setShowServiceForm(false)} className="h-9 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">Batal</button>
-                  <button onClick={saveService} className="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 text-xs font-bold">Simpan Layanan</button>
+                  <button onClick={saveService} className="h-9 px-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-zinc-950 text-xs font-bold">Simpan Layanan</button>
                 </div>
               </div>
             )}
@@ -661,12 +661,12 @@ export default function AdminPage() {
                   {services.map((s) => (
                     <tr key={s.id} className="hover:bg-slate-100/40 transition-colors">
                       <td className="p-3.5 font-bold text-slate-900">{s.name}</td>
-                      <td className="p-3.5 text-right font-mono text-amber-400 font-bold">{formatRp(s.price)}</td>
+                      <td className="p-3.5 text-right font-mono text-purple-500 font-bold">{formatRp(s.price)}</td>
                       <td className="p-3.5 text-right font-mono text-slate-500">{s.duration || 30} Menit</td>
                       <td className="p-3.5 text-center">
                         <button
                           onClick={() => openEditService(s)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-amber-400 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-purple-500 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                           <span>Edit</span>
@@ -688,7 +688,7 @@ export default function AdminPage() {
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
               placeholder="Cari Member berdasarkan nama atau HP..."
-              className="w-full h-10 px-4 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-amber-500/50"
+              className="w-full h-10 px-4 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-purple-500/50"
             />
             <div className="bg-white border border-slate-200 rounded-2xl overflow-x-auto shadow-xl">
               <table className="w-full text-left border-collapse min-w-[600px]">
@@ -707,7 +707,7 @@ export default function AdminPage() {
                       <td className="p-3.5 font-bold">{m.name}</td>
                       <td className="p-3.5 font-mono text-slate-500">{m.phone}</td>
                       <td className="p-3.5">
-                        <span className="px-2.5 py-0.5 rounded text-[10px] uppercase font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] uppercase font-bold bg-purple-500/20 text-purple-500 border border-purple-500/30">
                           {m.tier_name || 'Silver'}
                         </span>
                       </td>
@@ -737,7 +737,7 @@ export default function AdminPage() {
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-100/40">
                     <td className="p-3.5 font-bold">{p.name}</td>
-                    <td className="p-3.5 text-right font-mono text-amber-400 font-bold">{formatRp(p.price)}</td>
+                    <td className="p-3.5 text-right font-mono text-purple-500 font-bold">{formatRp(p.price)}</td>
                     <td className="p-3.5 text-right font-mono">{p.stock} Pcs</td>
                     <td className="p-3.5 uppercase text-[10px] font-bold text-slate-500">{p.category}</td>
                   </tr>

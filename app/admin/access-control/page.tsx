@@ -87,22 +87,22 @@ export default function AccessControlPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#F7F4EF] p-8">
-        <div className="text-[#746E66] font-medium text-sm">Memuat Pengaturan Hak Akses Rome Bois...</div>
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc] p-8">
+        <div className="text-[#6b7590] font-medium text-sm">Memuat Pengaturan Hak Akses Rome Bois...</div>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F4EF] min-h-full p-4 sm:p-6 space-y-6 text-[#26231F]">
+    <div className="flex-1 flex flex-col bg-[#f8f7fc] min-h-full p-4 sm:p-6 space-y-6 text-[#10224f]">
       {/* Header */}
-      <div className="bg-white border border-[#DED7CE] rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white border border-[#e9e6f2] rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-black text-[#26231F] flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-[#B7792B]" />
+          <h1 className="text-xl font-black text-[#10224f] flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-[#7c5ce8]" />
             MANAJEMEN HAK AKSES & PERMISSION INDIVIDU
           </h1>
-          <p className="text-xs text-[#746E66] mt-0.5">
+          <p className="text-xs text-[#6b7590] mt-0.5">
             Atur peran (Role) dan hak akses mendalam (User Overrides Allow/Deny) per individu tim Rome Bois.
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function AccessControlPage() {
 
       {alert && (
         <div className={`p-4 rounded-2xl text-xs font-semibold ${
-          alert.type === 'success' ? 'bg-[#56806A]/10 text-[#56806A] border border-[#56806A]/30' : 'bg-[#B45C54]/10 text-[#B45C54] border border-[#B45C54]/30'
+          alert.type === 'success' ? 'bg-[#0e7a57]/10 text-[#0e7a57] border border-[#0e7a57]/30' : 'bg-[#B45C54]/10 text-[#B45C54] border border-[#B45C54]/30'
         }`}>
           {alert.message}
         </div>
@@ -119,8 +119,8 @@ export default function AccessControlPage() {
       {/* Main Grid: User List + Permission Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* User Selection List */}
-        <div className="bg-white border border-[#DED7CE] rounded-3xl p-5 shadow-sm space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#746E66] border-b border-[#DED7CE] pb-2">
+        <div className="bg-white border border-[#e9e6f2] rounded-3xl p-5 shadow-sm space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-[#6b7590] border-b border-[#e9e6f2] pb-2">
             Daftar User Accounts
           </h3>
           <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
@@ -132,15 +132,15 @@ export default function AccessControlPage() {
                   onClick={() => selectUser(u)}
                   className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between text-xs ${
                     isSelected
-                      ? 'bg-[#B7792B]/10 border-[#B7792B] font-bold text-[#26231F]'
-                      : 'bg-[#F1ECE5] border-[#DED7CE] text-[#746E66] hover:border-[#B7792B]/50'
+                      ? 'bg-[#7c5ce8]/10 border-[#7c5ce8] font-bold text-[#10224f]'
+                      : 'bg-[#f8f7fc] border-[#e9e6f2] text-[#6b7590] hover:border-[#7c5ce8]/50'
                   }`}
                 >
                   <div>
-                    <span className="block font-bold text-[#26231F]">{u.username}</span>
-                    <span className="text-[10px] uppercase font-bold text-[#B7792B]">{u.role}</span>
+                    <span className="block font-bold text-[#10224f]">{u.username}</span>
+                    <span className="text-[10px] uppercase font-bold text-[#7c5ce8]">{u.role}</span>
                   </div>
-                  {isSelected && <UserCheck className="w-4 h-4 text-[#B7792B]" />}
+                  {isSelected && <UserCheck className="w-4 h-4 text-[#7c5ce8]" />}
                 </div>
               )
             })}
@@ -148,20 +148,20 @@ export default function AccessControlPage() {
         </div>
 
         {/* Permission Overrides Panel */}
-        <div className="md:col-span-2 bg-white border border-[#DED7CE] rounded-3xl p-6 shadow-sm space-y-5">
+        <div className="md:col-span-2 bg-white border border-[#e9e6f2] rounded-3xl p-6 shadow-sm space-y-5">
           {selectedUser ? (
             <>
-              <div className="flex items-center justify-between border-b border-[#DED7CE] pb-4">
+              <div className="flex items-center justify-between border-b border-[#e9e6f2] pb-4">
                 <div>
-                  <h3 className="text-sm font-bold text-[#26231F]">
-                    Pengaturan Access User: <strong className="text-[#B7792B]">{selectedUser.username}</strong>
+                  <h3 className="text-sm font-bold text-[#10224f]">
+                    Pengaturan Access User: <strong className="text-[#7c5ce8]">{selectedUser.username}</strong>
                   </h3>
-                  <p className="text-xs text-[#746E66]">Role Default: <span className="uppercase font-bold">{selectedUser.role}</span></p>
+                  <p className="text-xs text-[#6b7590]">Role Default: <span className="uppercase font-bold">{selectedUser.role}</span></p>
                 </div>
                 <button
                   onClick={savePermissions}
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-[#B7792B] hover:bg-[#7A4B16] text-white text-xs font-bold shadow-md shadow-[#B7792B]/20 transition-all"
+                  className="px-5 py-2.5 rounded-xl bg-[#7c5ce8] hover:bg-[#6344c0] text-white text-xs font-bold shadow-md shadow-[#7c5ce8]/20 transition-all"
                 >
                   {saving ? 'Menyimpan...' : 'Simpan Hak Akses'}
                 </button>
@@ -172,11 +172,11 @@ export default function AccessControlPage() {
                 {permissions.map((p) => {
                   const currentEffect: string = userOverrides[p.key] || 'default'
                   return (
-                    <div key={p.id} className="p-3.5 rounded-2xl bg-[#F1ECE5] border border-[#DED7CE] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <div key={p.id} className="p-3.5 rounded-2xl bg-[#f8f7fc] border border-[#e9e6f2] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                       <div>
-                        <span className="text-[10px] uppercase font-extrabold text-[#B7792B] block">{p.module}</span>
-                        <strong className="text-[#26231F]">{p.description}</strong>
-                        <span className="block font-mono text-[10px] text-[#746E66]">{p.key}</span>
+                        <span className="text-[10px] uppercase font-extrabold text-[#7c5ce8] block">{p.module}</span>
+                        <strong className="text-[#10224f]">{p.description}</strong>
+                        <span className="block font-mono text-[10px] text-[#6b7590]">{p.key}</span>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -184,8 +184,8 @@ export default function AccessControlPage() {
                           onClick={() => toggleOverride(p.key, 'default')}
                           className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border ${
                             currentEffect === 'default'
-                              ? 'bg-[#26231F] text-white border-[#26231F]'
-                              : 'bg-white text-[#746E66] border-[#DED7CE]'
+                              ? 'bg-[#10224f] text-white border-[#10224f]'
+                              : 'bg-white text-[#6b7590] border-[#e9e6f2]'
                           }`}
                         >
                           Role Default
@@ -194,8 +194,8 @@ export default function AccessControlPage() {
                           onClick={() => toggleOverride(p.key, 'allow')}
                           className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border ${
                             currentEffect === 'allow'
-                              ? 'bg-[#56806A] text-white border-[#56806A]'
-                              : 'bg-white text-[#746E66] border-[#DED7CE]'
+                              ? 'bg-[#0e7a57] text-white border-[#0e7a57]'
+                              : 'bg-white text-[#6b7590] border-[#e9e6f2]'
                           }`}
                         >
                           Allow (Izinkan)
@@ -205,7 +205,7 @@ export default function AccessControlPage() {
                           className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border ${
                             currentEffect === 'deny'
                               ? 'bg-[#B45C54] text-white border-[#B45C54]'
-                              : 'bg-white text-[#746E66] border-[#DED7CE]'
+                              : 'bg-white text-[#6b7590] border-[#e9e6f2]'
                           }`}
                         >
                           Deny (Blokir)
@@ -217,7 +217,7 @@ export default function AccessControlPage() {
               </div>
             </>
           ) : (
-            <div className="py-20 text-center text-xs text-[#746E66]">
+            <div className="py-20 text-center text-xs text-[#6b7590]">
               Pilih salah satu user di sebelah kiri untuk mengatur hak akses individu.
             </div>
           )}

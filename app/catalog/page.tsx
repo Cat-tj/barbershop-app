@@ -51,14 +51,14 @@ export default function CatalogPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
-        <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
+        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#f8f8fc] p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto bg-[#f8f7fc] p-4 space-y-4">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-base font-bold text-slate-900">ROMEBOIS</h1>
@@ -82,7 +82,7 @@ export default function CatalogPage() {
                     <p className="text-xs text-slate-400">{formatDuration(s.duration)}</p>
                   )}
                 </div>
-                <span className="text-sm font-semibold text-amber-400 flex-shrink-0">{formatRp(s.price)}</span>
+                <span className="text-sm font-semibold text-purple-500 flex-shrink-0">{formatRp(s.price)}</span>
               </div>
             ))}
           </div>
@@ -101,7 +101,7 @@ export default function CatalogPage() {
             {products.map(p => (
               <div key={p.id} className="px-4 py-2.5 flex items-center justify-between">
                 <p className="text-sm text-slate-800 truncate flex-1 mr-3">{p.name}</p>
-                <span className="text-sm font-semibold text-amber-400 flex-shrink-0">{formatRp(p.price)}</span>
+                <span className="text-sm font-semibold text-purple-500 flex-shrink-0">{formatRp(p.price)}</span>
               </div>
             ))}
           </div>

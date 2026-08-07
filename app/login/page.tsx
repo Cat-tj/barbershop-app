@@ -51,8 +51,8 @@ export default function LoginPage() {
     <div
       className="flex min-h-screen flex-1 md:grid md:grid-cols-2"
       style={{
-        '--color-primary': '#a730a8',
-        '--color-primary-dark': '#7e2582',
+        '--color-primary': '#7c5ce8',
+        '--color-primary-dark': '#6344c0',
       } as React.CSSProperties}
     >
       {/* Form side */}
@@ -60,7 +60,7 @@ export default function LoginPage() {
         className="flex flex-1 items-center justify-center px-4 py-10"
         style={{
           backgroundImage:
-            'linear-gradient(135deg, rgba(47,59,163,.2) 0%, rgba(167,48,168,.16) 45%, rgba(242,138,78,.2) 100%), radial-gradient(1000px 620px at 8% -5%, rgba(47,59,163,.38) 0%, transparent 60%), radial-gradient(900px 560px at 100% 0%, rgba(242,138,78,.38) 0%, transparent 55%), radial-gradient(800px 700px at 50% 120%, rgba(167,48,168,.32) 0%, transparent 60%)',
+            'linear-gradient(135deg, rgba(16,34,79,.2) 0%, rgba(124,92,232,.16) 45%, rgba(14,122,87,.2) 100%), radial-gradient(1000px 620px at 8% -5%, rgba(16,34,79,.38) 0%, transparent 60%), radial-gradient(900px 560px at 100% 0%, rgba(14,122,87,.38) 0%, transparent 55%), radial-gradient(800px 700px at 50% 120%, rgba(124,92,232,.32) 0%, transparent 60%)',
         }}
       >
         <div
@@ -218,7 +218,7 @@ export default function LoginPage() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(160deg, rgba(167,48,168,.10) 0%, rgba(167,48,168,.32) 100%), linear-gradient(135deg, #7e2582 0%, #a730a8 50%, #f28a4e 100%)',
+              'linear-gradient(160deg, rgba(124,92,232,.10) 0%, rgba(124,92,232,.32) 100%), linear-gradient(135deg, #6344c0 0%, #7c5ce8 50%, #0e7a57 100%)',
           }}
         />
         <p

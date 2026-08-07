@@ -26,7 +26,7 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="h-full bg-[#f8f8fc] text-slate-900">
+      <body className="h-full bg-[#f8f7fc] text-slate-900">
         <Script src="/sw-update.js" strategy="afterInteractive" />
         <AppShell>{children}</AppShell>
       </body>

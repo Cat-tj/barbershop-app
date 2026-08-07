@@ -46,7 +46,7 @@ interface NextTier {
 import { formatRupiah as formatRp } from '@/lib/currency'
 
 const TIER_COLORS: Record<string, string> = {
-  bronze: 'bg-amber-700/30 text-amber-400 border-amber-700',
+  bronze: 'bg-amber-700/30 text-purple-500 border-amber-700',
   silver: 'bg-zinc-400/20 text-slate-700 border-zinc-500',
   gold: 'bg-yellow-500/20 text-yellow-400 border-yellow-600',
   platinum: 'bg-cyan-600/20 text-cyan-400 border-cyan-600',
@@ -300,22 +300,22 @@ export default function MemberDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc]">
-        <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc]">
+        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   if (error || !member) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f8f8fc] p-4">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f7fc] p-4">
         <p className="text-slate-400 text-sm">{error || 'Member not found'}</p>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#f8f8fc] p-3 sm:p-4 space-y-3">
+    <div className="flex-1 overflow-y-auto bg-[#f8f7fc] p-3 sm:p-4 space-y-3">
       {/* Header: Name + Tier */}
       <div className="flex items-center justify-between">
         <div>
@@ -343,7 +343,7 @@ export default function MemberDetailPage() {
         </div>
         <div className="bg-white rounded-lg p-2.5 text-center border border-slate-200">
           <p className="text-[10px] text-slate-400 uppercase">Discount</p>
-          <p className="text-sm font-bold text-amber-400">{member.discount_pct}%</p>
+          <p className="text-sm font-bold text-purple-500">{member.discount_pct}%</p>
         </div>
       </div>
 
@@ -358,7 +358,7 @@ export default function MemberDetailPage() {
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-amber-500 rounded-full transition-all"
+              className="h-full bg-purple-500 rounded-full transition-all"
               style={{ width: `${tierProgress}%` }}
             />
           </div>
@@ -419,7 +419,7 @@ export default function MemberDetailPage() {
                     {o.capster_name ? ` · ${o.capster_name}` : ''}
                   </p>
                 </div>
-                <span className="text-xs text-amber-400 font-medium flex-shrink-0">{formatRp(o.total)}</span>
+                <span className="text-xs text-purple-500 font-medium flex-shrink-0">{formatRp(o.total)}</span>
               </div>
             ))}
           </div>
@@ -435,12 +435,12 @@ export default function MemberDetailPage() {
           placeholder="Tambahkan catatan..."
           rows={3}
           className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900
-                     placeholder:text-slate-400 focus:outline-none focus:border-amber-500/50 resize-none"
+                     placeholder:text-slate-400 focus:outline-none focus:border-purple-500/50 resize-none"
         />
         <button
           onClick={saveNotes}
           disabled={savingNotes}
-          className="h-9 px-4 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:bg-slate-200
+          className="h-9 px-4 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:bg-slate-200
                      disabled:text-slate-400 text-white text-xs font-semibold transition-colors"
         >
           {savingNotes ? 'Menyimpan...' : 'Simpan'}
